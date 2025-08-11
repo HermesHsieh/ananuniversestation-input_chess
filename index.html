@@ -41,7 +41,7 @@
 <body>
   <div class="wrap">
     <div class="topbar">
-      <div class="title">象棋卜卦-單掛輸入</div>
+      <div class="title">單掛輸入</div>
       <button class="ghost" id="reloadBtn">Reload</button>
     </div>
 
@@ -68,7 +68,8 @@
         <button class="btn btn-secondary" id="clearBtn">清除</button>
       </div>
 
-      <div class="hint">操作方式：先點「上方某個位置」→ 再點下方棋子；未選位置時，預設依序填入 1 → 2 → 3 → 4 → 5</div>
+      <div class="hint">點選下方棋子，系統會依序放入：1 → 2 → 3 → 4 → 5</div>
+	  <div class="hint">點選「指定位置」→ 再點下方棋子</div>
     </div>
 
     <!-- 棋子選擇（黑在上、紅在下） -->
@@ -298,7 +299,7 @@
         await liff.init({ liffId: LIFF_ID, withLoginOnExternalBrowser: true });
         if(!liff.isLoggedIn()){ statusEl.textContent="未登入 → 導向登入"; return liff.login(); }
         const profile = await liff.getProfile();
-        statusEl.textContent = `Hello, ${profile.displayName} 👋  |  定位模式已啟用`;
+        statusEl.textContent = `Hello, ${profile.displayName} 👋`;
       }catch(err){
         console.error(err);
         statusEl.textContent = `LIFF 初始化失敗：${err?.message||"unknown"}`;
