@@ -1,0 +1,37 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>LIFF Debug</title>
+  <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+  <style>body{font-family:system-ui,sans-serif;padding:20px}</style>
+</head>
+<body>
+  <h2 id="status">準備中…</h2>
+  <pre id="log" style="white-space:pre-wrap;background:#f7f7f7;padding:12px;border-radius:8px"></pre>
+  <script>
+    const LIFF_ID = "2007906926-NZW6EQ7P"; // ← 放「LINE Login channel」裡的 LIFF ID（完整字串）
+    const $ = (id) => document.getElementById(id);
+    (async () => {
+      try {
+        $("status").textContent = "初始化 LIFF 中…";
+        await liff.init({ liffId: LIFF_ID, withLoginOnExternalBrowser: true }); // 外部瀏覽器也可觸發登入
+        $("status").textContent = "檢查登入狀態…";
+        if (!liff.isLoggedIn()) {
+          $("status").textContent = "未登入 → 導向 LINE 登入";
+          liff.login(); return;
+        }
+        const ctx = { os: liff.getOS(), inClient: liff.isInClient() };
+        const profile = await liff.getProfile(); // 需在 LIFF 勾 profile scope
+        $("status").textContent = `Hello, ${profile.displayName} 👋`;
+        $("log").textContent = JSON.stringify({ ctx, profile }, null, 2);
+      } catch (err) {
+        $("status").textContent = "LIFF 初始化失敗";
+        $("log").textContent =
+          `code: ${err?.code || "-"}\nmessage: ${err?.message || "-"}\ncause: ${err?.cause?.message || "-"}`;
+        console.error(err);
+      }
+    })();
+  </script>
+</body>
+</html>
