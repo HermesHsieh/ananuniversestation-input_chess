@@ -1,37 +1,74 @@
 <!doctype html>
 <html>
 <head>
-  <meta charset="utf-8" />
-  <title>LIFF Debug</title>
-  <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
-  <style>body{font-family:system-ui,sans-serif;padding:20px}</style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>XQ LIFF</title>
+<style>
+  body { font-family: system-ui, sans-serif; margin: 12px; }
+  .grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; max-width: 360px; margin: 0 auto; }
+  .cell { padding: 14px; border-radius: 12px; border: 1px solid #ddd; text-align: center; font-size: 18px; }
+  .full { grid-column: 1 / span 3; text-align: center; margin: 12px 0; }
+  button { padding: 12px 16px; font-size: 16px; border-radius: 10px; border: 0; }
+</style>
+<script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
 </head>
 <body>
-  <h2 id="status">準備中…</h2>
-  <pre id="log" style="white-space:pre-wrap;background:#f7f7f7;padding:12px;border-radius:8px"></pre>
-  <script>
-    const LIFF_ID = "2007906926-NZW6EQ7P"; // ← 放「LINE Login channel」裡的 LIFF ID（完整字串）
-    const $ = (id) => document.getElementById(id);
-    (async () => {
-      try {
-        $("status").textContent = "初始化 LIFF 中…";
-        await liff.init({ liffId: LIFF_ID, withLoginOnExternalBrowser: true }); // 外部瀏覽器也可觸發登入
-        $("status").textContent = "檢查登入狀態…";
-        if (!liff.isLoggedIn()) {
-          $("status").textContent = "未登入 → 導向 LINE 登入";
-          liff.login(); return;
-        }
-        const ctx = { os: liff.getOS(), inClient: liff.isInClient() };
-        const profile = await liff.getProfile(); // 需在 LIFF 勾 profile scope
-        $("status").textContent = `Hello, ${profile.displayName} 👋`;
-        $("log").textContent = JSON.stringify({ ctx, profile }, null, 2);
-      } catch (err) {
-        $("status").textContent = "LIFF 初始化失敗";
-        $("log").textContent =
-          `code: ${err?.code || "-"}\nmessage: ${err?.message || "-"}\ncause: ${err?.cause?.message || "-"}`;
-        console.error(err);
-      }
-    })();
-  </script>
+  <h2>十字九宮格（Demo）</h2>
+  <div id="profile" class="full">Loading…</div>
+
+  <!-- 5 格：上(4) / 左(2) 中(1) 右(3) / 下(5) -->
+  <div class="grid">
+    <div></div><div id="pos4" class="cell">位置4</div><div></div>
+    <div id="pos2" class="cell">位置2</div><div id="pos1" class="cell">位置1</div><div id="pos3" class="cell">位置3</div>
+    <div></div><div id="pos5" class="cell">位置5</div><div></div>
+  </div>
+
+  <p class="full">
+    <button id="send">送出本局</button>
+  </p>
+
+<script>
+const LIFF_ID = '2007906926-NZW6EQ7P';
+
+const picks = { 1: null, 2: null, 3: null, 4: null, 5: null }; // 之後點格子→跳選單→填入
+
+async function main() {
+  await liff.init({ liffId: LIFF_ID }); // 初始化
+  if (!liff.isLoggedIn()) liff.login();
+
+  const prof = await liff.getProfile();
+  document.getElementById('profile').textContent = `Hi, ${prof.displayName}`;
+
+  // 簡單點擊事件（之後可彈出自製選單或跳轉子頁）
+  [1,2,3,4,5].forEach(i => {
+    document.getElementById('pos'+i).addEventListener('click', () => {
+      const color = prompt(`位置${i} 顏色?（紅/黑）`);
+      if (!color) return;
+      const list = color === '紅' ? ['兵','傌','俥','炮','相','仕','帥'] : ['卒','馬','車','包','象','士','將'];
+      const type = prompt(`位置${i} 棋子?\n${list.join('、')}`);
+      if (!type) return;
+      picks[i] = type;
+      document.getElementById('pos'+i).textContent = `位置${i}: ${type}`;
+    });
+  });
+
+  // 送訊息回聊天室（若從聊天室內開啟 LIFF）
+  document.getElementById('send').addEventListener('click', async () => {
+    const arr = [1,2,3,4,5].map(i => picks[i] || '未選');
+    const text = `本局：${arr.join(' ')}`
+    if (liff.isInClient()) {
+      await liff.sendMessages([{ type: 'text', text }]);
+      alert('已送出，關閉視窗返回聊天室');
+      liff.closeWindow();
+    } else if (liff.isApiAvailable('shareTargetPicker')) {
+      await liff.shareTargetPicker([{ type: 'text', text }]);
+    } else {
+      alert(text);
+    }
+  });
+}
+main();
+</script>
 </body>
 </html>
