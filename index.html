@@ -1,74 +1,208 @@
 <!doctype html>
-<html>
+<html lang="zh-Hant">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>XQ LIFF</title>
-<style>
-  body { font-family: system-ui, sans-serif; margin: 12px; }
-  .grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; max-width: 360px; margin: 0 auto; }
-  .cell { padding: 14px; border-radius: 12px; border: 1px solid #ddd; text-align: center; font-size: 18px; }
-  .full { grid-column: 1 / span 3; text-align: center; margin: 12px 0; }
-  button { padding: 12px 16px; font-size: 16px; border-radius: 10px; border: 0; }
-</style>
-<script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no" />
+  <title>XQ LIFF</title>
+  <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+  <style>
+    :root {
+      --red: #d32f2f;
+      --black: #111;
+      --bg: #fafafa;
+      --card: #ffffff;
+      --border: #e5e7eb;
+    }
+    body { margin:0; font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans TC", sans-serif; background: var(--bg); color:#111; }
+    .wrap { max-width: 480px; margin: 0 auto; padding: 12px 12px 28px; }
+    .topbar { display:flex; align-items:center; justify-content:space-between; gap:8px; }
+    .title { font-size:18px; font-weight:700; }
+    .ghost { background:transparent; border:1px solid var(--border); padding:8px 10px; border-radius:10px; font-size:14px; }
+    .ghost:active { opacity:.7; }
+    .card { background:var(--card); border:1px solid var(--border); border-radius:14px; padding:12px; box-shadow: 0 1px 2px rgba(0,0,0,.04); }
+    .grid { display:grid; grid-template-columns: 1fr 1fr 1fr; gap:10px; margin-top:10px; }
+    .cell { padding:18px 8px; border:1px dashed var(--border); border-radius:12px; text-align:center; font-size:20px; min-height:56px; user-select:none; background:#fff; }
+    .hint { font-size:12px; color:#666; text-align:center; margin-top:6px; }
+    .poslabel { font-size:12px; color:#999; display:block; margin-top:4px; }
+    .red { color: var(--red) !important; }
+    .black { color: var(--black) !important; }
+
+    .controls { display:flex; gap:10px; justify-content:center; margin:12px 0 8px; }
+    .btn { border:0; border-radius:12px; padding:12px 16px; font-size:16px; }
+    .btn-primary { background:#111; color:#fff; }
+    .btn-secondary { background:#f3f4f6; color:#111; border:1px solid var(--border); }
+
+    .pieces { margin-top:10px; }
+    .row { display:grid; grid-template-columns: repeat(7, 1fr); gap:8px; }
+    .piece-btn { border:1px solid var(--border); background:#fff; border-radius:12px; padding:12px 0; font-size:18px; text-align:center; }
+    .piece-btn:active { transform: scale(.98); }
+    .footer-pad { height: 8px; }
+
+    .status { margin: 8px 0 0; font-size:12px; color:#666; text-align:center; }
+  </style>
 </head>
 <body>
-  <h2>十字九宮格（Demo）</h2>
-  <div id="profile" class="full">Loading…</div>
+  <div class="wrap">
+    <div class="topbar">
+      <div class="title">象棋卜卦 - Anan Universe Station</div>
+      <button class="ghost" id="reloadBtn">Reload</button>
+    </div>
 
-  <!-- 5 格：上(4) / 左(2) 中(1) 右(3) / 下(5) -->
-  <div class="grid">
-    <div></div><div id="pos4" class="cell">位置4</div><div></div>
-    <div id="pos2" class="cell">位置2</div><div id="pos1" class="cell">位置1</div><div id="pos3" class="cell">位置3</div>
-    <div></div><div id="pos5" class="cell">位置5</div><div></div>
+    <div id="status" class="status">初始化中…</div>
+
+    <div class="card">
+      <!-- 九宮格（上：4 / 中：2 1 3 / 下：5） -->
+      <div class="grid" aria-label="象棋卜卦-單掛">
+        <div></div>
+        <div class="cell" id="pos4"><span>4</span><span class="poslabel">↑</span></div>
+        <div></div>
+
+        <div class="cell" id="pos2"><span>2</span><span class="poslabel">←</span></div>
+        <div class="cell" id="pos1"><span>1</span><span class="poslabel">中心</span></div>
+        <div class="cell" id="pos3"><span>3</span><span class="poslabel">→</span></div>
+
+        <div></div>
+        <div class="cell" id="pos5"><span>5</span><span class="poslabel">↓</span></div>
+        <div></div>
+      </div>
+
+      <div class="controls">
+        <button class="btn btn-primary" id="sendBtn">送出</button>
+        <button class="btn btn-secondary" id="clearBtn">清除</button>
+      </div>
+
+      <div class="hint">自下方選擇棋子，系統會依序放入：1 → 2 → 3 → 4 → 5</div>
+    </div>
+
+    <!-- 棋子選擇（兩排，黑在上、紅在下） -->
+    <div class="pieces">
+      <div class="row" style="margin-bottom:8px">
+        <!-- 黑國：將 士 象 車 馬 包 卒 -->
+        <button class="piece-btn black" data-piece="將">將</button>
+        <button class="piece-btn black" data-piece="士">士</button>
+        <button class="piece-btn black" data-piece="象">象</button>
+        <button class="piece-btn black" data-piece="車">車</button>
+        <button class="piece-btn black" data-piece="馬">馬</button>
+        <button class="piece-btn black" data-piece="包">包</button>
+        <button class="piece-btn black" data-piece="卒">卒</button>
+      </div>
+      <div class="row">
+        <!-- 紅國：帥 仕 相 俥 傌 炮 兵 -->
+        <button class="piece-btn red" data-piece="帥">帥</button>
+        <button class="piece-btn red" data-piece="仕">仕</button>
+        <button class="piece-btn red" data-piece="相">相</button>
+        <button class="piece-btn red" data-piece="俥">俥</button>
+        <button class="piece-btn red" data-piece="傌">傌</button>
+        <button class="piece-btn red" data-piece="炮">炮</button>
+        <button class="piece-btn red" data-piece="兵">兵</button>
+      </div>
+      <div class="footer-pad"></div>
+    </div>
   </div>
 
-  <p class="full">
-    <button id="send">送出本局</button>
-  </p>
+  <script>
+    // ★ 替換為你的 LIFF ID（完整字串，可含連字號後綴）
+    const LIFF_ID = "2007906926-NZW6EQ7P";
 
-<script>
-const LIFF_ID = '2007906926-NZW6EQ7P';
+    // 勾子
+    const $ = (id) => document.getElementById(id);
+    const posEls = { 1: $("pos1"), 2: $("pos2"), 3: $("pos3"), 4: $("pos4"), 5: $("pos5") };
+    const statusEl = $("status");
 
-const picks = { 1: null, 2: null, 3: null, 4: null, 5: null }; // 之後點格子→跳選單→填入
+    // 狀態：1..5 位置的棋子；值為 { type, color } 或 null
+    const picks = { 1:null, 2:null, 3:null, 4:null, 5:null };
 
-async function main() {
-  await liff.init({ liffId: LIFF_ID }); // 初始化
-  if (!liff.isLoggedIn()) liff.login();
+    const RED_SET   = new Set(["帥","仕","相","俥","傌","炮","兵"]);
+    const BLACK_SET = new Set(["將","士","象","車","馬","包","卒"]);
 
-  const prof = await liff.getProfile();
-  document.getElementById('profile').textContent = `Hi, ${prof.displayName}`;
-
-  // 簡單點擊事件（之後可彈出自製選單或跳轉子頁）
-  [1,2,3,4,5].forEach(i => {
-    document.getElementById('pos'+i).addEventListener('click', () => {
-      const color = prompt(`位置${i} 顏色?（紅/黑）`);
-      if (!color) return;
-      const list = color === '紅' ? ['兵','傌','俥','炮','相','仕','帥'] : ['卒','馬','車','包','象','士','將'];
-      const type = prompt(`位置${i} 棋子?\n${list.join('、')}`);
-      if (!type) return;
-      picks[i] = type;
-      document.getElementById('pos'+i).textContent = `位置${i}: ${type}`;
-    });
-  });
-
-  // 送訊息回聊天室（若從聊天室內開啟 LIFF）
-  document.getElementById('send').addEventListener('click', async () => {
-    const arr = [1,2,3,4,5].map(i => picks[i] || '未選');
-    const text = `本局：${arr.join(' ')}`
-    if (liff.isInClient()) {
-      await liff.sendMessages([{ type: 'text', text }]);
-      alert('已送出，關閉視窗返回聊天室');
-      liff.closeWindow();
-    } else if (liff.isApiAvailable('shareTargetPicker')) {
-      await liff.shareTargetPicker([{ type: 'text', text }]);
-    } else {
-      alert(text);
+    function pieceColorOf(type) {
+      if (RED_SET.has(type)) return "red";
+      if (BLACK_SET.has(type)) return "black";
+      return null;
     }
-  });
-}
-main();
-</script>
+
+    function firstEmptyPos() {
+      for (let i=1;i<=5;i++) if (!picks[i]) return i;
+      return null;
+    }
+
+    function render() {
+      for (let i=1;i<=5;i++) {
+        const el = posEls[i];
+        el.classList.remove("red","black");
+        if (picks[i]) {
+          el.innerHTML = `<span>${picks[i].type}</span><span class="poslabel">${i}</span>`;
+          el.classList.add(picks[i].color === "red" ? "red" : "black");
+        } else {
+          const dir = i===1?"中心": i===2?"←": i===3?"→": i===4?"↑":"↓";
+          el.innerHTML = `<span>位置${i}</span><span class="poslabel">${dir}</span>`;
+        }
+      }
+    }
+
+    function addPiece(type) {
+      const color = pieceColorOf(type);
+      if (!color) return;
+      const pos = firstEmptyPos();
+      if (!pos) {
+        alert("已放滿 5 格；若要重新選，請按「清除」。");
+        return;
+      }
+      picks[pos] = { type, color };
+      render();
+    }
+
+    function clearAll() {
+      for (let i=1;i<=5;i++) picks[i] = null;
+      render();
+    }
+
+    function hardReload() {
+      // 加時間戳避免 WebView 快取
+      const base = location.origin + location.pathname;
+      location.replace(base + "?t=" + Date.now());
+    }
+
+    async function sendResult() {
+      const filled = [1,2,3,4,5].map(i => picks[i]?.type || "未選");
+      const text = `本局：${filled.join(" ")}`;
+      try {
+        if (liff?.isInClient?.()) {
+          await liff.sendMessages([{ type:"text", text }]);
+          alert("已送出，返回聊天室"); liff.closeWindow();
+        } else {
+          alert(text);
+        }
+      } catch (e) {
+        alert("sendMessages 失敗：" + (e?.message||e));
+      }
+    }
+
+    // 綁定 UI
+    $("reloadBtn").addEventListener("click", hardReload);
+    $("clearBtn").addEventListener("click", clearAll);
+    $("sendBtn").addEventListener("click", sendResult);
+
+    document.querySelectorAll(".piece-btn").forEach(btn => {
+      btn.addEventListener("click", () => addPiece(btn.dataset.piece));
+    });
+
+    // 初始化 LIFF
+    (async () => {
+      try {
+        statusEl.textContent = "初始化 LIFF…";
+        await liff.init({ liffId: LIFF_ID, withLoginOnExternalBrowser: true });
+        if (!liff.isLoggedIn()) { statusEl.textContent = "未登入 → 導向登入"; return liff.login(); }
+        const profile = await liff.getProfile();
+        statusEl.textContent = `Hello, ${profile.displayName} 👋`;
+      } catch (err) {
+        console.error(err);
+        statusEl.textContent = `LIFF 初始化失敗：${err?.message || "unknown"}`;
+      }
+    })();
+
+    // 初始渲染
+    render();
+  </script>
 </body>
 </html>
