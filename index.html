@@ -304,7 +304,7 @@
     *  🔧 在這裡換你的 LIFF ID & 版本
     *********************************/
     const LIFF_ID = "2007906926-NZW6EQ7P";
-    const APP_VERSION = "v1.0.42";
+    const APP_VERSION = "v1.0.43";
 
     /** ******************************
     *  🧰 全套 32 枚牌堆（抽過即移除）
@@ -548,7 +548,7 @@
           height: CIRCLE_SIZE,
           cornerRadius: "999px",
           backgroundColor: "#111111",     // 黑色外圈
-          paddingAll: "4px",               // 外圈厚度
+          paddingAll: "3px",               // 外圈厚度
           contents: [
             {
               type: "box",
@@ -581,7 +581,7 @@
 
       return {
         type: "flex",
-        altText: `${summary}`,
+        altText: `${titleText} ${summary}`,
         contents: {
           type: "bubble",
           styles: { // ★ 設定柔和的背景色
