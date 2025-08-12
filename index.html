@@ -1,54 +1,202 @@
 <!doctype html>
 <html lang="zh-Hant">
+
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no" />
-  <title>象棋卜卦 - Anan Universe Station</title>
+  <title>象棋卜卦 - 安安宇宙站</title>
   <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
   <style>
-    :root{
-      --red:#d32f2f; --black:#111; --bg:#fafafa; --card:#fff; --border:#e5e7eb; --accent:#2563eb;
+    :root {
+      --red: #d32f2f;
+      --black: #111;
+      --bg: #fafafa;
+      --card: #fff;
+      --border: #e5e7eb;
+      --accent: #2563eb;
     }
-    body{margin:0; font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Noto Sans TC",sans-serif; background:var(--bg); color:#111;}
-    .wrap{max-width:480px; margin:0 auto; padding:12px 12px 28px;}
-    .topbar{display:flex; align-items:center; justify-content:space-between; gap:8px;}
-    .title{font-size:18px; font-weight:700;}
-    .bar-actions{display:flex; gap:8px;}
-    .ghost{background:transparent; border:1px solid var(--border); padding:8px 10px; border-radius:10px; font-size:14px;}
-    .ghost:active{opacity:.7;}
-    .status{margin:6px 0 10px; font-size:12px; color:#666; text-align:center;}
 
-    .card{background:var(--card); border:1px solid var(--border); border-radius:14px; padding:12px; box-shadow:0 1px 2px rgba(0,0,0,.04);}
-    .card-title{font-size:16px; font-weight:700; text-align:center; margin-bottom:8px;}
-    .grid{display:grid; grid-template-columns:1fr 1fr 1fr; gap:14px; margin-top:6px;}
-    .cell{
-      display:flex; align-items:center; justify-content:center; flex-direction:column;
-      border:2px dashed var(--border); border-radius:9999px; background:#fff;
-      aspect-ratio:1/1; min-width:72px; min-height:72px; user-select:none; cursor:pointer;
-      font-size:28px; /* 放大棋字 */
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans TC", sans-serif;
+      background: var(--bg);
+      color: #111;
     }
-    .cell.red{color:var(--red);} .cell.black{color:var(--black);}
-    .cell.selected{border-color:var(--accent); box-shadow:0 0 0 3px rgba(37,99,235,.12);}
-    .poslabel{font-size:12px; color:#999; margin-top:2px;}
-    .hint{font-size:12px; color:#666; text-align:center; margin:8px 0 0;}
 
-    .controls{display:flex; gap:8px; justify-content:center; margin:12px 0 8px; flex-wrap:wrap;}
-    .btn{border:0; border-radius:12px; padding:12px 16px; font-size:16px;}
-    .btn-primary{background:#111; color:#fff;}
-    .btn-secondary{background:#f3f4f6; color:#111; border:1px solid var(--border);}
+    .wrap {
+      max-width: 480px;
+      margin: 0 auto;
+      padding: 12px 12px 28px;
+    }
 
-    .pieces{margin-top:10px;}
-    .row{display:grid; grid-template-columns:repeat(7,1fr); gap:8px;}
-    .piece-btn{border:1px solid var(--border); background:#fff; border-radius:12px; padding:12px 0; font-size:18px; text-align:center;}
-    .piece-btn:active{transform:scale(.98);}
-    .piece-btn.red{color:var(--red);} .piece-btn.black{color:var(--black);}
-    .footer-pad{height:8px;}
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    .title {
+      font-size: 18px;
+      font-weight: 700;
+    }
+
+    .bar-actions {
+      display: flex;
+      gap: 8px;
+    }
+
+    .ghost {
+      background: transparent;
+      border: 1px solid var(--border);
+      padding: 8px 10px;
+      border-radius: 10px;
+      font-size: 14px;
+    }
+
+    .ghost:active {
+      opacity: .7;
+    }
+
+    .status {
+      margin: 6px 0 10px;
+      font-size: 12px;
+      color: #666;
+      text-align: center;
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 12px;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, .04);
+    }
+
+    .card-title {
+      font-size: 16px;
+      font-weight: 700;
+      text-align: center;
+      margin-bottom: 8px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 14px;
+      margin-top: 6px;
+    }
+
+    .cell {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      border: 2px dashed var(--border);
+      border-radius: 9999px;
+      background: #fff;
+      aspect-ratio: 1/1;
+      min-width: 72px;
+      min-height: 72px;
+      user-select: none;
+      cursor: pointer;
+      font-size: 28px;
+      /* 放大棋字 */
+    }
+
+    .cell.red {
+      color: var(--red);
+    }
+
+    .cell.black {
+      color: var(--black);
+    }
+
+    .cell.selected {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, .12);
+    }
+
+    .poslabel {
+      font-size: 12px;
+      color: #999;
+      margin-top: 2px;
+    }
+
+    .hint {
+      font-size: 12px;
+      color: #666;
+      text-align: center;
+      margin: 8px 0 0;
+    }
+
+    .controls {
+      display: flex;
+      gap: 8px;
+      justify-content: center;
+      margin: 12px 0 8px;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      border: 0;
+      border-radius: 12px;
+      padding: 12px 16px;
+      font-size: 16px;
+    }
+
+    .btn-primary {
+      background: #111;
+      color: #fff;
+    }
+
+    .btn-secondary {
+      background: #f3f4f6;
+      color: #111;
+      border: 1px solid var(--border);
+    }
+
+    .pieces {
+      margin-top: 10px;
+    }
+
+    .row {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 8px;
+    }
+
+    .piece-btn {
+      border: 1px solid var(--border);
+      background: #fff;
+      border-radius: 12px;
+      padding: 12px 0;
+      font-size: 18px;
+      text-align: center;
+    }
+
+    .piece-btn:active {
+      transform: scale(.98);
+    }
+
+    .piece-btn.red {
+      color: var(--red);
+    }
+
+    .piece-btn.black {
+      color: var(--black);
+    }
+
+    .footer-pad {
+      height: 8px;
+    }
   </style>
 </head>
+
 <body>
   <div class="wrap">
     <div class="topbar">
-      <div class="title">象棋卜卦 - Anan Universe Station</div>
+      <div class="title">象棋卜卦</div>
       <div class="bar-actions">
         <button class="ghost" id="askBtn">輸入問題</button>
         <button class="ghost" id="reloadBtn">Reload</button>
@@ -58,20 +206,30 @@
     <div id="status" class="status">初始化中…</div>
 
     <div class="card">
-      <div id="cardTitle" class="card-title">象棋卜卦-單掛</div>
+      <div id="cardTitle" class="card-title">單卦</div>
 
       <!-- 九宮格（上：4 / 中：2 1 3 / 下：5） -->
       <div class="grid" aria-label="十字九宮格">
         <div></div>
-        <div class="cell" id="pos4"><span>位置4</span><div class="poslabel">↑ 點選以鎖定</div></div>
+        <div class="cell" id="pos4"><span>位置4</span>
+          <div class="poslabel">↑ 點選以鎖定</div>
+        </div>
         <div></div>
 
-        <div class="cell" id="pos2"><span>位置2</span><div class="poslabel">←</div></div>
-        <div class="cell" id="pos1"><span>位置1</span><div class="poslabel">中心</div></div>
-        <div class="cell" id="pos3"><span>位置3</span><div class="poslabel">→</div></div>
+        <div class="cell" id="pos2"><span>位置2</span>
+          <div class="poslabel">←</div>
+        </div>
+        <div class="cell" id="pos1"><span>位置1</span>
+          <div class="poslabel">中心</div>
+        </div>
+        <div class="cell" id="pos3"><span>位置3</span>
+          <div class="poslabel">→</div>
+        </div>
 
         <div></div>
-        <div class="cell" id="pos5"><span>位置5</span><div class="poslabel">↓</div></div>
+        <div class="cell" id="pos5"><span>位置5</span>
+          <div class="poslabel">↓</div>
+        </div>
         <div></div>
       </div>
 
@@ -81,7 +239,8 @@
         <button class="btn btn-secondary" id="clearBtn">清除</button>
       </div>
 
-      <div class="hint">操作：先點上方某格以「鎖定」，再點下方棋子放入；若未鎖定，預設依序填 1 → 2 → 3 → 4 → 5</div>
+      <div class="hint">點選下方棋子，系統會依序放入：1 → 2 → 3 → 4 → 5</div>
+      <div class="hint">點選「指定位置」→ 再點下方棋子</div>
     </div>
 
     <!-- 棋子選擇（黑在上、紅在下） -->
@@ -117,76 +276,76 @@
     const LIFF_ID = "2007906926-NZW6EQ7P";
 
     // ====== 狀態與工具 ======
-    const $ = (id)=>document.getElementById(id);
-    const posEls = {1:$("pos1"),2:$("pos2"),3:$("pos3"),4:$("pos4"),5:$("pos5")};
+    const $ = (id) => document.getElementById(id);
+    const posEls = { 1: $("pos1"), 2: $("pos2"), 3: $("pos3"), 4: $("pos4"), 5: $("pos5") };
     const statusEl = $("status");
     const titleEl = $("cardTitle");
 
     // 目前 5 格內容：{ type, color } 或 null
-    const picks = {1:null,2:null,3:null,4:null,5:null};
+    const picks = { 1: null, 2: null, 3: null, 4: null, 5: null };
     let selectedPos = null; // 定位模式：使用者選的目標位置
 
-    const RED_SET   = new Set(["帥","仕","相","俥","傌","炮","兵"]);
-    const BLACK_SET = new Set(["將","士","象","車","馬","包","卒"]);
+    const RED_SET = new Set(["帥", "仕", "相", "俥", "傌", "炮", "兵"]);
+    const BLACK_SET = new Set(["將", "士", "象", "車", "馬", "包", "卒"]);
 
     // 整副棋上限
     const PIECE_LIMITS = {
-      "帥":1,"仕":2,"相":2,"俥":2,"傌":2,"炮":2,"兵":5,
-      "將":1,"士":2,"象":2,"車":2,"馬":2,"包":2,"卒":5
+      "帥": 1, "仕": 2, "相": 2, "俥": 2, "傌": 2, "炮": 2, "兵": 5,
+      "將": 1, "士": 2, "象": 2, "車": 2, "馬": 2, "包": 2, "卒": 5
     };
 
-    function pieceColorOf(type){
-      if(RED_SET.has(type)) return "red";
-      if(BLACK_SET.has(type)) return "black";
+    function pieceColorOf(type) {
+      if (RED_SET.has(type)) return "red";
+      if (BLACK_SET.has(type)) return "black";
       return null;
     }
-    function firstEmptyPos(){
-      for(let i=1;i<=5;i++) if(!picks[i]) return i;
+    function firstEmptyPos() {
+      for (let i = 1; i <= 5; i++) if (!picks[i]) return i;
       return null;
     }
-    function countUsed(type){
-      let c=0;
-      for(let i=1;i<=5;i++) if(picks[i]?.type===type) c++;
+    function countUsed(type) {
+      let c = 0;
+      for (let i = 1; i <= 5; i++) if (picks[i]?.type === type) c++;
       return c;
     }
-    function canPlace(type, pos){
+    function canPlace(type, pos) {
       const limit = PIECE_LIMITS[type] ?? 0;
       const used = countUsed(type);
       const currentTypeAtPos = picks[pos]?.type || null;
-      if(currentTypeAtPos === type) return true; // 覆蓋同種不增加用量
+      if (currentTypeAtPos === type) return true; // 覆蓋同種不增加用量
       return used < limit;
     }
 
-    function render(){
-      for(let i=1;i<=5;i++){
+    function render() {
+      for (let i = 1; i <= 5; i++) {
         const el = posEls[i];
-        el.classList.remove("red","black","selected");
-        if(picks[i]){
+        el.classList.remove("red", "black", "selected");
+        if (picks[i]) {
           el.innerHTML = `<span>${picks[i].type}</span><div class="poslabel">位置${i}</div>`;
-          el.classList.add(picks[i].color==="red"?"red":"black");
-        }else{
-          const dir = i===1?"中心": i===2?"←": i===3?"→": i===4?"↑":"↓";
+          el.classList.add(picks[i].color === "red" ? "red" : "black");
+        } else {
+          const dir = i === 1 ? "中心" : i === 2 ? "←" : i === 3 ? "→" : i === 4 ? "↑" : "↓";
           el.innerHTML = `<span>位置${i}</span><div class="poslabel">${dir}</div>`;
         }
-        if(selectedPos===i) el.classList.add("selected");
+        if (selectedPos === i) el.classList.add("selected");
       }
     }
 
-    function setSelected(pos){
-      selectedPos = (selectedPos===pos ? null : pos);
+    function setSelected(pos) {
+      selectedPos = (selectedPos === pos ? null : pos);
       render();
     }
 
-    function addPiece(type){
+    function addPiece(type) {
       const color = pieceColorOf(type);
-      if(!color) return;
+      if (!color) return;
 
       const pos = selectedPos || firstEmptyPos();
-      if(!pos){ alert("已放滿 5 格；若要重選，請按「清除」。"); return; }
+      if (!pos) { alert("已放滿 5 格；若要重選，請按「清除」。"); return; }
 
-      if(!canPlace(type, pos)){
+      if (!canPlace(type, pos)) {
         const remain = (PIECE_LIMITS[type] - countUsed(type));
-        alert(`「${type}」可用數量不足（剩餘 ${Math.max(0,remain)}）`);
+        alert(`「${type}」可用數量不足（剩餘 ${Math.max(0, remain)}）`);
         return;
       }
 
@@ -196,38 +355,38 @@
       render();
     }
 
-    function clearAll(){
-      for(let i=1;i<=5;i++) picks[i]=null;
-      selectedPos=null;
+    function clearAll() {
+      for (let i = 1; i <= 5; i++) picks[i] = null;
+      selectedPos = null;
       render();
     }
 
-    function hardReload(){
+    function hardReload() {
       const base = location.origin + location.pathname;
       location.replace(base + "?t=" + Date.now()); // 破快取
     }
 
-    function promptQuestion(){
+    function promptQuestion() {
       const t = prompt("請輸入你的卜卦問題（將顯示於卡片標題）：", titleEl.textContent || "");
-      if(t && t.trim()) titleEl.textContent = t.trim();
+      if (t && t.trim()) titleEl.textContent = t.trim();
     }
 
     // ====== 隨機 5 顆（遵守每種上限） ======
-    function randomFill(){
+    function randomFill() {
       clearAll();
       // 建權重池：每種棋依上限重複放入，讓兵/卒較常被抽中
       const pool = [];
-      Object.keys(PIECE_LIMITS).forEach(type=>{
-        for(let k=0;k<PIECE_LIMITS[type];k++) pool.push(type);
+      Object.keys(PIECE_LIMITS).forEach(type => {
+        for (let k = 0; k < PIECE_LIMITS[type]; k++) pool.push(type);
       });
       // 隨機抽 5 顆，抽到不合法（超上限）就重抽一次
-      let i=0, guard=0;
-      while(i<5 && guard<100){
+      let i = 0, guard = 0;
+      while (i < 5 && guard < 100) {
         guard++;
-        const type = pool[Math.floor(Math.random()*pool.length)];
+        const type = pool[Math.floor(Math.random() * pool.length)];
         const pos = firstEmptyPos();
-        if(!pos) break;
-        if(canPlace(type,pos)){
+        if (!pos) break;
+        if (canPlace(type, pos)) {
           picks[pos] = { type, color: pieceColorOf(type) };
           i++;
         }
@@ -237,17 +396,17 @@
     }
 
     // ====== Flex 送出 ======
-    function buildFlexMessage(){
-      const cells = [1,2,3,4,5].map(i => picks[i]);
-      if(cells.some(x=>!x)){ alert("請先選滿 5 格再送出。"); return null; }
+    function buildFlexMessage() {
+      const cells = [1, 2, 3, 4, 5].map(i => picks[i]);
+      if (cells.some(x => !x)) { alert("請先選滿 5 格再送出。"); return null; }
 
-      const toText = (cell)=>({
-        type:"text",
+      const toText = (cell) => ({
+        type: "text",
         text: cell.type,
-        weight:"bold",
-        align:"center",
-        size:"xl",
-        color: cell.color==="red" ? "#d32f2f" : "#111111"
+        weight: "bold",
+        align: "center",
+        size: "xl",
+        color: cell.color === "red" ? "#d32f2f" : "#111111"
       });
 
       const t1 = toText(picks[4]);
@@ -256,13 +415,13 @@
       const t4 = toText(picks[3]);
       const t5 = toText(picks[5]);
 
-      const summary = [1,2,3,4,5].map(i=>`${i}:${picks[i].type}`).join("  ");
-      const fiveStr = [1,2,3,4,5].map(i=>picks[i].type).join(""); // 5 字給 bot 用
-      const titleText = titleEl.textContent || "象棋卜卦-單掛";
+      const summary = [1, 2, 3, 4, 5].map(i => `${i}:${picks[i].type}`).join("  ");
+      const fiveStr = [1, 2, 3, 4, 5].map(i => picks[i].type).join(""); // 5 字給 bot
+      const titleText = (titleEl.textContent || "象棋卜卦-單卦").trim();
 
       return {
         type: "flex",
-        altText: `${titleText}｜${summary}`,
+        altText: `${titleText}｜${summary}`, // altText 合法純文字
         contents: {
           type: "bubble",
           body: {
@@ -270,15 +429,12 @@
             layout: "vertical",
             spacing: "md",
             contents: [
-              { type:"text", text: titleText, weight:"bold", size:"lg", wrap:true },
-              // 上：4
-              { type:"box", layout:"horizontal", justifyContent:"center", contents:[ t1 ]},
-              // 中：2 1 3
-              { type:"box", layout:"horizontal", spacing:"md", contents:[ t2, t3, t4 ]},
-              // 下：5
-              { type:"box", layout:"horizontal", justifyContent:"center", contents:[ t5 ]},
-              { type:"separator", margin:"md" },
-              { type:"text", text: summary, size:"sm", color:"#6b7280", wrap:true }
+              { type: "text", text: titleText, weight: "bold", size: "lg", wrap: true },
+              { type: "box", layout: "horizontal", justifyContent: "center", contents: [t1] },          // 上：4
+              { type: "box", layout: "horizontal", spacing: "md", contents: [t2, t3, t4] },             // 中：2 1 3
+              { type: "box", layout: "horizontal", justifyContent: "center", contents: [t5] },          // 下：5
+              { type: "separator", margin: "md" },
+              { type: "text", text: summary, size: "sm", color: "#6b7280", wrap: true }
             ]
           },
           footer: {
@@ -287,14 +443,33 @@
             spacing: "sm",
             contents: [
               {
-                type:"box", layout:"horizontal", spacing:"md",
-                contents:[
-                  { type:"button", style:"primary", height:"sm", flex:1,
-                    action:{ type:"postback", label:"解析", data:`cmd=analyze&p=${fiveStr}`, displayText:`解析：${fiveStr}` } },
-                  { type:"button", style:"primary", height:"sm", flex:1,
-                    action:{ type:"postback", label:"療癒分數", data:`cmd=heal&p=${fiveStr}`, displayText:`療癒分數：${fiveStr}` } },
-                  { type:"button", style:"secondary", height:"sm", flex:1,
-                    action:{ type:"uri", label:"再一次", uri:`https://liff.line.me/${LIFF_ID}` } }
+                type: "box", layout: "horizontal", spacing: "md",
+                contents: [
+                  // ✅ 按鈕外包一層 box，box 才加 flex:1，按鈕不放 flex 屬性
+                  {
+                    type: "box", layout: "vertical", flex: 1, contents: [
+                      {
+                        type: "button", style: "primary", height: "sm",
+                        action: { type: "postback", label: "解析", data: `cmd=analyze&p=${fiveStr}`, displayText: `解析：${fiveStr}` }
+                      }
+                    ]
+                  },
+                  {
+                    type: "box", layout: "vertical", flex: 1, contents: [
+                      {
+                        type: "button", style: "primary", height: "sm",
+                        action: { type: "postback", label: "療癒分數", data: `cmd=heal&p=${fiveStr}`, displayText: `療癒分數：${fiveStr}` }
+                      }
+                    ]
+                  },
+                  {
+                    type: "box", layout: "vertical", flex: 1, contents: [
+                      {
+                        type: "button", style: "secondary", height: "sm",
+                        action: { type: "uri", label: "再一次", uri: `https://liff.line.me/${LIFF_ID}` }
+                      }
+                    ]
+                  }
                 ]
               }
             ]
@@ -303,25 +478,26 @@
       };
     }
 
-    async function sendResult(){
+
+    async function sendResult() {
       const flex = buildFlexMessage();
-      if(!flex) return;
-      try{
-        if(liff?.isInClient?.()){
-          await liff.sendMessages([ flex ]);
+      if (!flex) return;
+      try {
+        if (liff?.isInClient?.()) {
+          await liff.sendMessages([flex]);
           alert("已送出，返回聊天室"); liff.closeWindow();
-        }else if(liff.isApiAvailable('shareTargetPicker')){
-          await liff.shareTargetPicker([ flex ]);
+        } else if (liff.isApiAvailable('shareTargetPicker')) {
+          await liff.shareTargetPicker([flex]);
           alert("已分享");
-        }else{
+        } else {
           alert("請在 LINE 內開啟此 LIFF 頁面再送出。");
         }
-      }catch(e){
+      } catch (e) {
         const msg = (e?.message || e || '').toString();
-        if((msg.includes('scope') || msg.includes('not in LIFF app scope')) && liff.isApiAvailable('shareTargetPicker')){
-          await liff.shareTargetPicker([ flex ]);
+        if ((msg.includes('scope') || msg.includes('not in LIFF app scope')) && liff.isApiAvailable('shareTargetPicker')) {
+          await liff.shareTargetPicker([flex]);
           alert("尚未授權 chat_message.write，已改用分享送出");
-        }else{
+        } else {
           alert("sendMessages 失敗：" + msg);
         }
       }
@@ -334,25 +510,25 @@
     $("randomBtn").addEventListener("click", randomFill);
     $("sendBtn").addEventListener("click", sendResult);
 
-    Object.entries(posEls).forEach(([idx,el])=>{
-      el.addEventListener("click", ()=> setSelected(Number(idx)));
+    Object.entries(posEls).forEach(([idx, el]) => {
+      el.addEventListener("click", () => setSelected(Number(idx)));
     });
 
-    document.querySelectorAll(".piece-btn").forEach(btn=>{
-      btn.addEventListener("click", ()=> addPiece(btn.dataset.piece));
+    document.querySelectorAll(".piece-btn").forEach(btn => {
+      btn.addEventListener("click", () => addPiece(btn.dataset.piece));
     });
 
     // ====== 初始化 LIFF ======
-    (async ()=>{
-      try{
+    (async () => {
+      try {
         statusEl.textContent = "初始化 LIFF…";
         await liff.init({ liffId: LIFF_ID, withLoginOnExternalBrowser: true });
-        if(!liff.isLoggedIn()){ statusEl.textContent="未登入 → 導向登入"; return liff.login(); }
+        if (!liff.isLoggedIn()) { statusEl.textContent = "未登入 → 導向登入"; return liff.login(); }
         const profile = await liff.getProfile();
         statusEl.textContent = `Hello, ${profile.displayName} 👋`;
-      }catch(err){
+      } catch (err) {
         console.error(err);
-        statusEl.textContent = `LIFF 初始化失敗：${err?.message||"unknown"}`;
+        statusEl.textContent = `LIFF 初始化失敗：${err?.message || "unknown"}`;
       }
     })();
 
@@ -360,4 +536,5 @@
     render();
   </script>
 </body>
+
 </html>
