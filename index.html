@@ -304,7 +304,7 @@
     *  🔧 在這裡換你的 LIFF ID & 版本
     *********************************/
     const LIFF_ID = "2007906926-NZW6EQ7P";
-    const APP_VERSION = "v1.0.54";
+    const APP_VERSION = "v1.0.55";
 
     /** ******************************
     *  🧰 全套 32 枚牌堆（抽過即移除）
@@ -625,7 +625,7 @@
                     type: "button",
                     style: "primary",
                     flex: 1,
-                    action: { type: "message", label: "療癒分數", text: "文字訊息", data: LIFF_ID, uri: `https://liff.line.me/${LIFF_ID}` }
+                    action: { type: "message", label: "療癒分數", text: "給我分數" }
                   },
                   {
                     type: "button",
@@ -662,11 +662,11 @@
           const res = await validateFlexOnServerJSONP(flex);
           printLog("Validator 回應：\n" + JSON.stringify(res, null, 2));
           if (res?.status === "error") {
-            alert("Flex 格式錯誤：" + res.message);
+            printLog("Flex 格式錯誤：" + res.message);
             return;
           }
         } catch (err) {
-          console.error("驗證 Flex 格式失敗：", err);
+          printLog("驗證 Flex 格式失敗：", err);
         }
         const msg = (e?.message || e || '').toString();
         if ((msg.includes('scope') || msg.includes('not in LIFF app scope')) && liff.isApiAvailable('shareTargetPicker')) {
