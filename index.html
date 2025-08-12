@@ -304,7 +304,7 @@
     *  🔧 在這裡換你的 LIFF ID & 版本
     *********************************/
     const LIFF_ID = "2007906926-NZW6EQ7P";
-    const APP_VERSION = "v1.0.38";
+    const APP_VERSION = "v1.0.39";
 
     /** ******************************
     *  🧰 全套 32 枚牌堆（抽過即移除）
@@ -607,9 +607,7 @@
               { type: "separator", margin: "md" },
               { type: "text", text: APP_VERSION, size: "xs", color: "#9ca3af", align: "end" },
               { type: "text", text: summary, size: "sm", color: "#6b7280", wrap: true },
-              { type: "text", text: modeHint, size: "sm", color: "#6b7280", wrap: true },
-              { type: "text", text: fiveStr, size: "sm", color: "#6b7280", wrap: true },
-              { type: "text", text: fiveParam, size: "sm", color: "#6b7280", wrap: true }
+              { type: "text", text: modeHint, size: "sm", color: "#6b7280", wrap: true }
             ]
           },
           footer: {
@@ -627,7 +625,7 @@
                     type: "button",
                     style: "primary",
                     flex: 1,
-                    action: { type: "message", label: "療癒分數", text: "計算療癒分數" }
+                    action: { type: "uri", label: "療癒分數", uri: `https://liff.line.me/${LIFF_ID}` }
                   },
                   {
                     type: "button",
