@@ -304,7 +304,7 @@
     *  🔧 在這裡換你的 LIFF ID & 版本
     *********************************/
     const LIFF_ID = "2007906926-NZW6EQ7P";
-    const APP_VERSION = "v1.0.39";
+    const APP_VERSION = "v1.0.40";
 
     /** ******************************
     *  🧰 全套 32 枚牌堆（抽過即移除）
@@ -534,7 +534,7 @@
       // ★ 圓圈尺寸（可調）：建議 72~90px
       const CIRCLE_SIZE = "80px";
       // ★ 文字大小（可調）： xxs / xs / sm / md / lg / xl / xxl / 3xl / 4xl / 5xl
-      const PIECE_TEXT_SIZE = "5xl";
+      const PIECE_TEXT_SIZE = "4xl";
       // ★ 舒服背景色（Flex bubble 的 body）
       const FLEX_BG = "#F6F7FB"; // 微藍灰，耐看
 
@@ -548,7 +548,7 @@
           height: CIRCLE_SIZE,
           cornerRadius: "999px",
           backgroundColor: "#111111",     // 黑色外圈
-          paddingAll: "2px",               // 外圈厚度
+          paddingAll: "4px",               // 外圈厚度
           contents: [
             {
               type: "box",
@@ -625,7 +625,7 @@
                     type: "button",
                     style: "primary",
                     flex: 1,
-                    action: { type: "uri", label: "療癒分數", uri: `https://liff.line.me/${LIFF_ID}` }
+                    action: { type: "message", label: "療癒分數", text: "record" }
                   },
                   {
                     type: "button",
