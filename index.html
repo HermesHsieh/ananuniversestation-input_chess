@@ -196,7 +196,7 @@
 <body>
   <div class="wrap">
     <div class="topbar">
-      <div class="title">象棋卜卦-單卦</div>
+      <div class="title">象棋卜卦-單卦v12</div>
       <div class="bar-actions">
         <button class="ghost" id="askBtn">輸入問題</button>
         <button class="ghost" id="reloadBtn">Reload</button>
@@ -442,36 +442,13 @@
           footer: {
             type: "box",
             layout: "vertical",
-            spacing: "sm",
             contents: [
+              { type: "text", text: "LIFF 提交", size: "xs", color: "#9ca3af", align: "end" },
               {
-                type: "box",
-                layout: "horizontal",
-                spacing: "md",
-                contents: [
+                type: "box", layout: "vertical", flex: 1, contents: [
                   {
-                    type: "box", layout: "vertical", flex: 1, contents: [
-                      {
-                        type: "button", style: "primary",
-                        action: { type: "postback", label: "解析", data: `cmd=analyze&p=${fiveParam}` }
-                      }
-                    ]
-                  },
-                  {
-                    type: "box", layout: "vertical", flex: 1, contents: [
-                      {
-                        type: "button", style: "primary",
-                        action: { type: "postback", label: "療癒分數", data: `cmd=heal&p=${fiveParam}` }
-                      }
-                    ]
-                  },
-                  {
-                    type: "box", layout: "vertical", flex: 1, contents: [
-                      {
-                        type: "button", style: "secondary",
-                        action: { type: "uri", label: "再一次", uri: `https://liff.line.me/${LIFF_ID}` }
-                      }
-                    ]
+                    type: "button", style: "secondary",
+                    action: { type: "uri", label: "再一次", uri: `https://liff.line.me/${LIFF_ID}` }
                   }
                 ]
               }
