@@ -212,7 +212,7 @@
 <body>
   <div class="wrap">
     <div class="topbar">
-      <div class="title">單卦v22</div>
+      <div class="title">單卦v23</div>
       <div class="bar-actions">
         <button class="ghost" id="askBtn">輸入問題</button>
         <button class="ghost" id="reloadBtn">Reload</button>
@@ -299,7 +299,7 @@
     *  🔧 在這裡換你的 LIFF ID & 版本
     *********************************/
     const LIFF_ID = "2007906926-NZW6EQ7P";
-    const APP_VERSION = "v1.0.22";
+    const APP_VERSION = "v1.0.23";
 
     /** ******************************
     *  🧰 全套 32 枚牌堆（抽過即移除）
@@ -442,29 +442,27 @@
     }
 
     // ====== 隨機 5 顆（遵守每種上限） ======
-    function randomFill() {
-      clearAll(false);
-      setDrawMode("隨機"); // ← 按「隨機」即視為隨機抽卦
-      // 建權重池：每種棋依上限重複放入，讓兵/卒較常被抽中
-      const pool = [];
-      Object.keys(PIECE_LIMITS).forEach(type => {
-        for (let k = 0; k < PIECE_LIMITS[type]; k++) pool.push(type);
-      });
-      // 隨機抽 5 顆，抽到不合法（超上限）就重抽一次
-      let i = 0, guard = 0;
-      while (i < 5 && guard < 100) {
-        guard++;
-        const type = pool[Math.floor(Math.random() * pool.length)];
-        const pos = firstEmptyPos();
-        if (!pos) break;
-        if (canPlace(type, pos)) {
-          picks[pos] = { type, color: pieceColorOf(type) };
-          i++;
-        }
+    function randomFillAll() {
+      // 先清空五格＆重置牌堆（保留「隨機」模式）
+      clearAll(false, true);
+      setDrawMode("隨機");
+
+      // 確保有 32 枚完整牌堆
+      ensureDeck();
+
+      const order = [1, 2, 3, 4, 5];
+      for (const pos of order) {
+        const type = drawFromDeck();
+        if (!type) { alert("牌堆意外為空，請再試一次。"); ensureDeck(); break; }
+        // deck 已保證數量，理論上不會超上限；保險檢查可保留
+        if (!canPlace(type, pos)) continue;
+        picks[pos] = { type, color: pieceColorOf(type) };
       }
-      selectedPos = firstEmptyPos();
+
+      selectedPos = null; // 抽滿後取消鎖定
       render();
     }
+
 
     // ====== 隨機抽 1 枚（若 5 格已滿則提示） ======
     function randomDrawOne() {
@@ -523,8 +521,8 @@
 
       // ★ 圓圈尺寸（可調）：建議 72~90px
       const CIRCLE_SIZE = "80px";
-      // ★ 文字大小（可調）：lg / xl
-      const PIECE_TEXT_SIZE = "xl";
+      // ★ 文字大小（可調）： xxs / xs / sm / md / lg / xl / xxl / 3xl / 4xl / 5xl
+      const PIECE_TEXT_SIZE = "3xl";
       // ★ 舒服背景色（Flex bubble 的 body）
       const FLEX_BG = "#F6F7FB"; // 微藍灰，耐看
 
@@ -571,7 +569,7 @@
 
       return {
         type: "flex",
-        altText: `${summary}`,
+        altText: `${titleText}｜${summary}`,
         contents: {
           type: "bubble",
           styles: { // ★ 設定柔和的背景色
@@ -594,7 +592,7 @@
               // 下：5（置中）
               { type: "box", layout: "horizontal", justifyContent: "center", contents: [circ5] },
 
-              { type: "separator", margin: "md" },
+              { type: "separator", margin: "md", color: "#666" },
               { type: "text", text: APP_VERSION, size: "xs", color: "#9ca3af", align: "end" },
               { type: "text", text: summary, size: "sm", color: "#6b7280", wrap: true },
               { type: "text", text: modeHint, size: "sm", color: "#6b7280", wrap: true }
@@ -605,7 +603,7 @@
             layout: "vertical",
             spacing: "sm",
             contents: [
-              { type: "text", text: "Anan Universe Station Generated.", size: "xs", color: "#9ca3af", align: "end" },
+              { type: "text", text: "Anan Universe Station Generated.", size: "xxs", color: "#9ca3af", align: "end" },
               {
                 type: "box",
                 layout: "horizontal",   // 改成水平排列
@@ -614,8 +612,13 @@
                   {
                     type: "button",
                     style: "primary",
-                    flex: 1,             // 平均分配寬度
-                    action: { type: "uri", label: "療癒分數", uri: `https://liff.line.me/${LIFF_ID}` }
+                    flex: 1,
+                    action: {
+                      type: "postback",
+                      label: "療癒分數",
+                      data: `cmd=5chessvalue&param=${fiveParam}`,
+                      displayText: "計算療癒分數"
+                    }
                   },
                   {
                     type: "button",
@@ -627,7 +630,6 @@
               }
             ]
           }
-
         }
       };
     }
@@ -660,7 +662,7 @@
     $("askBtn").addEventListener("click", promptQuestion);
     $("reloadBtn").addEventListener("click", hardReload);
     $("clearBtn").addEventListener("click", clearAll);
-    $("randomBtn").addEventListener("click", randomDrawOne);
+    $("randomBtn").addEventListener("click", randomFillAll);
     $("sendBtn").addEventListener("click", sendResult);
 
     Object.entries(posEls).forEach(([idx, el]) => {
