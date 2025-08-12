@@ -304,7 +304,7 @@
     *  🔧 在這裡換你的 LIFF ID & 版本
     *********************************/
     const LIFF_ID = "2007906926-NZW6EQ7P";
-    const APP_VERSION = "v1.0.51";
+    const APP_VERSION = "v1.0.52";
 
     /** ******************************
     *  🧰 全套 32 枚牌堆（抽過即移除）
@@ -657,8 +657,17 @@
           alert("請在 LINE 內開啟此 LIFF 頁面再送出。");
         }
       } catch (e) {
-        const res = await validateFlexOnServerJSONP(flex);
-        printLog("Validator 回應：\n" + JSON.stringify(res, null, 2));
+        try {
+          // 嘗試使用 JSONP 驗證 Flex 格式
+          const res = await validateFlexOnServerJSONP(flex);
+          printLog("Validator 回應：\n" + JSON.stringify(res, null, 2));
+          if (res?.status === "error") {
+            alert("Flex 格式錯誤：" + res.message);
+            return;
+          }
+        } catch (err) {
+          console.error("驗證 Flex 格式失敗：", err);
+        }
         const msg = (e?.message || e || '').toString();
         if ((msg.includes('scope') || msg.includes('not in LIFF app scope')) && liff.isApiAvailable('shareTargetPicker')) {
           await liff.shareTargetPicker([flex]);
