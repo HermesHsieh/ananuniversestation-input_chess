@@ -304,7 +304,7 @@
     *  🔧 在這裡換你的 LIFF ID & 版本
     *********************************/
     const LIFF_ID = "2007906926-NZW6EQ7P";
-    const APP_VERSION = "v1.0.59";
+    const APP_VERSION = "v1.0.60";
 
     /** ******************************
     *  🧰 全套 32 枚牌堆（抽過即移除）
@@ -625,7 +625,7 @@
                     type: "button",
                     style: "primary",
                     flex: 1,
-                    action: { type: "uri", label: "療癒分數", uri: `https://liff.line.me/${LIFF_ID}&parameter=manually` }
+                    action: { type: "uri", label: "療癒分數", uri: `https://hermeshsieh.github.io/ananuniversestation-input_chess/index.html?p=manually` }
                   },
                   {
                     type: "button",
@@ -733,17 +733,18 @@
     // ====== 初始化 LIFF ======
     (async () => {
       try {
-        statusEl.textContent = "初始化 LIFF…";
+        statusEl.textContent = "頁面初始化…";
         await liff.init({ liffId: LIFF_ID, withLoginOnExternalBrowser: true }).then(() => {
-          printLog("LIFF 初始化成功");
+          printLog("頁面初始化成功");
           liff.getProfile().then(profile => {
             printLog("用戶名稱：" + profile.displayName);
           });
+          const urlParams = new URLSearchParams(window.location.search);
+          const parameter = urlParams.get('p');
+          printLog("網址參數 p: " + parameter);
         }).catch(err => {
           printLog("初始化錯誤: " + err.message);
         });
-        const parameter = getQueryParam('parameter');
-        printLog('網址參數 parameter = ' + parameter);
         if (!liff.isLoggedIn()) { statusEl.textContent = "未登入 → 導向登入"; return liff.login(); }
         const profile = await liff.getProfile();
         statusEl.textContent = `Hello, ${profile.displayName} 👋`;
