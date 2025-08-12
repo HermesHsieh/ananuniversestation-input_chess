@@ -212,7 +212,7 @@
 <body>
   <div class="wrap">
     <div class="topbar">
-      <div class="title">單卦v29</div>
+      <div class="title">單卦v30</div>
       <div class="bar-actions">
         <button class="ghost" id="askBtn">輸入問題</button>
         <button class="ghost" id="reloadBtn">Reload</button>
@@ -299,7 +299,7 @@
     *  🔧 在這裡換你的 LIFF ID & 版本
     *********************************/
     const LIFF_ID = "2007906926-NZW6EQ7P";
-    const APP_VERSION = "v1.0.29";
+    const APP_VERSION = "v1.0.30";
 
     /** ******************************
     *  🧰 全套 32 枚牌堆（抽過即移除）
@@ -612,13 +612,8 @@
                   {
                     type: "button",
                     style: "primary",
-                    flex: 1,
-                    action: {
-                      type: "postback",
-                      label: "療癒分數",
-                      data: "hello_word",
-                      displayText: "計算療癒分數"
-                    }
+                    flex: 1, 
+                    action: { type: "uri", label: "療癒分數", uri: `https://liff.line.me/${LIFF_ID}` }
                   },
                   {
                     type: "button",
