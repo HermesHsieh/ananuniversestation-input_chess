@@ -402,7 +402,7 @@
 
       const toText = (cell) => ({
         type: "text",
-        text: cell.type,
+        text: String(cell.type),
         weight: "bold",
         align: "center",
         size: "xl",
@@ -416,12 +416,13 @@
       const t5 = toText(picks[5]);
 
       const summary = [1, 2, 3, 4, 5].map(i => `${i}:${picks[i].type}`).join("  ");
-      const fiveStr = [1, 2, 3, 4, 5].map(i => picks[i].type).join(""); // 5 字給 bot
-      const titleText = (titleEl.textContent || "象棋卜卦-單卦").trim();
+      const fiveStr = [1, 2, 3, 4, 5].map(i => picks[i].type).join(""); // 五字
+      const fiveParam = encodeURIComponent(fiveStr);
+      const titleText = (titleEl.textContent || "象棋卜卦-單掛").trim();
 
       return {
         type: "flex",
-        altText: `${titleText}｜${summary}`, // altText 合法純文字
+        altText: `${titleText}｜${summary}`,
         contents: {
           type: "bubble",
           body: {
@@ -430,9 +431,9 @@
             spacing: "md",
             contents: [
               { type: "text", text: titleText, weight: "bold", size: "lg", wrap: true },
-              { type: "box", layout: "horizontal", justifyContent: "center", contents: [t1] },          // 上：4
-              { type: "box", layout: "horizontal", spacing: "md", contents: [t2, t3, t4] },             // 中：2 1 3
-              { type: "box", layout: "horizontal", justifyContent: "center", contents: [t5] },          // 下：5
+              { type: "box", layout: "horizontal", justifyContent: "center", contents: [t1] },
+              { type: "box", layout: "horizontal", spacing: "md", contents: [t2, t3, t4] },
+              { type: "box", layout: "horizontal", justifyContent: "center", contents: [t5] },
               { type: "separator", margin: "md" },
               { type: "text", text: summary, size: "sm", color: "#6b7280", wrap: true }
             ]
@@ -443,29 +444,30 @@
             spacing: "sm",
             contents: [
               {
-                type: "box", layout: "horizontal", spacing: "md",
+                type: "box",
+                layout: "horizontal",
+                spacing: "md",
                 contents: [
-                  // ✅ 按鈕外包一層 box，box 才加 flex:1，按鈕不放 flex 屬性
                   {
                     type: "box", layout: "vertical", flex: 1, contents: [
                       {
-                        type: "button", style: "primary", height: "sm",
-                        action: { type: "postback", label: "解析", data: `cmd=analyze&p=${fiveStr}`, displayText: `解析：${fiveStr}` }
+                        type: "button", style: "primary",
+                        action: { type: "postback", label: "解析", data: `cmd=analyze&p=${fiveParam}` }
                       }
                     ]
                   },
                   {
                     type: "box", layout: "vertical", flex: 1, contents: [
                       {
-                        type: "button", style: "primary", height: "sm",
-                        action: { type: "postback", label: "療癒分數", data: `cmd=heal&p=${fiveStr}`, displayText: `療癒分數：${fiveStr}` }
+                        type: "button", style: "primary",
+                        action: { type: "postback", label: "療癒分數", data: `cmd=heal&p=${fiveParam}` }
                       }
                     ]
                   },
                   {
                     type: "box", layout: "vertical", flex: 1, contents: [
                       {
-                        type: "button", style: "secondary", height: "sm",
+                        type: "button", style: "secondary",
                         action: { type: "uri", label: "再一次", uri: `https://liff.line.me/${LIFF_ID}` }
                       }
                     ]
@@ -477,7 +479,6 @@
         }
       };
     }
-
 
     async function sendResult() {
       const flex = buildFlexMessage();
