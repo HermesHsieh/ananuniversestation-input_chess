@@ -304,7 +304,7 @@
     *  🔧 在這裡換你的 LIFF ID & 版本
     *********************************/
     const LIFF_ID = "2007906926-NZW6EQ7P";
-    const APP_VERSION = "v1.0.57";
+    const APP_VERSION = "v1.0.58";
 
     /** ******************************
     *  🧰 全套 32 枚牌堆（抽過即移除）
@@ -625,7 +625,7 @@
                     type: "button",
                     style: "primary",
                     flex: 1,
-                    action: { type: "uri", label: "療癒分數", displayText: "給我分數" }
+                    action: { type: "postback", label: "療癒分數", data: 'hello', displayText: "給我分數" }
                   },
                   {
                     type: "button",
