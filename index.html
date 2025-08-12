@@ -256,12 +256,16 @@
         <button class="btn btn-secondary" id="clearBtn">清除</button>
       </div>
 
-      <div class="hint">點選下方棋子，系統會依序放入：1 → 2 → 3 → 4 → 5</div>
-      <div class="hint">點選「指定位置」→ 再點下方棋子</div>
-      <div class="hint-box">
-        <div id="drawMode" class="hint">輸入方式：手動</div>
-        <div class="hint-version" id="ver" style="text-align: right;"></div>
+      <div class="hint" style="text-align: left;">點選下方棋子，系統會依序放入：1 → 2 → 3 → 4 → 5</div>
+      <div class="hint" style="text-align: left;">點選「指定位置」→ 再點下方棋子</div>
+      <div class="hint-box" style="display: flex; justify-content: space-between; align-items: center;">
+        <div id="drawMode" class="hint" style="text-align: left;">
+          輸入方式：手動
+        </div>
+        <div class="hint-version" id="ver" style="text-align: right;">
+        </div>
       </div>
+
     </div>
 
     <!-- 棋子選擇（黑在上、紅在下） -->
@@ -386,10 +390,10 @@
       render();
     }
 
-    function clearAll() {
+    function clearAll(resetMode = true) {
       for (let i = 1; i <= 5; i++) picks[i] = null;
       selectedPos = null;
-      setDrawMode("手動"); // 清空後回到手動
+      if (resetMode) setDrawMode("手動"); // 只有需要才重置
       render();
     }
 
@@ -405,8 +409,8 @@
 
     // ====== 隨機 5 顆（遵守每種上限） ======
     function randomFill() {
+      clearAll(false);
       setDrawMode("隨機"); // ← 按「隨機」即視為隨機抽卦
-      clearAll();
       // 建權重池：每種棋依上限重複放入，讓兵/卒較常被抽中
       const pool = [];
       Object.keys(PIECE_LIMITS).forEach(type => {
