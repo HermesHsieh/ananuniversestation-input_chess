@@ -190,16 +190,26 @@
     .footer-pad {
       height: 8px;
     }
+
+    .ver-badge {
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      padding: 6px 10px;
+      font-size: 12px;
+      color: #6b7280;
+      background: #fff;
+    }
   </style>
 </head>
 
 <body>
   <div class="wrap">
     <div class="topbar">
-      <div class="title">象棋卜卦-單卦v12</div>
+      <div class="title">象棋卜卦-單卦</div>
       <div class="bar-actions">
         <button class="ghost" id="askBtn">輸入問題</button>
         <button class="ghost" id="reloadBtn">Reload</button>
+        <span class="ver-badge" id="ver">v1.0.12</span>
       </div>
     </div>
 
@@ -271,9 +281,11 @@
 
   <script>
     /** ******************************
-     *  🔧 在這裡換你的 LIFF ID
-     *********************************/
+    *  🔧 在這裡換你的 LIFF ID & 版本
+    *********************************/
     const LIFF_ID = "2007906926-NZW6EQ7P";
+    const APP_VERSION = "v1.0.12";
+
 
     // ====== 狀態與工具 ======
     const $ = (id) => document.getElementById(id);
@@ -444,11 +456,28 @@
             layout: "vertical",
             contents: [
               { type: "text", text: "LIFF 提交", size: "xs", color: "#9ca3af", align: "end" },
+              { type: "text", text: APP_VERSION, size: "xs", color: "#9ca3af", align: "end" },
               {
                 type: "box", layout: "vertical", flex: 1, contents: [
                   {
                     type: "button", style: "secondary",
                     action: { type: "uri", label: "再一次", uri: `https://liff.line.me/${LIFF_ID}` }
+                  }
+                ]
+              },
+              {
+                type: "box", layout: "vertical", flex: 1, contents: [
+                  {
+                    type: "button", style: "secondary",
+                    action: { type: "uri", label: "再一次2", uri: `https://liff.line.me/${LIFF_ID}` }
+                  }
+                ]
+              },
+              {
+                type: "box", layout: "vertical", flex: 1, contents: [
+                  {
+                    type: "button", style: "secondary",
+                    action: { type: "uri", label: "再一次3", uri: `https://liff.line.me/${LIFF_ID}` }
                   }
                 ]
               }
@@ -508,8 +537,11 @@
       } catch (err) {
         console.error(err);
         statusEl.textContent = `LIFF 初始化失敗：${err?.message || "unknown"}`;
-      }
+      } 
     })();
+
+    // ====== 初始狀態與版本顯示 ======
+    document.getElementById("ver").textContent = APP_VERSION;
 
     // 初次渲染
     render();
