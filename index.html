@@ -130,6 +130,13 @@
       margin: 8px 0 0;
     }
 
+    .hint-version {
+      font-size: 8px;
+      color: #666;
+      text-align: center;
+      margin: 8px 0 0;
+    }
+
     .controls {
       display: flex;
       gap: 8px;
@@ -209,7 +216,6 @@
       <div class="bar-actions">
         <button class="ghost" id="askBtn">輸入問題</button>
         <button class="ghost" id="reloadBtn">Reload</button>
-        <span class="ver-badge" id="ver"></span>
       </div>
     </div>
 
@@ -251,6 +257,7 @@
 
       <div class="hint">點選下方棋子，系統會依序放入：1 → 2 → 3 → 4 → 5</div>
       <div class="hint">點選「指定位置」→ 再點下方棋子</div>
+      <div class="hint-version" id="ver" style="text-align: right;"></div>
     </div>
 
     <!-- 棋子選擇（黑在上、紅在下） -->
@@ -284,7 +291,7 @@
     *  🔧 在這裡換你的 LIFF ID & 版本
     *********************************/
     const LIFF_ID = "2007906926-NZW6EQ7P";
-    const APP_VERSION = "v1.0.13";
+    const APP_VERSION = "v1.0.14";
 
 
     // ====== 狀態與工具 ======
@@ -461,15 +468,7 @@
                 type: "box", layout: "vertical", flex: 1, contents: [
                   {
                     type: "button", style: "primary",
-                    action: { type: "postback", label: "解析", data: `cmd=analyze&p=${fiveParam}` }
-                  }
-                ]
-              },
-              {
-                type: "box", layout: "vertical", flex: 1, contents: [
-                  {
-                    type: "button", style: "primary",
-                    action: { type: "postback", label: "療癒分數", data: `cmd=heal&p=${fiveParam}` }
+                    action: { type: "uri", label: "再一次3", uri: `https://liff.line.me/${LIFF_ID}` }
                   }
                 ]
               },
@@ -538,7 +537,7 @@
       } catch (err) {
         console.error(err);
         statusEl.textContent = `LIFF 初始化失敗：${err?.message || "unknown"}`;
-      } 
+      }
     })();
 
     // ====== 初始狀態與版本顯示 ======
