@@ -304,7 +304,7 @@
     *  🔧 在這裡換你的 LIFF ID & 版本
     *********************************/
     const LIFF_ID = "2007906926-NZW6EQ7P";
-    const APP_VERSION = "v1.0.36";
+    const APP_VERSION = "v1.0.37";
 
     /** ******************************
     *  🧰 全套 32 枚牌堆（抽過即移除）
@@ -517,12 +517,19 @@
       const t5 = toText(picks[5]);
 
       const summary = [1, 2, 3, 4, 5].map(i => `${i}:${picks[i].type}`).join("  ");
+      printLog("抽取結果：" + summary);
       const fiveStr = [1, 2, 3, 4, 5].map(i => picks[i].type).join(""); // 五字
+      printLog("五字：" + fiveStr);
       const fiveParam = encodeURIComponent(fiveStr);
+      printLog("五字參數：" + fiveParam);
       const titleText = (titleEl.textContent || "象棋卜卦-單掛").trim();
+      printLog("卜卦問題：" + titleText);
       const modeTag = (drawMode === "隨機" ? "隨機" : "手動"); // 要顯示的文字
+      printLog("輸入方式：" + modeTag);
       const modeParam = encodeURIComponent(modeTag);
+      printLog("輸入方式參數：" + modeParam);
       const modeHint = (drawMode === "隨機" ? "*隨機抽卦結果僅供參考*" : "");
+      printLog("輸入方式提示：" + modeHint);
 
       // ★ 圓圈尺寸（可調）：建議 72~90px
       const CIRCLE_SIZE = "80px";
@@ -621,10 +628,9 @@
                     style: "primary",
                     flex: 1,
                     action: {
-                      type: "postback",
+                      type: "message",
                       label: "療癒分數",
-                      data: fiveStr,
-                      displayText: "查療癒分數"
+                      text: `/5chess ${fiveStr}`  // 這會在聊天室直接傳送這串文字
                     }
                   },
                   {
