@@ -304,7 +304,7 @@
     *  🔧 在這裡換你的 LIFF ID & 版本
     *********************************/
     const LIFF_ID = "2007906926-NZW6EQ7P";
-    const APP_VERSION = "v1.0.67";
+    const APP_VERSION = "v1.0.68";
 
     /** ******************************
     *  🧰 全套 32 枚牌堆（抽過即移除）
@@ -652,8 +652,9 @@
 
     async function sendResult() {
       // const flex = buildFlexMessage();
+      // printLog("sendResult flex: ", flex);
 	  const mImage = buildImageMessage();
-      printLog("sendResult flex: ", flex);
+      printLog("sendResult mImage: ", mImage);
       if (!flex) return;
       try {
         if (liff?.isInClient?.()) {
