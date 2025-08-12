@@ -212,7 +212,7 @@
 <body>
   <div class="wrap">
     <div class="topbar">
-      <div class="title">單卦v32</div>
+      <div class="title">單卦v33</div>
       <div class="bar-actions">
         <button class="ghost" id="askBtn">輸入問題</button>
         <button class="ghost" id="reloadBtn">Reload</button>
@@ -299,7 +299,7 @@
     *  🔧 在這裡換你的 LIFF ID & 版本
     *********************************/
     const LIFF_ID = "2007906926-NZW6EQ7P";
-    const APP_VERSION = "v1.0.32";
+    const APP_VERSION = "v1.0.33";
 
     /** ******************************
     *  🧰 全套 32 枚牌堆（抽過即移除）
@@ -522,7 +522,7 @@
       // ★ 圓圈尺寸（可調）：建議 72~90px
       const CIRCLE_SIZE = "80px";
       // ★ 文字大小（可調）： xxs / xs / sm / md / lg / xl / xxl / 3xl / 4xl / 5xl
-      const PIECE_TEXT_SIZE = "3xl";
+      const PIECE_TEXT_SIZE = "5xl";
       // ★ 舒服背景色（Flex bubble 的 body）
       const FLEX_BG = "#F6F7FB"; // 微藍灰，耐看
 
@@ -614,8 +614,13 @@
                   {
                     type: "button",
                     style: "primary",
-                    flex: 1, 
-                    action: { type: "uri", label: "療癒分數", uri: `https://liff.line.me/${LIFF_ID}` }
+                    flex: 1,
+                    action: {
+                      type: "postback",
+                      label: "療癒分數",
+                      data: `cmd=5chess&param=${fiveStr}`,
+                      displayText: "查療癒分數"
+                    }
                   },
                   {
                     type: "button",
