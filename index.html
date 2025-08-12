@@ -196,7 +196,7 @@
 <body>
   <div class="wrap">
     <div class="topbar">
-      <div class="title">象棋卜卦</div>
+      <div class="title">象棋卜卦-單卦</div>
       <div class="bar-actions">
         <button class="ghost" id="askBtn">輸入問題</button>
         <button class="ghost" id="reloadBtn">Reload</button>
@@ -206,7 +206,7 @@
     <div id="status" class="status">初始化中…</div>
 
     <div class="card">
-      <div id="cardTitle" class="card-title">單卦</div>
+      <div id="cardTitle" class="card-title"></div>
 
       <!-- 九宮格（上：4 / 中：2 1 3 / 下：5） -->
       <div class="grid" aria-label="十字九宮格">
@@ -367,7 +367,7 @@
     }
 
     function promptQuestion() {
-      const t = prompt("請輸入你的卜卦問題（將顯示於卡片標題）：", titleEl.textContent || "");
+      const t = prompt("請輸入你的卜卦問題：", titleEl.textContent || "");
       if (t && t.trim()) titleEl.textContent = t.trim();
     }
 
