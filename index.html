@@ -292,6 +292,11 @@
       </div>
       <div class="footer-pad"></div>
     </div>
+
+    <div id="logOutput"
+      style="white-space: pre-wrap; background:#f0f0f0; padding:10px; border:1px solid #ccc; height:150px; overflow-y:auto;">
+    </div>
+
   </div>
 
   <script>
@@ -299,7 +304,7 @@
     *  🔧 在這裡換你的 LIFF ID & 版本
     *********************************/
     const LIFF_ID = "2007906926-NZW6EQ7P";
-    const APP_VERSION = "v1.0.35";
+    const APP_VERSION = "v1.0.36";
 
     /** ******************************
     *  🧰 全套 32 枚牌堆（抽過即移除）
@@ -642,7 +647,8 @@
       try {
         if (liff?.isInClient?.()) {
           await liff.sendMessages([flex]);
-          alert("已送出，返回聊天室"); liff.closeWindow();
+          alert("已送出，返回聊天室");
+          liff.closeWindow();
         } else if (liff.isApiAvailable('shareTargetPicker')) {
           await liff.shareTargetPicker([flex]);
           alert("已分享");
@@ -650,6 +656,8 @@
           alert("請在 LINE 內開啟此 LIFF 頁面再送出。");
         }
       } catch (e) {
+        console.error('sendMessages full error:', e);
+        printLog('sendMessages full error:', e);
         const msg = (e?.message || e || '').toString();
         if ((msg.includes('scope') || msg.includes('not in LIFF app scope')) && liff.isApiAvailable('shareTargetPicker')) {
           await liff.shareTargetPicker([flex]);
@@ -659,6 +667,17 @@
         }
       }
     }
+
+    // ====== 日誌輸出 ======
+    function printLog(message) {
+      const logDiv = document.getElementById('logOutput');
+      if (logDiv) {
+        logDiv.textContent += message + "\n";
+        logDiv.scrollTop = logDiv.scrollHeight;  // 自動捲到底部
+      }
+    }
+
+
 
     // ====== 綁定 UI ======
     $("askBtn").addEventListener("click", promptQuestion);
@@ -679,7 +698,14 @@
     (async () => {
       try {
         statusEl.textContent = "初始化 LIFF…";
-        await liff.init({ liffId: LIFF_ID, withLoginOnExternalBrowser: true });
+        await liff.init({ liffId: LIFF_ID, withLoginOnExternalBrowser: true }).then(() => {
+          printLog("LIFF 初始化成功");
+          liff.getProfile().then(profile => {
+            printLog("用戶名稱：" + profile.displayName);
+          });
+        }).catch(err => {
+          printLog("初始化錯誤: " + err.message);
+        });
         if (!liff.isLoggedIn()) { statusEl.textContent = "未登入 → 導向登入"; return liff.login(); }
         const profile = await liff.getProfile();
         statusEl.textContent = `Hello, ${profile.displayName} 👋`;
