@@ -10,7 +10,7 @@
     :root {
       --red: #d32f2f;
       --black: #111;
-      --bg: #fafafa;
+      --bg: #F6F7FB;
       --card: #fff;
       --border: #e5e7eb;
       --accent: #2563eb;
@@ -212,7 +212,7 @@
 <body>
   <div class="wrap">
     <div class="topbar">
-      <div class="title">單卦v21</div>
+      <div class="title">單卦v22</div>
       <div class="bar-actions">
         <button class="ghost" id="askBtn">輸入問題</button>
         <button class="ghost" id="reloadBtn">Reload</button>
@@ -299,7 +299,40 @@
     *  🔧 在這裡換你的 LIFF ID & 版本
     *********************************/
     const LIFF_ID = "2007906926-NZW6EQ7P";
-    const APP_VERSION = "v1.0.21";
+    const APP_VERSION = "v1.0.22";
+
+    /** ******************************
+    *  🧰 全套 32 枚牌堆（抽過即移除）
+    *********************************/
+    // 以整副棋的數量建立完整牌堆
+    const FULL_DECK_COUNTS = {
+      "帥": 1, "仕": 2, "相": 2, "俥": 2, "傌": 2, "炮": 2, "兵": 5,
+      "將": 1, "士": 2, "象": 2, "車": 2, "馬": 2, "包": 2, "卒": 5
+    };
+    // 依數量展開成陣列（32 枚）
+    function makeFullDeck() {
+      const arr = [];
+      Object.entries(FULL_DECK_COUNTS).forEach(([type, n]) => {
+        for (let i = 0; i < n; i++) arr.push(type);
+      });
+      return arr;
+    }
+    // 目前牌堆（null 表示尚未建立或已重置）
+    let deck = null;
+
+    // 需求：第一次按「隨機」或清空後才建立牌堆
+    function ensureDeck() {
+      if (!deck || deck.length === 0) deck = makeFullDeck();
+      return deck;
+    }
+    // 從牌堆隨機抽 1 枚（會移除該枚）
+    function drawFromDeck() {
+      ensureDeck();
+      if (deck.length === 0) return null;
+      const idx = Math.floor(Math.random() * deck.length);
+      const [picked] = deck.splice(idx, 1);
+      return picked; // 回傳棋種字元
+    }
 
     // 輸入方式（手動 / 隨機）
     let drawMode = "手動"; // 預設手動
@@ -390,10 +423,11 @@
       render();
     }
 
-    function clearAll(resetMode = true) {
+    function clearAll(resetMode = true, resetDeck = true) {
       for (let i = 1; i <= 5; i++) picks[i] = null;
       selectedPos = null;
-      if (resetMode) setDrawMode("手動"); // 只有需要才重置
+      if (resetMode) setDrawMode("手動"); // 清空後回到手動（可關閉）
+      if (resetDeck) deck = null;        // ★ 清空時也重置牌堆（回到 32 枚）
       render();
     }
 
@@ -432,6 +466,33 @@
       render();
     }
 
+    // ====== 隨機抽 1 枚（若 5 格已滿則提示） ======
+    function randomDrawOne() {
+      // 若 5 格已滿，直接提示
+      const empty = firstEmptyPos();
+      if (!empty) { alert("5 格已滿，請先「清除」再抽。"); return; }
+
+      // 定位模式優先：若鎖定的格為空，就放那格；否則放最前面空格
+      const target = (selectedPos && !picks[selectedPos]) ? selectedPos : empty;
+
+      // 抽 1 枚；若牌堆空了會自動重建
+      setDrawMode("隨機");
+      const type = drawFromDeck();
+      if (!type) { alert("牌堆已空，已重建。請再試一次。"); ensureDeck(); return; }
+
+      // 放到目標格
+      if (!canPlace(type, target)) {
+        // 理論上不會發生（因為 5 格上限遠小於整副棋數），但保險處理：
+        alert(`「${type}」已超出可用數量，改抽下一枚。`);
+        return randomDrawOne(); // 直接再抽一枚
+      }
+      picks[target] = { type, color: pieceColorOf(type) };
+
+      // 下一個預選目標 = 下一個空格（若已滿則 null）
+      selectedPos = firstEmptyPos();
+      render();
+    }
+
     // ====== Flex 送出 ======
     function buildFlexMessage() {
       const cells = [1, 2, 3, 4, 5].map(i => picks[i]);
@@ -460,20 +521,79 @@
       const modeParam = encodeURIComponent(modeTag);
       const modeHint = (drawMode === "隨機" ? "*隨機抽卦結果僅供參考*" : "");
 
+      // ★ 圓圈尺寸（可調）：建議 72~90px
+      const CIRCLE_SIZE = "80px";
+      // ★ 文字大小（可調）：lg / xl
+      const PIECE_TEXT_SIZE = "xl";
+      // ★ 舒服背景色（Flex bubble 的 body）
+      const FLEX_BG = "#F6F7FB"; // 微藍灰，耐看
+
+      // 產生：黑外圈 + 白內圈 + 中央字
+      const toCircle = (cell) => {
+        const pieceColor = (cell.color === "red") ? "#d32f2f" : "#111111";
+        return {
+          type: "box",
+          layout: "vertical",
+          width: CIRCLE_SIZE,
+          height: CIRCLE_SIZE,
+          cornerRadius: "999px",
+          backgroundColor: "#111111",     // 黑色外圈
+          paddingAll: "2px",               // 外圈厚度
+          contents: [
+            {
+              type: "box",
+              layout: "vertical",
+              width: "100%", height: "100%",
+              cornerRadius: "999px",
+              backgroundColor: "#FFFFFF",  // 白色內圈
+              contents: [
+                { type: "filler" },
+                {
+                  type: "text",
+                  text: String(cell.type),
+                  weight: "bold",
+                  align: "center",
+                  size: PIECE_TEXT_SIZE,
+                  color: pieceColor
+                },
+                { type: "filler" }
+              ]
+            }
+          ]
+        };
+      };
+
+      const circ4 = toCircle(picks[4]);
+      const circ2 = toCircle(picks[2]);
+      const circ1 = toCircle(picks[1]);
+      const circ3 = toCircle(picks[3]);
+      const circ5 = toCircle(picks[5]);
+
       return {
         type: "flex",
         altText: `${summary}`,
         contents: {
           type: "bubble",
+          styles: { // ★ 設定柔和的背景色
+            body: { backgroundColor: FLEX_BG },
+            footer: { backgroundColor: FLEX_BG }
+          },
           body: {
             type: "box",
             layout: "vertical",
             spacing: "md",
             contents: [
               { type: "text", text: titleText, weight: "bold", size: "lg", wrap: true },
-              { type: "box", layout: "horizontal", justifyContent: "center", contents: [t1] },
-              { type: "box", layout: "horizontal", spacing: "md", contents: [t2, t3, t4] },
-              { type: "box", layout: "horizontal", justifyContent: "center", contents: [t5] },
+
+              // 上：4（置中）
+              { type: "box", layout: "horizontal", justifyContent: "center", contents: [circ4] },
+
+              // 中：2 1 3（間距一致）
+              { type: "box", layout: "horizontal", spacing: "md", justifyContent: "center", contents: [circ2, circ1, circ3] },
+
+              // 下：5（置中）
+              { type: "box", layout: "horizontal", justifyContent: "center", contents: [circ5] },
+
               { type: "separator", margin: "md" },
               { type: "text", text: APP_VERSION, size: "xs", color: "#9ca3af", align: "end" },
               { type: "text", text: summary, size: "sm", color: "#6b7280", wrap: true },
@@ -483,7 +603,7 @@
           footer: {
             type: "box",
             layout: "vertical",
-            spacing: "md",
+            spacing: "sm",
             contents: [
               { type: "text", text: "Anan Universe Station Generated.", size: "xs", color: "#9ca3af", align: "end" },
               {
@@ -540,7 +660,7 @@
     $("askBtn").addEventListener("click", promptQuestion);
     $("reloadBtn").addEventListener("click", hardReload);
     $("clearBtn").addEventListener("click", clearAll);
-    $("randomBtn").addEventListener("click", randomFill);
+    $("randomBtn").addEventListener("click", randomDrawOne);
     $("sendBtn").addEventListener("click", sendResult);
 
     Object.entries(posEls).forEach(([idx, el]) => {
