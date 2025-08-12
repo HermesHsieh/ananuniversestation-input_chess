@@ -304,7 +304,7 @@
     *  🔧 在這裡換你的 LIFF ID & 版本
     *********************************/
     const LIFF_ID = "2007906926-NZW6EQ7P";
-    const APP_VERSION = "v1.0.61";
+    const APP_VERSION = "v1.0.62";
 
     /** ******************************
     *  🧰 全套 32 枚牌堆（抽過即移除）
@@ -631,7 +631,7 @@
                     type: "button",
                     style: "secondary",
                     flex: 1,
-                    action: { type: "uri", label: "再一次", uri: `https://liff.line.me/${LIFF_ID}&parameter=auto` }
+                    action: { type: "uri", label: "再一次", uri: `https://liff.line.me/${LIFF_ID}` }
                   }
                 ]
               }
@@ -744,6 +744,7 @@
           const parameter = urlParams.get('p');
           printLog("網址參數 p: " + parameter);
           if (parameter !== null) {
+            printLog("sendMessages p: " + parameter);
             liff.sendMessages([
               {
                 type: 'text',
