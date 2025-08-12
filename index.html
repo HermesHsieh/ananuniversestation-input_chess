@@ -304,7 +304,7 @@
     *  🔧 在這裡換你的 LIFF ID & 版本
     *********************************/
     const LIFF_ID = "2007906926-NZW6EQ7P";
-    const APP_VERSION = "v1.0.47";
+    const APP_VERSION = "v1.0.48";
 
     /** ******************************
     *  🧰 全套 32 枚牌堆（抽過即移除）
@@ -622,9 +622,10 @@
                 spacing: "md",          // 按鈕間距
                 contents: [
                   {
-                    type: "box", layout: "vertical", flex: 1, contents: [
-                      { type: "button", style: "primary", action: { type: "postback", label: "療癒分數", data: "hello word!" } }
-                    ]
+                    type: "button",
+                    style: "primary",
+                    flex: 1,
+                    action: { type: "message", label: "療癒分數", text: "send" }
                   },
                   {
                     type: "button",
@@ -655,7 +656,8 @@
           alert("請在 LINE 內開啟此 LIFF 頁面再送出。");
         }
       } catch (e) {
-        await validateFlexOnServer(flex); // ★ 追加這行，看官方 validator 說了什麼
+        const res = await validateFlexOnServerJSONP(flex);
+        printLog("Validator 回應：\n" + JSON.stringify(res, null, 2));
         const details = {
           name: e?.name,
           message: e?.message,
@@ -682,23 +684,18 @@
       }
     }
 
-    async function validateFlexOnServer(flex) {
-      try {
-        const res = await fetch("https://script.google.com/macros/s/AKfycbwpTCUmsM55eTsXPLpkR6qgSkr8L0KzHXf323pwBXrwvTQJ2A8L2K0XmJwhyFPYaZRwPQ/exec", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ message: flex })
-        });
-        const json = await res.json();
-        console.log("Validator result:", json);
-        alert("Validator 回應：\n" + JSON.stringify(json, null, 2));
-      } catch (err) {
-        alert("呼叫 Validator 失敗：" + (err?.message || err));
-      }
+    async function validateFlexOnServerJSONP(flex) {
+      return new Promise((resolve, reject) => {
+        const url = "https://script.google.com/macros/s/AKfycbwpTCUmsM55eTsXPLpkR6qgSkr8L0KzHXf323pwBXrwvTQJ2A8L2K0XmJwhyFPYaZRwPQ/exec";
+        const cb = "cb" + Date.now();
+        window[cb] = (data) => { resolve(data); delete window[cb]; script.remove(); };
+        const u = `${url}?callback=${cb}&message=${encodeURIComponent(JSON.stringify(flex))}`;
+        const script = document.createElement("script");
+        script.src = u;
+        script.onerror = () => { reject(new Error("JSONP load error")); delete window[cb]; };
+        document.body.appendChild(script);
+      });
     }
-
-
-
 
     // ====== 綁定 UI ======
     $("askBtn").addEventListener("click", promptQuestion);
