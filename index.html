@@ -212,7 +212,7 @@
 <body>
   <div class="wrap">
     <div class="topbar">
-      <div class="title">象棋卜卦-單卦</div>
+      <div class="title">單卦</div>
       <div class="bar-actions">
         <button class="ghost" id="askBtn">輸入問題</button>
         <button class="ghost" id="reloadBtn">Reload</button>
@@ -223,6 +223,7 @@
 
     <div class="card">
       <div id="cardTitle" class="card-title"></div>
+      <div id="drawMode" class="hint" style="margin-top:4px">輸入方式：手動</div>
 
       <!-- 九宮格（上：4 / 中：2 1 3 / 下：5） -->
       <div class="grid" aria-label="十字九宮格">
@@ -291,8 +292,15 @@
     *  🔧 在這裡換你的 LIFF ID & 版本
     *********************************/
     const LIFF_ID = "2007906926-NZW6EQ7P";
-    const APP_VERSION = "v1.0.14";
+    const APP_VERSION = "v1.0.15";
 
+    // 輸入方式（手動 / 隨機）
+    let drawMode = "手動"; // 預設手動
+    function setDrawMode(mode) {
+      drawMode = mode;
+      const dm = document.getElementById("drawMode");
+      if (dm) dm.textContent = `輸入方式：${drawMode}`;
+    }
 
     // ====== 狀態與工具 ======
     const $ = (id) => document.getElementById(id);
@@ -356,6 +364,7 @@
     }
 
     function addPiece(type) {
+      setDrawMode("手動"); // ← 使用者點底部棋子視為手動
       const color = pieceColorOf(type);
       if (!color) return;
 
@@ -377,6 +386,7 @@
     function clearAll() {
       for (let i = 1; i <= 5; i++) picks[i] = null;
       selectedPos = null;
+      setDrawMode("手動"); // 清空後回到手動
       render();
     }
 
@@ -392,6 +402,7 @@
 
     // ====== 隨機 5 顆（遵守每種上限） ======
     function randomFill() {
+      setDrawMode("隨機"); // ← 按「隨機」即視為隨機抽卦
       clearAll();
       // 建權重池：每種棋依上限重複放入，讓兵/卒較常被抽中
       const pool = [];
@@ -438,6 +449,9 @@
       const fiveStr = [1, 2, 3, 4, 5].map(i => picks[i].type).join(""); // 五字
       const fiveParam = encodeURIComponent(fiveStr);
       const titleText = (titleEl.textContent || "象棋卜卦-單掛").trim();
+      const modeTag = (drawMode === "隨機" ? "隨機" : "手動"); // 要顯示的文字
+      const modeParam = encodeURIComponent(modeTag);
+      const modeHint = (drawMode === "隨機" ? "*隨機抽卦結果僅供參考*" : "");
 
       return {
         type: "flex",
@@ -454,8 +468,9 @@
               { type: "box", layout: "horizontal", spacing: "md", contents: [t2, t3, t4] },
               { type: "box", layout: "horizontal", justifyContent: "center", contents: [t5] },
               { type: "separator", margin: "md" },
-              { type: "text", text: summary, size: "sm", color: "#6b7280", wrap: true },
-              { type: "text", text: titleText, size: "sm", color: "#6b7280", wrap: true }
+              { type: "text", text: APP_VERSION, size: "xs", color: "#9ca3af", align: "end" },
+              { type: "text", text: modeHint, size: "sm", color: "#6b7280", wrap: true }
+              { type: "text", text: summary, size: "sm", color: "#6b7280", wrap: true }
             ]
           },
           footer: {
@@ -463,12 +478,20 @@
             layout: "vertical",
             spacing: "md",
             contents: [
-              { type: "text", text: "LIFF 提交", size: "xs", color: "#9ca3af", align: "end" },
+              { type: "text", text: "Anan Universe Station Generated.", size: "xs", color: "#9ca3af", align: "end" },
               {
                 type: "box", layout: "vertical", flex: 1, contents: [
                   {
                     type: "button", style: "primary",
-                    action: { type: "uri", label: "再一次3", uri: `https://liff.line.me/${LIFF_ID}` }
+                    action: { type: "uri", label: "再一次1", uri: `https://liff.line.me/${LIFF_ID}` }
+                  }
+                ]
+              },
+              {
+                type: "box", layout: "vertical", flex: 1, contents: [
+                  {
+                    type: "button", style: "primary",
+                    action: { type: "uri", label: "再一次2", uri: `https://liff.line.me/${LIFF_ID}` }
                   }
                 ]
               },
@@ -479,8 +502,7 @@
                     action: { type: "uri", label: "再一次3", uri: `https://liff.line.me/${LIFF_ID}` }
                   }
                 ]
-              },
-              { type: "text", text: APP_VERSION, size: "xs", color: "#9ca3af", align: "end" }
+              }
             ]
           }
         }
@@ -542,6 +564,7 @@
 
     // ====== 初始狀態與版本顯示 ======
     document.getElementById("ver").textContent = APP_VERSION;
+    setDrawMode("手動"); // 初始化顯示
 
     // 初次渲染
     render();
