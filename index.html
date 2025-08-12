@@ -454,22 +454,22 @@
           footer: {
             type: "box",
             layout: "vertical",
+            spacing: "md",
             contents: [
               { type: "text", text: "LIFF 提交", size: "xs", color: "#9ca3af", align: "end" },
-              { type: "text", text: APP_VERSION, size: "xs", color: "#9ca3af", align: "end" },
               {
                 type: "box", layout: "vertical", flex: 1, contents: [
                   {
-                    type: "button", style: "secondary",
-                    action: { type: "uri", label: "再一次", uri: `https://liff.line.me/${LIFF_ID}` }
+                    type: "button", style: "primary",
+                    action: { type: "postback", label: "解析", data: `cmd=analyze&p=${fiveParam}` }
                   }
                 ]
               },
               {
                 type: "box", layout: "vertical", flex: 1, contents: [
                   {
-                    type: "button", style: "secondary",
-                    action: { type: "uri", label: "再一次2", uri: `https://liff.line.me/${LIFF_ID}` }
+                    type: "button", style: "primary",
+                    action: { type: "postback", label: "療癒分數", data: `cmd=heal&p=${fiveParam}` }
                   }
                 ]
               },
@@ -480,7 +480,8 @@
                     action: { type: "uri", label: "再一次3", uri: `https://liff.line.me/${LIFF_ID}` }
                   }
                 ]
-              }
+              },
+              { type: "text", text: APP_VERSION, size: "xs", color: "#9ca3af", align: "end" }
             ]
           }
         }
