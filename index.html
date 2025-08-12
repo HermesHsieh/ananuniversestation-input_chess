@@ -304,7 +304,7 @@
     *  🔧 在這裡換你的 LIFF ID & 版本
     *********************************/
     const LIFF_ID = "2007906926-NZW6EQ7P";
-    const APP_VERSION = "v1.0.73";
+    const APP_VERSION = "v1.0.74";
 
     /** ******************************
     *  🧰 全套 32 枚牌堆（抽過即移除）
@@ -523,6 +523,8 @@
       printLog("五字參數：" + fiveParam);
       const titleText = (titleEl.textContent || "象棋卜卦-單掛").trim();
       printLog("卜卦問題：" + titleText);
+      const titleParam = encodeURIComponent(titleText);
+      printLog("卜卦問題參數：" + titleParam);
       const modeTag = (drawMode === "隨機" ? "隨機" : "手動"); // 要顯示的文字
       printLog("輸入方式：" + modeTag);
       const modeParam = encodeURIComponent(modeTag);
@@ -532,8 +534,8 @@
 	  
 		return {
 		  type: 'image',
-		  originalContentUrl: 'https://i.imgur.com/MwS42AE.png?p=5chess&c=${fiveStr}&n=${titleText}',
-		  previewImageUrl: 'https://i.imgur.com/MwS42AE.png?p=5chess&c=${fiveStr}&n=${titleText}'
+		  originalContentUrl: 'https://i.imgur.com/MwS42AE.png?p=5chess&c=${fiveParam}&n=${titleParam}',
+		  previewImageUrl: 'https://i.imgur.com/MwS42AE.png?p=5chess&c=${fiveParam}&n=${titleParam}'
 		};
 	}
 
