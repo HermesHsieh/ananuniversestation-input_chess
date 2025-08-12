@@ -304,7 +304,7 @@
     *  🔧 在這裡換你的 LIFF ID & 版本
     *********************************/
     const LIFF_ID = "2007906926-NZW6EQ7P";
-    const APP_VERSION = "v1.0.44";
+    const APP_VERSION = "v1.0.45";
 
     /** ******************************
     *  🧰 全套 32 枚牌堆（抽過即移除）
@@ -656,8 +656,13 @@
           alert("請在 LINE 內開啟此 LIFF 頁面再送出。");
         }
       } catch (e) {
-        console.error('sendMessages full error:', e);
-        printLog('sendMessages full error:', e);
+        const details = {
+          name: e?.name,
+          message: e?.message,
+          stack: e?.stack,
+          raw: e
+        };
+        printLog("sendMessages failed", details);
         const msg = (e?.message || e || '').toString();
         if ((msg.includes('scope') || msg.includes('not in LIFF app scope')) && liff.isApiAvailable('shareTargetPicker')) {
           await liff.shareTargetPicker([flex]);
