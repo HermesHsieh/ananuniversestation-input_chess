@@ -304,7 +304,7 @@
     *  🔧 在這裡換你的 LIFF ID & 版本
     *********************************/
     const LIFF_ID = "2007906926-NZW6EQ7P";
-    const APP_VERSION = "v1.0.46";
+    const APP_VERSION = "v1.0.47";
 
     /** ******************************
     *  🧰 全套 32 枚牌堆（抽過即移除）
@@ -655,6 +655,7 @@
           alert("請在 LINE 內開啟此 LIFF 頁面再送出。");
         }
       } catch (e) {
+        await validateFlexOnServer(flex); // ★ 追加這行，看官方 validator 說了什麼
         const details = {
           name: e?.name,
           message: e?.message,
@@ -680,6 +681,22 @@
         logDiv.scrollTop = logDiv.scrollHeight;  // 自動捲到底部
       }
     }
+
+    async function validateFlexOnServer(flex) {
+      try {
+        const res = await fetch("https://script.google.com/macros/s/AKfycbwpTCUmsM55eTsXPLpkR6qgSkr8L0KzHXf323pwBXrwvTQJ2A8L2K0XmJwhyFPYaZRwPQ/exec", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ message: flex })
+        });
+        const json = await res.json();
+        console.log("Validator result:", json);
+        alert("Validator 回應：\n" + JSON.stringify(json, null, 2));
+      } catch (err) {
+        alert("呼叫 Validator 失敗：" + (err?.message || err));
+      }
+    }
+
 
 
 
