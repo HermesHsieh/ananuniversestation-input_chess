@@ -304,7 +304,7 @@
     *  🔧 在這裡換你的 LIFF ID & 版本
     *********************************/
     const LIFF_ID = "2007906926-NZW6EQ7P";
-    const APP_VERSION = "v1.0.58";
+    const APP_VERSION = "v1.0.59";
 
     /** ******************************
     *  🧰 全套 32 枚牌堆（抽過即移除）
@@ -621,17 +621,17 @@
                 layout: "horizontal",   // 改成水平排列
                 spacing: "md",          // 按鈕間距
                 contents: [
-                {
+                  {
                     type: "button",
                     style: "primary",
                     flex: 1,
-                    action: { type: "postback", label: "療癒分數", data: 'hello', displayText: "給我分數" }
+                    action: { type: "uri", label: "療癒分數", uri: `https://liff.line.me/${LIFF_ID}&parameter=manually` }
                   },
                   {
                     type: "button",
                     style: "secondary",
                     flex: 1,
-                    action: { type: "uri", label: "再一次", uri: `https://liff.line.me/${LIFF_ID}` }
+                    action: { type: "uri", label: "再一次", uri: `https://liff.line.me/${LIFF_ID}&parameter=auto` }
                   }
                 ]
               }
@@ -676,6 +676,32 @@
       }
     }
 
+    // 解析網址參數函式
+    function getQueryParam(param) {
+      const urlParams = new URLSearchParams(window.location.search);
+      return urlParams.get(param);
+    }
+
+    // 準備要送的訊息，依參數不同決定內容
+    function prepareMessage(parameter) {
+      if (parameter === 'manually') {
+        return {
+          type: 'text',
+          text: '收到參數 manully，執行療癒分數指令！'
+        };
+      } else if (parameter === 'auto') {
+        return {
+          type: 'text',
+          text: '自動模式啟動中...'
+        };
+      } else {
+        return {
+          type: 'text',
+          text: '未帶參數或參數內容未知。'
+        };
+      }
+    }
+
     async function validateFlexOnServerJSONP(flex) {
       return new Promise((resolve, reject) => {
         const url = "https://script.google.com/macros/s/AKfycbwpTCUmsM55eTsXPLpkR6qgSkr8L0KzHXf323pwBXrwvTQJ2A8L2K0XmJwhyFPYaZRwPQ/exec";
@@ -716,6 +742,8 @@
         }).catch(err => {
           printLog("初始化錯誤: " + err.message);
         });
+        const parameter = getQueryParam('parameter');
+        printLog('網址參數 parameter = ' + parameter);
         if (!liff.isLoggedIn()) { statusEl.textContent = "未登入 → 導向登入"; return liff.login(); }
         const profile = await liff.getProfile();
         statusEl.textContent = `Hello, ${profile.displayName} 👋`;
