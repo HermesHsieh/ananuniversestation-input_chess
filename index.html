@@ -212,7 +212,7 @@
 <body>
   <div class="wrap">
     <div class="topbar">
-      <div class="title">單卦v20</div>
+      <div class="title">單卦v21</div>
       <div class="bar-actions">
         <button class="ghost" id="askBtn">輸入問題</button>
         <button class="ghost" id="reloadBtn">Reload</button>
@@ -259,7 +259,7 @@
       <div class="hint" style="text-align: left;">點選下方棋子，系統會依序放入：1 → 2 → 3 → 4 → 5</div>
       <div class="hint" style="text-align: left;">點選「指定位置」→ 再點下方棋子</div>
       <div class="hint-box" style="display: flex; justify-content: space-between; align-items: center;">
-        <div id="drawMode" class="hint" style="text-align: left;">
+        <div id="draw-mode" class="hint-version" style="text-align: left;">
           輸入方式：手動
         </div>
         <div class="hint-version" id="ver" style="text-align: right;">
@@ -299,13 +299,13 @@
     *  🔧 在這裡換你的 LIFF ID & 版本
     *********************************/
     const LIFF_ID = "2007906926-NZW6EQ7P";
-    const APP_VERSION = "v1.0.20";
+    const APP_VERSION = "v1.0.21";
 
     // 輸入方式（手動 / 隨機）
     let drawMode = "手動"; // 預設手動
     function setDrawMode(mode) {
       drawMode = mode;
-      const dm = document.getElementById("drawMode");
+      const dm = document.getElementById("draw-mode");
       if (dm) dm.textContent = `輸入方式：${drawMode}`;
     }
 
@@ -476,7 +476,8 @@
               { type: "box", layout: "horizontal", justifyContent: "center", contents: [t5] },
               { type: "separator", margin: "md" },
               { type: "text", text: APP_VERSION, size: "xs", color: "#9ca3af", align: "end" },
-              { type: "text", text: summary, size: "sm", color: "#6b7280", wrap: true }
+              { type: "text", text: summary, size: "sm", color: "#6b7280", wrap: true },
+              { type: "text", text: modeHint, size: "sm", color: "#6b7280", wrap: true }
             ]
           },
           footer: {
