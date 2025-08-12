@@ -304,7 +304,7 @@
     *  🔧 在這裡換你的 LIFF ID & 版本
     *********************************/
     const LIFF_ID = "2007906926-NZW6EQ7P";
-    const APP_VERSION = "v1.0.63";
+    const APP_VERSION = "v1.0.64";
 
     /** ******************************
     *  🧰 全套 32 枚牌堆（抽過即移除）
@@ -625,7 +625,7 @@
                     type: "button",
                     style: "primary",
                     flex: 1,
-                    action: { type: "uri", label: "療癒分數", uri: `https://hermeshsieh.github.io/ananuniversestation-input_chess/index.html?p=manually` }
+                    action: { type: "uri", label: "療癒分數", uri: `https://hermeshsieh.github.io/ananuniversestation-input_chess/index.html?p=${fiveStr}` }
                   },
                   {
                     type: "button",
@@ -734,31 +734,47 @@
     // ====== 初始化 LIFF ======
     (async () => {
       try {
-        statusEl.textContent = "頁面初始化…";
-        await liff.init({ liffId: LIFF_ID, withLoginOnExternalBrowser: true }).then(() => {
-          printLog("頁面初始化成功");
-          liff.getProfile().then(profile => {
-            printLog("用戶名稱：" + profile.displayName);
-          });
-          const urlParams = new URLSearchParams(window.location.search);
-          const parameter = urlParams.get('p');
-          printLog("網址參數 p: " + parameter);
-          if (parameter !== null) {
-            printLog("sendMessages p: " + parameter);
-            liff.sendMessages([{ type: 'text', text: `啟動療癒分數指令 ${parameter}` }]);
-            liff.closeWindow();
-          }
-        }).catch(err => {
-          printLog("初始化錯誤: " + err.message);
-        });
-        if (!liff.isLoggedIn()) { statusEl.textContent = "未登入 → 導向登入"; return liff.login(); }
+        statusEl.textContent = "頁面初始化中…";
+        // 初始化 LIFF 附帶自動登入外部瀏覽器用戶功能
+        await liff.init({ liffId: LIFF_ID, withLoginOnExternalBrowser: true });
+        printLog("頁面初始化成功");
+
+        // 檢查是否登入，未登入導向登入
+        if (!liff.isLoggedIn()) {
+          statusEl.textContent = "未登入 → 導向登入";
+          await liff.login();  // 呼叫後會跳轉頁面，這邊後面程式碼不會繼續執行
+          return;
+        }
+
+        // 登入成功，取得使用者資訊
         const profile = await liff.getProfile();
+        printLog("用戶名稱：" + profile.displayName);
         statusEl.textContent = `Hello, ${profile.displayName} 👋`;
+
+        // 取得網址參數 p
+        const urlParams = new URLSearchParams(window.location.search);
+        const parameter = urlParams.get('p');
+        printLog("網址參數 p: " + parameter);
+
+        // 若有帶參數且非空，發送訊息並關閉窗口
+        if (parameter !== null && parameter !== '') {
+          printLog("sendMessages p: " + parameter);
+          try {
+            await liff.sendMessages([{ type: 'text', text: `啟動療癒分數指令 ${parameter}` }]);
+            printLog("訊息送出成功，關閉視窗");
+            liff.closeWindow();
+          } catch (sendError) {
+            printLog("sendMessages 失敗: " + sendError.message);
+            alert("訊息送出失敗:" + sendError.message);
+          }
+        }
+
       } catch (err) {
-        console.error(err);
+        printLog("初始化錯誤: " + (err?.message || err));
         statusEl.textContent = `LIFF 初始化失敗：${err?.message || "unknown"}`;
       }
     })();
+
 
     // ====== 初始狀態與版本顯示 ======
     document.getElementById("ver").textContent = APP_VERSION;
