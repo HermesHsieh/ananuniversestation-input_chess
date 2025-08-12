@@ -304,7 +304,7 @@
     *  🔧 在這裡換你的 LIFF ID & 版本
     *********************************/
     const LIFF_ID = "2007906926-NZW6EQ7P";
-    const APP_VERSION = "v1.0.65";
+    const APP_VERSION = "v1.0.66";
 
     /** ******************************
     *  🧰 全套 32 枚牌堆（抽過即移除）
@@ -495,6 +495,15 @@
       selectedPos = firstEmptyPos();
       render();
     }
+	
+	function buildImageMessage() {
+		const fiveStr = [1, 2, 3, 4, 5].map(i => picks[i].type).join(""); // 五字
+		return {
+		  type: 'image',
+		  originalContentUrl: 'https://i.imgur.com/MwS42AE.png?chess=${fiveStr}',
+		  previewImageUrl: 'https://i.imgur.com/MwS42AE.png?chess=${fiveStr}'
+		};
+	}
 
     // ====== Flex 送出 ======
     function buildFlexMessage() {
@@ -642,7 +651,8 @@
     }
 
     async function sendResult() {
-      const flex = buildFlexMessage();
+      // const flex = buildFlexMessage();
+	  const mImage = buildImageMessage();
       printLog("sendResult flex: ", flex);
       if (!flex) return;
       try {
