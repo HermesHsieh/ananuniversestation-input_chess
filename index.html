@@ -304,7 +304,7 @@
     *  🔧 在這裡換你的 LIFF ID & 版本
     *********************************/
     const LIFF_ID = "2007906926-NZW6EQ7P";
-    const APP_VERSION = "v1.0.76";
+    const APP_VERSION = "v1.0.0";
 
     /** ******************************
     *  🧰 全套 32 枚牌堆（抽過即移除）
@@ -495,9 +495,9 @@
       selectedPos = firstEmptyPos();
       render();
     }
-	
-	function buildImageMessage() {
-		const cells = [1, 2, 3, 4, 5].map(i => picks[i]);
+
+    function buildImageMessage() {
+      const cells = [1, 2, 3, 4, 5].map(i => picks[i]);
       if (cells.some(x => !x)) { alert("請先選滿 5 格再送出。"); return null; }
 
       const toText = (cell) => ({
@@ -531,13 +531,15 @@
       printLog("輸入方式參數：" + modeParam);
       const modeHint = (drawMode === "隨機" ? "*隨機抽卦結果僅供參考*" : "");
       printLog("輸入方式提示：" + modeHint);
-	  
-		return {
-	  type: 'image',
-		  originalContentUrl: `https://i.imgur.com/MwS42AE.png?p=5chess&c=${fiveStr}&n=${titleText}&m=${drawMode}&t=${titleText}&v=${APP_VERSION}`,
-		  previewImageUrl: `https://i.imgur.com/MwS42AE.png?p=5chess&c=${fiveStr}&n=${titleText}&m=${drawMode}&t=${titleText}&v=${APP_VERSION}`
-	};
-	}
+      const auto = (drawMode === "隨機") ? 1 : 0;
+      printLog("是否隨機產生：" + auto);
+
+      return {
+        type: 'image',
+        originalContentUrl: `https://i.imgur.com/MwS42AE.png?p=5cg&c=${fiveStr}&n=${titleText}&at=${auto}&v=${APP_VERSION}`,
+        previewImageUrl: `https://i.imgur.com/MwS42AE.png?p=5cg&c=${fiveStr}&n=${titleText}&at=${auto}&v=${APP_VERSION}`
+      };
+    }
 
     // ====== Flex 送出 ======
     function buildFlexMessage() {
@@ -687,7 +689,7 @@
     async function sendResult() {
       // const flex = buildFlexMessage();
       // printLog("sendResult flex: ", flex);
-	  const flex = buildImageMessage();
+      const flex = buildImageMessage();
       printLog("sendResult flex: ", flex);
       if (!flex) return;
       try {
