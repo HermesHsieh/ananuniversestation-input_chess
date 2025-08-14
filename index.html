@@ -312,7 +312,7 @@
     *  🔧 在這裡換你的 LIFF ID & 版本
     *********************************/
     const LIFF_ID = "2007906926-NZW6EQ7P";
-    const APP_VERSION = "v1.0.7";
+    const APP_VERSION = "v1.0.8";
     const LINE_ID = "@968noswo"; // 你的官方帳號 ID（@ 開頭）
 
     /** ******************************
@@ -756,7 +756,8 @@
                 "style": "primary",
                 "action": {
                   "type": "postback",
-                  "label": "點我觸發 Postback",
+                  "label": "action",
+                  "displayText": "按下按鈕",
                   "data": "action=buy&itemid=123"
                 }
               }
@@ -1004,6 +1005,8 @@
         const parameter = urlParams.get('p');
         printLog("網址參數 p: " + parameter);
 
+        getQueryParamFromShared();
+
         // 若有帶參數且非空，發送訊息並關閉窗口
         if (parameter !== null && parameter !== '') {
           printLog("sendMessages p: " + parameter);
@@ -1029,8 +1032,6 @@
 
     // 隱藏日誌輸出區域
     // document.getElementById("logOutput").classList.add("hidden");
-
-    getQueryParamFromShared();
 
     // 初次渲染
     render();
