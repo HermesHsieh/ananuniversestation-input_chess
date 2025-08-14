@@ -312,7 +312,7 @@
     *  🔧 在這裡換你的 LIFF ID & 版本
     *********************************/
     const LIFF_ID = "2007906926-NZW6EQ7P";
-    const APP_VERSION = "v1.0.4";
+    const APP_VERSION = "v1.0.5";
 
     /** ******************************
     *  🧰 全套 32 枚牌堆（抽過即移除）
@@ -809,7 +809,7 @@
                 action: {
                   type: "uri",
                   label: "分享此訊息",
-                  uri: `https://liff.line.me/${LIFF_ID}/path?param1=value1&param2=value2` // 請替換成你的分享鏈結 
+                  uri: `https://liff.line.me/${LIFF_ID}?param1=value1&param2=value2` // 請替換成你的分享鏈結 
                 }
               }
             ]
@@ -1016,6 +1016,8 @@
 
     // 隱藏日誌輸出區域
     document.getElementById("logOutput").classList.add("hidden");
+
+    getQueryParamFromShared();
 
     // 初次渲染
     render();
