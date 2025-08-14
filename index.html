@@ -312,7 +312,7 @@
     *  🔧 在這裡換你的 LIFF ID & 版本
     *********************************/
     const LIFF_ID = "2007906926-NZW6EQ7P";
-    const APP_VERSION = "v1.0.8";
+    const APP_VERSION = "v1.0.9";
     const LINE_ID = "@968noswo"; // 你的官方帳號 ID（@ 開頭）
 
     /** ******************************
@@ -696,12 +696,6 @@
     }
 
     async function sendResult() {
-      if (!await isUserFriend()) {
-        alert("請先加入好友才能使用此功能！");
-        // 轉跳至加好友頁面 (你的官方帳號加入連結)
-        window.location.href = "https://line.me/R/ti/p/" + LINE_ID;
-        return;
-      }
       // const flex = buildFlexMessage();
       // printLog("sendResult flex: ", flex);
       const flex = buildImageMessage();
@@ -849,6 +843,12 @@
     }
 
     async function clickBtnDebug3() {
+      if (!await isUserFriend()) {
+        alert("請先加入好友才能使用此功能！");
+        // 轉跳至加好友頁面 (你的官方帳號加入連結)
+        window.location.href = "https://line.me/R/ti/p/" + LINE_ID;
+        return;
+      }
       // const flex = buildFlexMessage();
       // printLog("sendResult flex: ", flex);
       const flex = buildImageMessage();
