@@ -312,7 +312,7 @@
     *  🔧 在這裡換你的 LIFF ID & 版本
     *********************************/
     const LIFF_ID = "2007906926-NZW6EQ7P";
-    const APP_VERSION = "v1.0.3";
+    const APP_VERSION = "v1.0.4";
 
     /** ******************************
     *  🧰 全套 32 枚牌堆（抽過即移除）
@@ -724,33 +724,33 @@
 
     async function clickBtnDebug1() {
       const flex = {
-        type: "flex",
-        altText: "測試 Flex Message",
-        contents: {
-          type: "bubble",
-          body: {
-            type: "box",
-            layout: "vertical",
-            contents: [
+        "type": "flex",
+        "altText": "測試 Flex Message",
+        "contents": {
+          "type": "bubble",
+          "body": {
+            "type": "box",
+            "layout": "vertical",
+            "contents": [
               {
-                type: "text",
-                text: "這是標題文字",
-                weight: "bold",
-                size: "lg"
+                "type": "text",
+                "text": "這是標題文字",
+                "weight": "bold",
+                "size": "lg"
               }
             ]
           },
-          footer: {
-            type: "box",
-            layout: "vertical",
-            contents: [
+          "footer": {
+            "type": "box",
+            "layout": "vertical",
+            "contents": [
               {
-                type: "button",
-                style: "primary",
-                action: {
-                  type: "postback",
-                  label: "點我觸發 Postback",
-                  data: "action=buy&itemid=123"
+                "type": "button",
+                "style": "primary",
+                "action": {
+                  "type": "postback",
+                  "label": "點我觸發 Postback",
+                  "data": "action=buy&itemid=123"
                 }
               }
             ]
@@ -809,7 +809,7 @@
                 action: {
                   type: "uri",
                   label: "分享此訊息",
-                  uri: "https://liff.line.me/" + LIFF_ID + "/path?param1=value1&param2=value2"  // 請替換成你的分享鏈結
+                  uri: `https://liff.line.me/${LIFF_ID}/path?param1=value1&param2=value2` // 請替換成你的分享鏈結 
                 }
               }
             ]
@@ -881,6 +881,37 @@
     function getQueryParam(param) {
       const urlParams = new URLSearchParams(window.location.search);
       return urlParams.get(param);
+    }
+
+    function getQueryParamFromShared() {
+      try {
+        // 取得目前瀏覽器網址的 search params
+        const params = new URLSearchParams(window.location.search);
+
+        // 取得 liff.state（經 URL encode）
+        let stateParam = params.get('liff.state');
+
+        if (stateParam) {
+          // 解碼參數
+          stateParam = decodeURIComponent(stateParam);
+
+          // stateParam 會是類似 /path?a=1&b=2 的URI 路徑及查詢字串
+          // 我們要把它解析成 key-value
+          const url = new URL("http://example.com" + stateParam); // 加入 domain 方便用 URL API 解析
+          const searchParams = url.searchParams;
+
+          // 範例：取得特定參數
+          const a = searchParams.get('a');
+          const b = searchParams.get('b');
+
+          printLog(`liff.state 解碼參數:\n完整路徑: ${stateParam}\na = ${a}\nb = ${b}`);
+        } else {
+          printLog('沒有 liff.state 參數');
+        }
+      } catch (error) {
+        printLog('解析 liff.state 參數失敗:', error);
+        printLog('初始化 LIFF 失敗');
+      }
     }
 
     // 準備要送的訊息，依參數不同決定內容
