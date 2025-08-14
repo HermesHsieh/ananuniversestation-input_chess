@@ -23,6 +23,11 @@
       color: #111;
     }
 
+    /* 定義隱藏用的 CSS */
+    .hidden {
+      display: none !important;
+    }
+
     .wrap {
       max-width: 480px;
       margin: 0 auto;
@@ -214,7 +219,10 @@
     <div class="topbar">
       <div class="title">單卦</div>
       <div class="bar-actions">
-        <button class="ghost" id="askBtn">輸入問題</button>
+        <button class="ghost" id="debugBtn1">Btn1</button>
+        <button class="ghost" id="debugBtn2">Btn2</button>
+        <button class="ghost" id="debugBtn3">Btn3</button>
+        <button class="ghost" id="askBtn">輸入問題名稱</button>
         <button class="ghost" id="reloadBtn">Reload</button>
       </div>
     </div>
@@ -304,7 +312,7 @@
     *  🔧 在這裡換你的 LIFF ID & 版本
     *********************************/
     const LIFF_ID = "2007906926-NZW6EQ7P";
-    const APP_VERSION = "v1.0.2";
+    const APP_VERSION = "v1.0.3";
 
     /** ******************************
     *  🧰 全套 32 枚牌堆（抽過即移除）
@@ -714,6 +722,152 @@
       }
     }
 
+    async function clickBtnDebug1() {
+      const flex = {
+        type: "flex",
+        altText: "測試 Flex Message",
+        contents: {
+          type: "bubble",
+          body: {
+            type: "box",
+            layout: "vertical",
+            contents: [
+              {
+                type: "text",
+                text: "這是標題文字",
+                weight: "bold",
+                size: "lg"
+              }
+            ]
+          },
+          footer: {
+            type: "box",
+            layout: "vertical",
+            contents: [
+              {
+                type: "button",
+                style: "primary",
+                action: {
+                  type: "postback",
+                  label: "點我觸發 Postback",
+                  data: "action=buy&itemid=123"
+                }
+              }
+            ]
+          }
+        }
+      };
+      printLog("sendResult flex: ", flex);
+      if (!flex) return;
+      try {
+        if (liff?.isInClient?.()) {
+          await liff.sendMessages([flex]);
+          alert("已送出，返回聊天室");
+          liff.closeWindow();
+        } else if (liff.isApiAvailable('shareTargetPicker')) {
+          await liff.shareTargetPicker([flex]);
+          alert("已分享");
+        } else {
+          alert("請在 LINE 內開啟此 LIFF 頁面再送出。");
+        }
+      } catch (e) {
+        const msg = (e?.message || e || '').toString();
+        if ((msg.includes('scope') || msg.includes('not in LIFF app scope')) && liff.isApiAvailable('shareTargetPicker')) {
+          await liff.shareTargetPicker([flex]);
+          alert("尚未授權 chat_message.write，已改用分享送出");
+        } else {
+          alert("sendMessages 失敗：" + msg);
+        }
+      }
+    }
+
+    async function clickBtnDebug2() {
+      const flex = {
+        type: "flex",
+        altText: "測試 Flex Message",
+        contents: {
+          type: "bubble",
+          body: {
+            type: "box",
+            layout: "vertical",
+            contents: [
+              {
+                type: "text",
+                text: "這是標題文字",
+                weight: "bold",
+                size: "lg"
+              }
+            ]
+          },
+          footer: {
+            type: "box",
+            layout: "vertical",
+            contents: [
+              {
+                type: "button",
+                style: "primary",
+                action: {
+                  type: "uri",
+                  label: "分享此訊息",
+                  uri: "https://liff.line.me/" + LIFF_ID + "/path?param1=value1&param2=value2"  // 請替換成你的分享鏈結
+                }
+              }
+            ]
+          }
+        }
+      };
+      printLog("sendResult flex: ", flex);
+      if (!flex) return;
+      try {
+        if (liff?.isInClient?.()) {
+          await liff.sendMessages([flex]);
+          alert("已送出，返回聊天室");
+          liff.closeWindow();
+        } else if (liff.isApiAvailable('shareTargetPicker')) {
+          await liff.shareTargetPicker([flex]);
+          alert("已分享");
+        } else {
+          alert("請在 LINE 內開啟此 LIFF 頁面再送出。");
+        }
+      } catch (e) {
+        const msg = (e?.message || e || '').toString();
+        if ((msg.includes('scope') || msg.includes('not in LIFF app scope')) && liff.isApiAvailable('shareTargetPicker')) {
+          await liff.shareTargetPicker([flex]);
+          alert("尚未授權 chat_message.write，已改用分享送出");
+        } else {
+          alert("sendMessages 失敗：" + msg);
+        }
+      }
+    }
+
+    async function clickBtnDebug3() {
+      // const flex = buildFlexMessage();
+      // printLog("sendResult flex: ", flex);
+      const flex = buildImageMessage();
+      printLog("sendResult flex: ", flex);
+      if (!flex) return;
+      try {
+        if (liff?.isInClient?.()) {
+          await liff.sendMessages([flex]);
+          alert("已送出，返回聊天室");
+          liff.closeWindow();
+        } else if (liff.isApiAvailable('shareTargetPicker')) {
+          await liff.shareTargetPicker([flex]);
+          alert("已分享");
+        } else {
+          alert("請在 LINE 內開啟此 LIFF 頁面再送出。");
+        }
+      } catch (e) {
+        const msg = (e?.message || e || '').toString();
+        if ((msg.includes('scope') || msg.includes('not in LIFF app scope')) && liff.isApiAvailable('shareTargetPicker')) {
+          await liff.shareTargetPicker([flex]);
+          alert("尚未授權 chat_message.write，已改用分享送出");
+        } else {
+          alert("sendMessages 失敗：" + msg);
+        }
+      }
+    }
+
     // ====== 日誌輸出 ======
     function printLog(message) {
       const logDiv = document.getElementById('logOutput');
@@ -768,6 +922,9 @@
     $("clearBtn").addEventListener("click", clearAll);
     $("randomBtn").addEventListener("click", randomFillAll);
     $("sendBtn").addEventListener("click", sendResult);
+    $("debugBtn1").addEventListener("click", clickBtnDebug1);
+    $("debugBtn2").addEventListener("click", clickBtnDebug2);
+    $("debugBtn3").addEventListener("click", clickBtnDebug3);
 
     Object.entries(posEls).forEach(([idx, el]) => {
       el.addEventListener("click", () => setSelected(Number(idx)));
@@ -824,7 +981,10 @@
 
 
     // ====== 初始狀態與版本顯示 ======
-    document.getElementById("ver").textContent = "@968noswo " + APP_VERSION;
+    document.getElementById("ver").textContent = "@968noswo | " + APP_VERSION;
+
+    // 隱藏日誌輸出區域
+    document.getElementById("logOutput").classList.add("hidden");
 
     // 初次渲染
     render();
