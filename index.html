@@ -312,7 +312,7 @@
     *  🔧 在這裡換你的 LIFF ID & 版本
     *********************************/
     const LIFF_ID = "2007906926-NZW6EQ7P";
-    const APP_VERSION = "v1.0.9";
+    const APP_VERSION = "v1.0.0";
     const LINE_ID = "@968noswo"; // 你的官方帳號 ID（@ 開頭）
 
     /** ******************************
@@ -1031,7 +1031,12 @@
     document.getElementById("ver").textContent = LINE_ID + " | " + APP_VERSION;
 
     // 隱藏日誌輸出區域
-    // document.getElementById("logOutput").classList.add("hidden");
+    document.getElementById("logOutput").classList.add("hidden");
+
+    // 隱藏除錯按鈕
+    document.getElementById("debugBtn1").classList.add("hidden");
+    document.getElementById("debugBtn2").classList.add("hidden");
+    document.getElementById("debugBtn3").classList.add("hidden");
 
     // 初次渲染
     render();
