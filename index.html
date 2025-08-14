@@ -312,7 +312,8 @@
     *  🔧 在這裡換你的 LIFF ID & 版本
     *********************************/
     const LIFF_ID = "2007906926-NZW6EQ7P";
-    const APP_VERSION = "v1.0.6";
+    const APP_VERSION = "v1.0.7";
+    const LINE_ID = "@968noswo"; // 你的官方帳號 ID（@ 開頭）
 
     /** ******************************
     *  🧰 全套 32 枚牌堆（抽過即移除）
@@ -695,6 +696,12 @@
     }
 
     async function sendResult() {
+      if (!await isUserFriend()) {
+        alert("請先加入好友才能使用此功能！");
+        // 轉跳至加好友頁面 (你的官方帳號加入連結)
+        window.location.href = "https://line.me/R/ti/p/" + LINE_ID;
+        return;
+      }
       // const flex = buildFlexMessage();
       // printLog("sendResult flex: ", flex);
       const flex = buildImageMessage();
@@ -868,6 +875,12 @@
       }
     }
 
+    // ====== LIFF 判斷是否為好友 ======
+    async function isUserFriend() {
+      const friend = await liff.getFriendship();
+      return friend.friendFlag; // true 代表是好友，false 代表不是好友
+    }
+
     // ====== 日誌輸出 ======
     function printLog(message) {
       const logDiv = document.getElementById('logOutput');
@@ -1012,7 +1025,7 @@
 
 
     // ====== 初始狀態與版本顯示 ======
-    document.getElementById("ver").textContent = "@968noswo | " + APP_VERSION;
+    document.getElementById("ver").textContent = LINE_ID + " | " + APP_VERSION;
 
     // 隱藏日誌輸出區域
     // document.getElementById("logOutput").classList.add("hidden");
