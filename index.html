@@ -11,209 +11,310 @@
   <!-- End Cloudflare Web Analytics -->
   <style>
     :root {
-      --red: #d32f2f;
-      --black: #111;
-      --bg: #F6F7FB;
-      --card: #fff;
-      --border: #e5e7eb;
-      --accent: #2563eb;
-    }
+		--red: #d32f2f;
+		--black: #111;
+		--bg: #F6F7FB;
+		--card: #fff;
+		--border: #e5e7eb;
+		--accent: #2563eb;
+	}
 
-    body {
-      margin: 0;
-      font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans TC", sans-serif;
-      background: var(--bg);
-      color: #111;
-    }
+	body {
+		margin: 0;
+		font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans TC", sans-serif;
+		background: var(--bg);
+		color: #111;
+	}
 
-    /* 定義隱藏用的 CSS */
-    .hidden {
-      display: none !important;
-    }
+	/* 定義隱藏用的 CSS */
+	.hidden {
+		display: none !important;
+	}
 
-    .wrap {
-      max-width: 480px;
-      margin: 0 auto;
-      padding: 12px 12px 28px;
-    }
+	.wrap {
+		max-width: 480px;
+		margin: 0 auto;
+		padding: 12px 12px 28px;
+	}
 
-    .topbar {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 8px;
-    }
+	.topbar {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 8px;
+	}
 
-    .title {
-      font-size: 18px;
-      font-weight: 700;
-    }
+	.title {
+		font-size: 18px;
+		font-weight: 700;
+	}
 
-    .bar-actions {
-      display: flex;
-      gap: 8px;
-    }
+	.number {
+		font-size: 18px;
+	}
 
-    .ghost {
-      background: transparent;
-      border: 1px solid var(--border);
-      padding: 8px 10px;
-      border-radius: 10px;
-      font-size: 14px;
-    }
+	.bar-actions {
+		display: flex;
+		gap: 8px;
+	}
 
-    .ghost:active {
-      opacity: .7;
-    }
+	.ghost {
+		background: transparent;
+		border: 1px solid var(--border);
+		padding: 8px 10px;
+		border-radius: 10px;
+		font-size: 14px;
+	}
 
-    .status {
-      margin: 6px 0 10px;
-      font-size: 12px;
-      color: #666;
-      text-align: center;
-    }
+	.ghost:active {
+		opacity: .7;
+	}
 
-    .card {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 14px;
-      padding: 12px;
-      box-shadow: 0 1px 2px rgba(0, 0, 0, .04);
-    }
+	.status {
+		margin: 6px 0 10px;
+		font-size: 12px;
+		color: #666;
+		text-align: center;
+	}
 
-    .card-title {
-      font-size: 16px;
-      font-weight: 700;
-      text-align: center;
-      margin-bottom: 8px;
-    }
+	.card {
+		background: var(--card);
+		border: 1px solid var(--border);
+		border-radius: 14px;
+		padding: 12px;
+		box-shadow: 0 1px 2px rgba(0, 0, 0, .04);
+	}
 
-    .grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr 1fr;
-      gap: 14px;
-      margin-top: 6px;
-    }
+	.card-title {
+		font-size: 16px;
+		font-weight: 700;
+		text-align: center;
+		margin-bottom: 8px;
+	}
 
-    .cell {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-direction: column;
-      border: 2px dashed var(--border);
-      border-radius: 9999px;
-      background: #fff;
-      aspect-ratio: 1/1;
-      min-width: 72px;
-      min-height: 72px;
-      user-select: none;
-      cursor: pointer;
-      font-size: 36px;
-      /* 放大棋字 */
-    }
+	.grid {
+		display: grid;
+		grid-template-columns: 1fr 1fr 1fr;
+		gap: 14px;
+		margin-top: 6px;
+	}
 
-    .cell.red {
-      color: var(--red);
-    }
+	.cell {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		flex-direction: column;
+		border: 4px dashed var(--border);
+		border-radius: 9999px;
+		background: #fff;
+		aspect-ratio: 1/1;
+		min-width: 72px;
+		min-height: 72px;
+		user-select: none;
+		cursor: pointer;
+		font-size: 36px;
+		/* 放大棋字 */
+	}
 
-    .cell.black {
-      color: var(--black);
-    }
+	.cell.red {
+		color: var(--red);
+	}
 
-    .cell.selected {
-      border-color: var(--accent);
-      box-shadow: 0 0 0 3px rgba(37, 99, 235, .12);
-    }
+	.cell.black {
+		color: var(--black);
+	}
 
-    .poslabel {
-      font-size: 12px;
-      color: #999;
-      margin-top: 2px;
-    }
+	.cell.selected {
+		border-color: var(--accent);
+		box-shadow: 0 0 0 3px rgba(37, 99, 235, .12);
+		background-color: rgba(255, 165, 0, 0.2);
+		/* 透明淡藍色背景 */
+	}
 
-    .hint {
-      font-size: 12px;
-      color: #666;
-      text-align: center;
-      margin: 8px 0 0;
-    }
+	.poslabel {
+		font-size: 20px;
+		color: #999;
+		margin-top: 2px;
+	}
 
-    .hint-version {
-      font-size: 8px;
-      color: #666;
-      text-align: center;
-      margin: 8px 0 0;
-    }
+	.hint {
+		font-size: 12px;
+		color: #666;
+		text-align: center;
+		margin: 8px 0 0;
+	}
 
-    .controls {
-      display: flex;
-      gap: 8px;
-      justify-content: center;
-      margin: 12px 0 8px;
-      flex-wrap: wrap;
-    }
+	.hint-version {
+		font-size: 8px;
+		color: #666;
+		text-align: center;
+		margin: 8px 0 0;
+	}
 
-    .btn {
-      border: 0;
-      border-radius: 12px;
-      padding: 12px 16px;
-      font-size: 16px;
-    }
+	.controls {
+		display: flex;
+		gap: 8px;
+		justify-content: center;
+		margin: 12px 0 8px;
+		flex-wrap: wrap;
+	}
 
-    .btn-primary {
-      background: #111;
-      color: #fff;
-    }
+	.btn {
+		border: 0;
+		border-radius: 12px;
+		padding: 12px 16px;
+		font-size: 16px;
+	}
 
-    .btn-secondary {
-      background: #f3f4f6;
-      color: #111;
-      border: 1px solid var(--border);
-    }
+	.btn-primary {
+		background: #111;
+		color: #fff;
+	}
 
-    .pieces {
-      margin-top: 10px;
-    }
+	.btn-secondary {
+		background: #f3f4f6;
+		color: #111;
+		border: 1px solid var(--border);
+	}
 
-    .row {
-      display: grid;
-      grid-template-columns: repeat(7, 1fr);
-      gap: 8px;
-    }
+	.pieces {
+		margin-top: 10px;
+	}
 
-    .piece-btn {
-      border: 1px solid var(--border);
-      background: #fff;
-      border-radius: 12px;
-      padding: 12px 0;
-      font-size: 18px;
-      text-align: center;
-    }
+	.row {
+		display: grid;
+		grid-template-columns: repeat(7, 1fr);
+		gap: 8px;
+	}
 
-    .piece-btn:active {
-      transform: scale(.98);
-    }
+	.piece-btn {
+		border: 1px solid var(--border);
+		background: #fff;
+		border-radius: 12px;
+		padding: 12px 0;
+		font-size: 28px;
+		text-align: center;
+	}
 
-    .piece-btn.red {
-      color: var(--red);
-    }
+	.piece-btn:active {
+		transform: scale(.98);
+	}
 
-    .piece-btn.black {
-      color: var(--black);
-    }
+	.piece-btn.red {
+		color: var(--red);
+	}
 
-    .footer-pad {
-      height: 8px;
-    }
+	.piece-btn.black {
+		color: var(--black);
+	}
 
-    .ver-badge {
-      border: 1px solid var(--border);
-      border-radius: 999px;
-      padding: 6px 10px;
-      font-size: 12px;
-      color: #6b7280;
-      background: #fff;
-    }
+	.footer-pad {
+		height: 8px;
+	}
+
+	.ver-badge {
+		border: 1px solid var(--border);
+		border-radius: 999px;
+		padding: 6px 10px;
+		font-size: 12px;
+		color: #6b7280;
+		background: #fff;
+	}
+	
+	/* ===== 老人模式：五子改一列可滑、顯示游標 ===== */
+	body.mode-elder .grid{
+	 display:flex;
+	 gap:10px;
+	 overflow-x:auto;
+	 overflow-y:hidden;
+	 -webkit-overflow-scrolling:touch;
+	 scroll-snap-type:x proximity;
+	 padding:4px 2px;
+	}
+	/* 把原本九宮的 4 個空白格隱藏 */
+	body.mode-elder .grid > div:empty{ display:none; }
+
+	/* 一列時每顆固定尺寸、可居中對齊 */
+	body.mode-elder .cell{
+	 flex:0 0 auto;
+	 width:140px;
+	 height:140px;           /* 覆蓋原本 aspect-ratio 的尺寸，視覺更穩定 */
+	 scroll-snap-align:center;
+	}
+
+	/* 游標（正在輸入） */
+	.cell{ position:relative; overflow:visible; } /* 讓游標可外凸 */
+	.cursor{
+	 position:absolute;
+	 top:-8px; right:6px;
+	 background:#6495ED;
+	 color:#FFFFFF;
+	 font-weight:800;
+	 font-size:16px;
+	 padding:4px 8px;
+	 border-radius:8px;
+	 z-index:5;
+	}
+
+	/* 一列時強制排序為 1→2→3→4→5（避免沿用九宮原本 DOM 順序） */
+	body.mode-elder #pos1{ order:1; }
+	body.mode-elder #pos2{ order:2; }
+	body.mode-elder #pos3{ order:3; }
+	body.mode-elder #pos4{ order:4; }
+	body.mode-elder #pos5{ order:5; }
+
+	
+/* ===== 放大模式：棋子選擇區改為 2×7 網格，且整體可左右滑動 ===== */
+body.mode-elder .picker-wrap{
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+  padding: 6px 4px;
+}
+
+/* 內層用固定 7 欄的網格；寬度用內容撐開，讓外層可以水平捲動 */
+body.mode-elder .picker-grid{
+  display: grid;
+  grid-template-columns: repeat(7, auto);
+  gap: 12px;
+  width: max-content;     /* 關鍵：以內容寬度為準，超過螢幕就能橫向捲動 */
+}
+
+/* 放大約 1.5 倍的按鈕尺寸與字級（放大模式專用，不影響一般模式） */
+body.mode-elder .piece-btn{
+  min-width: 100px;       /* 原本 ~80 → 120 */
+  height: 100px;           /* 原本 ~48 → 72 */
+  font-size: 48px;        /* 原本 ~20 → 32 */
+  font-weight: 800;
+  border: 3px solid #000; /* 視覺更清楚 */
+  border-radius: 18px;
+}
+
+/* 切換模式按鈕（依顯示文字決定配色） */
+.mode-toggle{
+  font-weight: 800;
+  padding: 8px 12px;
+  border-radius: 12px;
+  border: 2px solid transparent;
+  cursor: pointer;
+}
+
+/* 顯示「一般模式」時：黃底、藍字（提示按下會回到一般） */
+#elderToggleBtn.mode-normal{
+  background: #CCFF00;     /* 黃 */
+  color: #1D4ED8;          /* 藍 */
+  border-color: #CCFF00;
+}
+
+/* 顯示「放大模式」時：藍底、白字（提示按下會切到長輩） */
+#elderToggleBtn.mode-elder{
+  background: #2563EB;     /* 藍 */
+  color: #FFFFFF;          /* 白 */
+  border-color: #2563EB;
+}
+
+#elderToggleBtn:active{ transform: translateY(1px); }
+
   </style>
 </head>
 
@@ -222,6 +323,7 @@
     <div class="topbar">
       <div class="title">單卦</div>
       <div class="bar-actions">
+		<button class="mode-toggle" id="elderToggleBtn">放大模式</button>
         <button class="ghost" id="debugBtn1">Btn1</button>
         <button class="ghost" id="debugBtn2">Btn2</button>
         <button class="ghost" id="debugBtn3">Btn3</button>
@@ -280,29 +382,23 @@
     </div>
 
     <!-- 棋子選擇（黑在上、紅在下） -->
-    <div class="pieces">
-      <div class="row" style="margin-bottom:8px">
-        <!-- 黑國：將 士 象 車 馬 包 卒 -->
-        <button class="piece-btn black" data-piece="將">將</button>
-        <button class="piece-btn black" data-piece="士">士</button>
-        <button class="piece-btn black" data-piece="象">象</button>
-        <button class="piece-btn black" data-piece="車">車</button>
-        <button class="piece-btn black" data-piece="馬">馬</button>
-        <button class="piece-btn black" data-piece="包">包</button>
-        <button class="piece-btn black" data-piece="卒">卒</button>
-      </div>
-      <div class="row">
-        <!-- 紅國：帥 仕 相 俥 傌 炮 兵 -->
-        <button class="piece-btn red" data-piece="帥">帥</button>
-        <button class="piece-btn red" data-piece="仕">仕</button>
-        <button class="piece-btn red" data-piece="相">相</button>
-        <button class="piece-btn red" data-piece="俥">俥</button>
-        <button class="piece-btn red" data-piece="傌">傌</button>
-        <button class="piece-btn red" data-piece="炮">炮</button>
-        <button class="piece-btn red" data-piece="兵">兵</button>
-      </div>
-      <div class="footer-pad"></div>
-    </div>
+		<div class="pieces">
+		<div class="picker-wrap">
+    <div class="picker-grid" id="pickerGrid" aria-label="棋子選擇（7×2，可左右滑動）">
+			<div class="row" style="margin-bottom:8px">
+				<!-- 黑國：將 士 象 車 馬 包 卒 -->
+				<button class="piece-btn black" data-piece="將">將</button> <button class="piece-btn black" data-piece="士">士</button> <button class="piece-btn black" data-piece="象">象</button> <button class="piece-btn black" data-piece="車">車</button> <button class="piece-btn black" data-piece="馬">馬</button> <button class="piece-btn black" data-piece="包">包</button> <button class="piece-btn black" data-piece="卒">卒</button>
+
+				<!-- 紅國：帥 仕 相 俥 傌 炮 兵 -->
+				<button class="piece-btn red" data-piece="帥">帥</button> <button class="piece-btn red" data-piece="仕">仕</button> <button class="piece-btn red" data-piece="相">相</button> <button class="piece-btn red" data-piece="俥">俥</button> <button class="piece-btn red" data-piece="傌">傌</button> <button class="piece-btn red" data-piece="炮">炮</button> <button class="piece-btn red" data-piece="兵">兵</button>
+			</div>
+			<div class="footer-pad"></div>
+			</div>
+			</div>
+		</div>
+		
+		<div id="logOutput" style="white-space: pre-wrap; background:#f0f0f0; padding:10px; border:1px solid #ccc; height:150px; overflow-y:auto;"></div>
+	</div>
 
     <div id="logOutput"
       style="white-space: pre-wrap; background:#f0f0f0; padding:10px; border:1px solid #ccc; height:150px; overflow-y:auto;">
@@ -358,6 +454,42 @@
       const dm = document.getElementById("draw-mode");
       if (dm) dm.textContent = `輸入方式：${drawMode}`;
     }
+	
+	// 讀寫模式
+	function applyElderMode(on) {
+		document.body.classList.toggle('mode-elder',  ! !on);
+		localStorage.setItem('elderMode', on ? '1':'0');
+
+		const btn=document.getElementById('elderToggleBtn');
+
+		if (btn) {
+			// 規則：在「放大模式」時，按鈕顯示「一般模式」；反之亦然（顯示將切換到的目標）
+			btn.textContent=on ? '一般模式': '放大模式';
+			btn.classList.remove('mode-normal', 'mode-elder');
+			btn.classList.add(on ? 'mode-normal' : 'mode-elder');
+		}
+
+		// 切到放大模式時，捲動游標所在那格到視窗中
+		if (on) {
+			const pos=selectedPos || firstEmptyPos();
+
+			if (pos) {
+				const el=document.getElementById('pos'+pos);
+
+				if (el) el.scrollIntoView( {
+						behavior:'smooth', inline:'center', block:'nearest'
+					}
+
+				);
+			}
+		}
+	}
+
+
+	function initElderMode() {
+		const saved=localStorage.getItem('elderMode')==='1';
+		applyElderMode(saved);
+	}
 
     // ====== 狀態與工具 ======
     const $ = (id) => document.getElementById(id);
@@ -400,20 +532,38 @@
       return used < limit;
     }
 
-    function render() {
-      for (let i = 1; i <= 5; i++) {
-        const el = posEls[i];
-        el.classList.remove("red", "black", "selected");
-        if (picks[i]) {
-          el.innerHTML = `<span>${picks[i].type}</span><div class="poslabel">${i}</div>`;
-          el.classList.add(picks[i].color === "red" ? "red" : "black");
-        } else {
-          const dir = i === 1 ? "中心" : i === 2 ? "←" : i === 3 ? "→" : i === 4 ? "↑" : "↓";
-          el.innerHTML = `<span>${i}</span><div class="poslabel">${dir}</div>`;
-        }
-        if (selectedPos === i) el.classList.add("selected");
-      }
-    }
+		function render() {
+	 const cursorPos = selectedPos || firstEmptyPos(); // 沒鎖定就顯示下一空位
+
+	 for (let i = 1; i <= 5; i++) {
+	   const el = posEls[i];
+	   el.classList.remove("red", "black", "selected");
+
+	   if (picks[i]) {
+	     el.innerHTML = `<span>${picks[i].type}<\/span><div class="poslabel">${i}<\/div>`;
+	     el.classList.add(picks[i].color === "red" ? "red" : "black");
+	   } else {
+	     const dir = i === 1 ? "中心" : i === 2 ? "位置" : i === 3 ? "位置" : i === 4 ? "位置" : "位置";
+	     el.innerHTML = `<span>${i}<\/span><div class="poslabel">${dir}<\/div>`;
+	   }
+	   if (selectedPos === i) el.classList.add("selected");
+
+	   // 先清舊游標，再視需要加上
+	   el.querySelectorAll('.cursor').forEach(n=>n.remove());
+	   if (cursorPos === i) {
+	     const tag = document.createElement('div');
+	     tag.className = 'cursor';
+	     tag.textContent = '正在輸入';
+	     el.appendChild(tag);
+	   }
+	 }
+
+	 // 老人模式：把游標那格捲到可視範圍
+	 if (document.body.classList.contains('mode-elder') && cursorPos) {
+	   const el = document.getElementById('pos'+cursorPos);
+	   if (el) el.scrollIntoView({ behavior:'smooth', inline:'center', block:'nearest' });
+	 }
+	}
 
     function setSelected(pos) {
       selectedPos = (selectedPos === pos ? null : pos);
@@ -833,6 +983,11 @@
     document.querySelectorAll(".piece-btn").forEach(btn => {
       btn.addEventListener("click", () => addPiece(btn.dataset.piece));
     });
+	
+	document.getElementById('elderToggleBtn').addEventListener('click', ()=> {
+        const on= !document.body.classList.contains('mode-elder');
+        applyElderMode(on);
+    });
 
 
     // ====== 初始化 LIFF ======
@@ -893,6 +1048,7 @@
     document.getElementById("debugBtn2").classList.add("hidden");
     document.getElementById("debugBtn3").classList.add("hidden");
 
+	initElderMode();
     // 初次渲染
     render();
   </script>
