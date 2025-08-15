@@ -6,6 +6,9 @@
   <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no" />
   <title>象棋卜卦 - 安安宇宙站</title>
   <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+  <!-- Cloudflare Web Analytics -->
+  <script defer src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "50bd6af270b7443b8b555db9457b093f"}'></script>
+  <!-- End Cloudflare Web Analytics -->
   <style>
     :root {
       --red: #d32f2f;
@@ -211,125 +214,6 @@
       color: #6b7280;
       background: #fff;
     }
-
-    /* ===== 雙圈樣式（外圈4px / 間隙2px / 內圈2px；圈色＝字色） ===== */
-    .cell {
-      position: relative;
-    }
-
-    .cell .ring {
-      position: absolute;
-      inset: 0;
-      border-radius: 999px;
-      background: #111;
-      padding: 4px;
-    }
-
-    .cell .ring .gap {
-      width: 100%;
-      height: 100%;
-      border-radius: 999px;
-      background: #fff;
-      padding: 2px;
-    }
-
-    .cell .ring .gap .inner {
-      width: 100%;
-      height: 100%;
-      border-radius: 999px;
-      background: #111;
-      padding: 2px;
-    }
-
-    .cell .face {
-      position: relative;
-      z-index: 1;
-      width: 100%;
-      height: 100%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      border-radius: 999px;
-      background: #fff;
-    }
-
-    .cell .face .face-text {
-      font-weight: 700;
-      font-size: 36px;
-      line-height: 1;
-      color: #111;
-    }
-
-    /* 顏色同化：外圈/內圈/字 同色 */
-    .cell.red .ring,
-    .cell.red .ring .gap .inner,
-    .cell.red .face .face-text {
-      background: #d32f2f;
-      color: #d32f2f;
-    }
-
-    .cell.black .ring,
-    .cell.black .ring .gap .inner,
-    .cell.black .face .face-text {
-      background: #111;
-      color: #111;
-    }
-
-    /* 原本的 dashed 邊框可以保留；若想隱藏請解除下一行註解： */
-    /* .cell{ border: none; } */
-
-    /* ===== 長輩模式：更大按鈕、單欄、五格更大並隱藏定位提示 ===== */
-    body.mode-elder .grid {
-      gap: 18px;
-    }
-
-    body.mode-elder .cell {
-      min-width: 96px;
-      min-height: 96px;
-    }
-
-    body.mode-elder .cell .face .face-text {
-      font-size: 42px;
-    }
-
-    body.mode-elder .pieces .row {
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-    }
-
-    body.mode-elder .piece-btn {
-      width: 100%;
-      height: 60px;
-      font-size: 26px;
-      text-align: left;
-      padding-left: 14px;
-      border-width: 2px;
-    }
-
-    body.mode-elder .btn {
-      padding: 14px 18px;
-      font-size: 18px;
-    }
-
-    /* 在 HTML 上給 class="hide-on-elder" 的元素，長輩模式自動隱藏 */
-    .hide-on-elder {
-      display: block;
-    }
-
-    body.mode-elder .hide-on-elder {
-      display: none !important;
-    }
-
-    /* 切換鈕樣式 */
-    .mode-toggle {
-      border: 1px solid var(--border);
-      background: #fff;
-      padding: 8px 10px;
-      border-radius: 10px;
-      font-size: 14px;
-      font-weight: 700;
-    }
   </style>
 </head>
 
@@ -343,7 +227,6 @@
         <button class="ghost" id="debugBtn3">Btn3</button>
         <button class="ghost" id="askBtn">輸入問題名稱</button>
         <button class="ghost" id="reloadBtn">Reload</button>
-        <button class="mode-toggle" id="modeToggleBtn">長輩模式</button>
       </div>
     </div>
 
@@ -354,58 +237,29 @@
       <div id="cardTitle" class="card-title"></div>
 
       <!-- 九宮格（上：4 / 中：2 1 3 / 下：5） -->
-      <div></div>
-      <div class="cell" id="pos4">
-        <div class="ring">
-          <div class="gap">
-            <div class="inner"></div>
-          </div>
+      <div class="grid" aria-label="十字九宮格">
+        <div></div>
+        <div class="cell" id="pos4"><span>4</span>
+          <div class="poslabel">↑ 點選以鎖定</div>
         </div>
-        <div class="face"><span class="face-text">4</span></div>
-        <div class="poslabel hide-on-elder">↑ 點選以鎖定</div>
-      </div>
-      <div></div>
+        <div></div>
 
-      <div class="cell" id="pos2">
-        <div class="ring">
-          <div class="gap">
-            <div class="inner"></div>
-          </div>
+        <div class="cell" id="pos2"><span>2</span>
+          <div class="poslabel">←</div>
         </div>
-        <div class="face"><span class="face-text">2</span></div>
-        <div class="poslabel">←</div>
-      </div>
-      <div class="cell" id="pos1">
-        <div class="ring">
-          <div class="gap">
-            <div class="inner"></div>
-          </div>
+        <div class="cell" id="pos1"><span>1</span>
+          <div class="poslabel">中心</div>
         </div>
-        <div class="face"><span class="face-text">1</span></div>
-        <div class="poslabel">中心</div>
-      </div>
-      <div class="cell" id="pos3">
-        <div class="ring">
-          <div class="gap">
-            <div class="inner"></div>
-          </div>
+        <div class="cell" id="pos3"><span>3</span>
+          <div class="poslabel">→</div>
         </div>
-        <div class="face"><span class="face-text">3</span></div>
-        <div class="poslabel">→</div>
-      </div>
 
-      <div></div>
-      <div class="cell" id="pos5">
-        <div class="ring">
-          <div class="gap">
-            <div class="inner"></div>
-          </div>
+        <div></div>
+        <div class="cell" id="pos5"><span>5</span>
+          <div class="poslabel">↓</div>
         </div>
-        <div class="face"><span class="face-text">5</span></div>
-        <div class="poslabel">↓</div>
+        <div></div>
       </div>
-      <div></div>
-
 
       <div class="controls">
         <button class="btn btn-secondary" id="randomBtn">隨機</button>
@@ -414,7 +268,7 @@
       </div>
 
       <div class="hint" style="text-align: left;">點選下方棋子，系統會依序放入：1 → 2 → 3 → 4 → 5</div>
-      <div class="hint hide-on-elder" style="text-align: left;">點選「指定位置」→ 再點下方棋子</div>
+      <div class="hint" style="text-align: left;">點選「指定位置」→ 再點下方棋子</div>
       <div class="hint-box" style="display: flex; justify-content: space-between; align-items: center;">
         <div id="draw-mode" class="hint-version" style="text-align: left;">
           輸入方式：手動
@@ -460,11 +314,8 @@
     /** ******************************
     *  🔧 在這裡換你的 LIFF ID & 版本
     *********************************/
-   // Production: 2007906926-NZW6EQ7P
-   // Dev: 2007931033-4D50LqwM
-    const LIFF_ID = "2007931033-4D50LqwM"; 
-    
-    const APP_VERSION = "v1.0.2";
+    const LIFF_ID = "2007906926-NZW6EQ7P";
+    const APP_VERSION = "v1.0.1";
     const LINE_ID = "@968noswo"; // 你的官方帳號 ID（@ 開頭）
 
     /** ******************************
@@ -552,25 +403,19 @@
     function render() {
       for (let i = 1; i <= 5; i++) {
         const el = posEls[i];
-        const faceText = el.querySelector('.face-text');
-        const posLbl = el.querySelector('.poslabel');
         el.classList.remove("red", "black", "selected");
-
         if (picks[i]) {
-          faceText.textContent = picks[i].type;
+          el.innerHTML = `<span>${picks[i].type}</span><div class="poslabel">${i}</div>`;
           el.classList.add(picks[i].color === "red" ? "red" : "black");
-          if (posLbl) posLbl.textContent = i === 1 ? "中心" : (i === 2 ? "←" : i === 3 ? "→" : i === 4 ? "↑" : "↓");
         } else {
-          faceText.textContent = String(i);
-          if (posLbl) posLbl.textContent = i === 1 ? "中心" : (i === 2 ? "←" : i === 3 ? "→" : i === 4 ? "↑" : "↓");
+          const dir = i === 1 ? "中心" : i === 2 ? "←" : i === 3 ? "→" : i === 4 ? "↑" : "↓";
+          el.innerHTML = `<span>${i}</span><div class="poslabel">${dir}</div>`;
         }
-
         if (selectedPos === i) el.classList.add("selected");
       }
     }
 
     function setSelected(pos) {
-      if (document.body.classList.contains('mode-elder')) return; // 長輩模式不鎖定
       selectedPos = (selectedPos === pos ? null : pos);
       render();
     }
@@ -1036,30 +881,6 @@
       }
     })();
 
-    /* ===== 長輩模式切換 ===== */
-    const MODE_KEY = 'xq_ui_mode'; // 'elder' | 'normal'
-
-    function applyElderMode(on) {
-      document.body.classList.toggle('mode-elder', !!on);
-      const btn = document.getElementById('modeToggleBtn');
-      if (btn) btn.textContent = on ? '進階模式' : '長輩模式';
-
-      // 長輩模式 → 僅允許依序填入，關閉定位（若有）
-      if (on) {
-        selectedPos = null;   // 取消鎖定
-      }
-      try { localStorage.setItem(MODE_KEY, on ? 'elder' : 'normal'); } catch (e) { }
-    }
-
-    function initElderMode() {
-      const saved = (typeof localStorage !== 'undefined') ? localStorage.getItem(MODE_KEY) : null;
-      applyElderMode(saved === 'elder');
-      const btn = document.getElementById('modeToggleBtn');
-      if (btn) btn.addEventListener('click', () => {
-        const next = !document.body.classList.contains('mode-elder');
-        applyElderMode(next);
-      });
-    }
 
     // ====== 初始狀態與版本顯示 ======
     document.getElementById("ver").textContent = LINE_ID + " | " + APP_VERSION;
@@ -1072,7 +893,6 @@
     document.getElementById("debugBtn2").classList.add("hidden");
     document.getElementById("debugBtn3").classList.add("hidden");
 
-    initElderMode();
     // 初次渲染
     render();
   </script>
