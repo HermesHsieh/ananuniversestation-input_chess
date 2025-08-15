@@ -3,569 +3,1053 @@
 
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
-  <title>象棋卜卦 - 安安宇宙站（DEV demo）</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no" />
+  <title>象棋卜卦 - 安安宇宙站</title>
+  <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+  <!-- Cloudflare Web Analytics -->
+  <script defer src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "50bd6af270b7443b8b555db9457b093f"}'></script>
+  <!-- End Cloudflare Web Analytics -->
   <style>
     :root {
-      --bg: #ffffff;
-      --ink: #111;
-      --line: #000;
-      --hint: #08b8cf;
-      /* 正在輸入標示藍 */
-      --panel: #faefcf;
-      /* 淡黃底 */
-      --red: #d32f2f;
-      --gap: 12px;
-      --radius: 16px;
-    }
+		--red: #d32f2f;
+		--black: #111;
+		--bg: #F6F7FB;
+		--card: #fff;
+		--border: #e5e7eb;
+		--accent: #2563eb;
+	}
 
-    * {
-      box-sizing: border-box
-    }
+	body {
+		margin: 0;
+		font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans TC", sans-serif;
+		background: var(--bg);
+		color: #111;
+	}
 
-    html,
-    body {
-      height: 100%
-    }
+	/* 定義隱藏用的 CSS */
+	.hidden {
+		display: none !important;
+	}
 
-    body {
-      margin: 0;
-      background: var(--bg);
-      color: var(--ink);
-      font-family: system-ui, -apple-system, Segoe UI, Roboto, Noto Sans TC, Arial, sans-serif;
-    }
+	.wrap {
+		max-width: 480px;
+		margin: 0 auto;
+		padding: 12px 12px 28px;
+	}
 
-    /* 頂部工具列（簡化版） */
-    .topbar {
-      position: sticky;
-      top: 0;
-      z-index: 10;
-      background: #fff;
-      border-bottom: 2px solid var(--line);
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 10px 12px;
-    }
+	.topbar {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 8px;
+	}
 
-    .title {
-      font-weight: 800;
-      font-size: 18px
-    }
+	.title {
+		font-size: 18px;
+		font-weight: 700;
+	}
 
-    .right-actions {
-      display: flex;
-      gap: 8px
-    }
+	.number {
+		font-size: 18px;
+	}
 
-    .btn {
-      border: 2px solid var(--line);
-      background: #fff;
-      color: var(--ink);
-      padding: 8px 12px;
-      border-radius: 10px;
-      font-weight: 700;
-      font-size: 14px;
-    }
+	.bar-actions {
+		display: flex;
+		gap: 8px;
+	}
 
-    .badge {
-      border: 2px solid var(--line);
-      background: #ffeb3b;
-      font-weight: 800;
-      padding: 4px 8px;
-      border-radius: 999px;
-      font-size: 12px;
-    }
+	.ghost {
+		background: transparent;
+		border: 1px solid var(--border);
+		padding: 8px 10px;
+		border-radius: 10px;
+		font-size: 14px;
+	}
 
-    /* 區段標題與容器 */
-    .section {
-      padding: 12px
-    }
+	.ghost:active {
+		opacity: .7;
+	}
 
-    .panel {
-      background: var(--panel);
-      border: 2px solid var(--line);
-      border-radius: 12px;
-      padding: 10px;
-    }
+	.status {
+		margin: 6px 0 10px;
+		font-size: 12px;
+		color: #666;
+		text-align: center;
+	}
 
-    /* 上排：五個位置（橫向卷軸） */
-    .slots {
-      display: flex;
-      gap: 10px;
-      overflow-x: auto;
-      padding: 4px;
-      scroll-snap-type: x mandatory;
-    }
+	.card {
+		background: var(--card);
+		border: 1px solid var(--border);
+		border-radius: 14px;
+		padding: 12px;
+		box-shadow: 0 1px 2px rgba(0, 0, 0, .04);
+	}
 
-    .slot {
-      flex: 0 0 auto;
-      width: 84px;
-      height: 84px;
-      scroll-snap-align: center;
-      position: relative;
-      display: grid;
-      place-items: center;
-    }
+	.card-title {
+		font-size: 16px;
+		font-weight: 700;
+		text-align: center;
+		margin-bottom: 8px;
+	}
 
-    /* 雙圈（外4 / 隔2 / 內2，同色） */
-    .ring {
-      position: absolute;
-      inset: 0;
-      border-radius: 999px;
-      background: var(--ink);
-      padding: 4px;
-    }
+	.grid {
+		display: grid;
+		grid-template-columns: 1fr 1fr 1fr;
+		gap: 14px;
+		margin-top: 6px;
+	}
 
-    .gap {
-      width: 100%;
-      height: 100%;
-      border-radius: 999px;
-      background: #fff;
-      padding: 2px;
-    }
+	.cell {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		flex-direction: column;
+		border: 4px dashed var(--border);
+		border-radius: 9999px;
+		background: #fff;
+		aspect-ratio: 1/1;
+		min-width: 72px;
+		min-height: 72px;
+		user-select: none;
+		cursor: pointer;
+		font-size: 36px;
+		/* 放大棋字 */
+	}
 
-    .inner {
-      width: 100%;
-      height: 100%;
-      border-radius: 999px;
-      background: var(--ink);
-      padding: 2px;
-    }
+	.cell.red {
+		color: var(--red);
+	}
 
-    .face {
-      position: relative;
-      z-index: 1;
-      width: 100%;
-      height: 100%;
-      border-radius: 999px;
-      background: #fff;
-      display: grid;
-      place-items: center;
-      font-weight: 800;
-      font-size: 24px;
-    }
+	.cell.black {
+		color: var(--black);
+	}
 
-    .slot.red .ring,
-    .slot.red .inner {
-      background: var(--red);
-    }
+	.cell.selected {
+		border-color: var(--accent);
+		box-shadow: 0 0 0 3px rgba(37, 99, 235, .12);
+		background-color: rgba(255, 165, 0, 0.2);
+		/* 透明淡藍色背景 */
+	}
 
-    .slot.red .face {
-      color: var(--red);
-    }
+	.poslabel {
+		font-size: 20px;
+		color: #999;
+		margin-top: 2px;
+	}
 
-    .slot.black .ring,
-    .slot.black .inner {
-      background: var(--ink);
-    }
+	.hint {
+		font-size: 12px;
+		color: #666;
+		text-align: center;
+		margin: 8px 0 0;
+	}
 
-    .slot.black .face {
-      color: var(--ink);
-    }
+	.hint-version {
+		font-size: 8px;
+		color: #666;
+		text-align: center;
+		margin: 8px 0 0;
+	}
 
-    /* 游標提示（正在輸入） */
-    .cursor {
-      position: absolute;
-      inset: -8px -6px auto -6px;
-      background: var(--hint);
-      color: #00323a;
-      font-weight: 800;
-      font-size: 12px;
-      padding: 2px 6px;
-      border-radius: 8px;
-      text-align: center;
-    }
+	.controls {
+		display: flex;
+		gap: 8px;
+		justify-content: center;
+		margin: 12px 0 8px;
+		flex-wrap: wrap;
+	}
 
-    /* 下排：14 枚大按鈕（橫向卷軸） */
-    .picker {
-      display: flex;
-      gap: 10px;
-      overflow-x: auto;
-      padding: 6px 4px;
-      scroll-snap-type: x proximity;
-    }
+	.btn {
+		border: 0;
+		border-radius: 12px;
+		padding: 12px 16px;
+		font-size: 16px;
+	}
 
-    .piece-btn {
-      flex: 0 0 auto;
-      min-width: 88px;
-      height: 64px;
-      border: 3px solid var(--line);
-      background: #fff;
-      border-radius: 18px;
-      display: grid;
-      place-items: center;
-      font-size: 28px;
-      font-weight: 800;
-      scroll-snap-align: center;
-    }
+	.btn-primary {
+		background: #111;
+		color: #fff;
+	}
 
-    .piece-btn.red {
-      color: var(--red);
-    }
+	.btn-secondary {
+		background: #f3f4f6;
+		color: #111;
+		border: 1px solid var(--border);
+	}
 
-    .piece-btn.black {
-      color: var(--ink);
-    }
+	.pieces {
+		margin-top: 10px;
+	}
 
-    /* 底部三顆大按鈕 */
-    .actions {
-      position: sticky;
-      bottom: 0;
-      background: var(--bg);
-      padding: 10px 12px;
-      border-top: 2px solid var(--line);
-      display: flex;
-      gap: 10px;
-      justify-content: space-between;
-    }
+	.row {
+		display: grid;
+		grid-template-columns: repeat(7, 1fr);
+		gap: 8px;
+	}
 
-    .big {
-      flex: 1 1 auto;
-      height: 56px;
-      font-size: 20px;
-      font-weight: 900;
-      border-radius: 16px;
-      border: 3px solid var(--line);
-      background: #fff;
-    }
+	.piece-btn {
+		border: 1px solid var(--border);
+		background: #fff;
+		border-radius: 12px;
+		padding: 12px 0;
+		font-size: 28px;
+		text-align: center;
+	}
 
-    .big.primary {
-      background: #111;
-      color: #fff;
-    }
+	.piece-btn:active {
+		transform: scale(.98);
+	}
 
-    /* --- 共用：可左右滑動的列 --- */
-    .row-scroll {
-      display: flex;
-      gap: 10px;
-      overflow-x: auto;
-      /* 開啟橫向滾動 */
-      overflow-y: hidden;
-      -webkit-overflow-scrolling: touch;
-      /* iOS 慣性捲動 */
-      scroll-snap-type: x proximity;
-      padding: 6px 4px;
-      white-space: nowrap;
-      /* 防換行導致換列 */
-    }
+	.piece-btn.red {
+		color: var(--red);
+	}
 
-    .picker-inner {
-      display: grid;
-      grid-template-columns: repeat(7, 1fr);
-      gap: 12px;
-      min-width: 560px;
-      overflow-x: auto;
-      /* 開啟橫向滾動 */
-      overflow-y: hidden;
-      -webkit-overflow-scrolling: touch;
-      /* iOS 慣性捲動 */
-      scroll-snap-type: x proximity;
-      padding: 6px 4px;
-      white-space: nowrap;
-      /* 防換行導致換列 */
-      /* 保證超過螢幕寬才需要滑 */
-    }
+	.piece-btn.black {
+		color: var(--black);
+	}
 
-    .row-scroll>* {
-      flex: 0 0 auto;
-      /* 子項固定寬，不被壓縮 */
-      scroll-snap-align: center;
-    }
+	.footer-pad {
+		height: 8px;
+	}
 
-    /* 上排 5 格（橫向捲動容器） */
-    #slotsRow {
-      width: 100%;
-      max-width: 100vw;
-    }
+	.ver-badge {
+		border: 1px solid var(--border);
+		border-radius: 999px;
+		padding: 6px 10px;
+		font-size: 12px;
+		color: #6b7280;
+		background: #fff;
+	}
+	
+	/* ===== 老人模式：五子改一列可滑、顯示游標 ===== */
+	body.mode-elder .grid{
+	 display:flex;
+	 gap:10px;
+	 overflow-x:auto;
+	 overflow-y:hidden;
+	 -webkit-overflow-scrolling:touch;
+	 scroll-snap-type:x proximity;
+	 padding:4px 2px;
+	}
+	/* 把原本九宮的 4 個空白格隱藏 */
+	body.mode-elder .grid > div:empty{ display:none; }
 
-    /* 下排 14 顆放大按鈕（橫向捲動容器） */
-    #pickerRow {
-      width: 100%;
-      max-width: 100vw;
-    }
+	/* 一列時每顆固定尺寸、可居中對齊 */
+	body.mode-elder .cell{
+	 flex:0 0 auto;
+	 width:140px;
+	 height:140px;           /* 覆蓋原本 aspect-ratio 的尺寸，視覺更穩定 */
+	 scroll-snap-align:center;
+	}
 
-    /* 放大棋子按鈕（長輩友善） */
-    .piece-btn {
-      min-width: 88px;
-      /* 固定寬度讓橫向捲動有意義 */
-      height: 64px;
-      font-size: 28px;
-      font-weight: 800;
-      border: 3px solid #000;
-      border-radius: 18px;
-      background: #fff;
-    }
+	/* 游標（正在輸入） */
+	.cell{ position:relative; overflow:visible; } /* 讓游標可外凸 */
+	.cursor{
+	 position:absolute;
+	 top:-8px; right:6px;
+	 background:#6495ED;
+	 color:#FFFFFF;
+	 font-weight:800;
+	 font-size:16px;
+	 padding:4px 8px;
+	 border-radius:8px;
+	 z-index:5;
+	}
 
-    /* 上排五顆圓：雙圈維持，這裡只確保不被壓縮 */
-    .slot {
-      width: 84px;
-      height: 84px;
-    }
+	/* 一列時強制排序為 1→2→3→4→5（避免沿用九宮原本 DOM 順序） */
+	body.mode-elder #pos1{ order:1; }
+	body.mode-elder #pos2{ order:2; }
+	body.mode-elder #pos3{ order:3; }
+	body.mode-elder #pos4{ order:4; }
+	body.mode-elder #pos5{ order:5; }
 
-    /* --- 吸底操作列（隨機 / 送出 / 清除） --- */
-    .actions {
-      position: fixed;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      padding: 10px 12px calc(10px + env(safe-area-inset-bottom));
-      background: #fff;
-      border-top: 2px solid #000;
-      display: flex;
-      gap: 10px;
-      justify-content: space-between;
-      z-index: 20;
-    }
+	
+/* ===== 放大模式：棋子選擇區改為 2×7 網格，且整體可左右滑動 ===== */
+body.mode-elder .picker-wrap{
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+  padding: 6px 4px;
+}
 
-    body {
-      /* 預留底部空間，避免內容被吸底列遮住 */
-      padding-bottom: 96px;
-    }
+/* 內層用固定 7 欄的網格；寬度用內容撐開，讓外層可以水平捲動 */
+body.mode-elder .picker-grid{
+  display: grid;
+  grid-template-columns: repeat(7, auto);
+  gap: 12px;
+  width: max-content;     /* 關鍵：以內容寬度為準，超過螢幕就能橫向捲動 */
+}
 
-    /* 巨型按鈕 */
-    .big {
-      flex: 1 1 auto;
-      height: 56px;
-      font-size: 20px;
-      font-weight: 900;
-      border-radius: 16px;
-      border: 3px solid #000;
-      background: #fff;
-    }
+/* 放大約 1.5 倍的按鈕尺寸與字級（放大模式專用，不影響一般模式） */
+body.mode-elder .piece-btn{
+  min-width: 100px;       /* 原本 ~80 → 120 */
+  height: 100px;           /* 原本 ~48 → 72 */
+  font-size: 48px;        /* 原本 ~20 → 32 */
+  font-weight: 800;
+  border: 3px solid #000; /* 視覺更清楚 */
+  border-radius: 18px;
+}
 
-    .big.primary {
-      background: #111;
-      color: #fff;
-    }
+/* 切換模式按鈕（依顯示文字決定配色） */
+.mode-toggle{
+  font-weight: 800;
+  padding: 8px 12px;
+  border-radius: 12px;
+  border: 2px solid transparent;
+  cursor: pointer;
+}
 
-    /* 避免外層 panel 把滾動吃掉 */
-    .panel {
-      overflow: visible;
-    }
+/* 顯示「一般模式」時：黃底、藍字（提示按下會回到一般） */
+#elderToggleBtn.mode-normal{
+  background: #CCFF00;     /* 黃 */
+  color: #1D4ED8;          /* 藍 */
+  border-color: #CCFF00;
+}
 
-    .picker-scroll {
-      overflow-x: auto;
-      white-space: nowrap;
-    }
+/* 顯示「放大模式」時：藍底、白字（提示按下會切到長輩） */
+#elderToggleBtn.mode-elder{
+  background: #2563EB;     /* 藍 */
+  color: #FFFFFF;          /* 白 */
+  border-color: #2563EB;
+}
 
-    .piece-btn {
-      height: 64px;
-      font-size: 28px;
-      font-weight: 800;
-      border: 3px solid #000;
-      border-radius: 18px;
-      background: #fff;
-    }
+#elderToggleBtn:active{ transform: translateY(1px); }
 
-    .piece-btn.red {
-      color: #d32f2f;
-    }
-
-    .piece-btn.black {
-      color: #111;
-    }
   </style>
 </head>
 
 <body>
-
-  <div class="topbar">
-    <div class="title">象棋卜卦 - 安安宇宙站</div>
-    <div class="right-actions">
-      <span class="badge">一般模式</span>
-      <button class="btn" id="friendlyBtn">友善模式</button>
-      <button class="btn" id="reloadBtn">Reload</button>
-    </div>
-  </div>
-
-  <!-- 上排：五個位置（橫向捲動） -->
-  <div class="section">
-    <div class="panel">
-      <div class="row-scroll" id="slotsRow" aria-label="已選棋子（可左右滑動）">
-        <!-- 位置 1~5 -->
-        <div class="slot" id="pos1">
-          <div class="ring">
-            <div class="gap">
-              <div class="inner"></div>
-            </div>
-          </div>
-          <div class="face">1</div>
-        </div>
-        <div class="slot" id="pos2">
-          <div class="ring">
-            <div class="gap">
-              <div class="inner"></div>
-            </div>
-          </div>
-          <div class="face">2</div>
-        </div>
-        <div class="slot" id="pos3">
-          <div class="ring">
-            <div class="gap">
-              <div class="inner"></div>
-            </div>
-          </div>
-          <div class="face">3</div>
-        </div>
-        <div class="slot" id="pos4">
-          <div class="ring">
-            <div class="gap">
-              <div class="inner"></div>
-            </div>
-          </div>
-          <div class="face">4</div>
-        </div>
-        <div class="slot" id="pos5">
-          <div class="ring">
-            <div class="gap">
-              <div class="inner"></div>
-            </div>
-          </div>
-          <div class="face">5</div>
-        </div>
+  <div class="wrap">
+    <div class="topbar">
+      <div class="title">單卦</div>
+      <div class="bar-actions">
+		<button class="mode-toggle" id="elderToggleBtn">放大模式</button>
+        <button class="ghost" id="debugBtn1">Btn1</button>
+        <button class="ghost" id="debugBtn2">Btn2</button>
+        <button class="ghost" id="debugBtn3">Btn3</button>
+        <button class="ghost" id="askBtn">輸入問題名稱</button>
+        <button class="ghost" id="reloadBtn">Reload</button>
       </div>
     </div>
-  </div>
 
-  <!-- 下排：14 枚棋子（橫向捲動） -->
-  <div class="section">
-    <div class="panel picker-scroll">
-      <div class="picker-inner" id="pickerRow" aria-label="棋子選擇（可左右滑動）">
-        <!-- 黑：將 士 象 車 馬 包 卒 -->
-        <button class="piece-btn black" data-type="將" data-color="black">將</button>
-        <button class="piece-btn black" data-type="士" data-color="black">士</button>
-        <button class="piece-btn black" data-type="象" data-color="black">象</button>
-        <button class="piece-btn black" data-type="車" data-color="black">車</button>
-        <button class="piece-btn black" data-type="馬" data-color="black">馬</button>
-        <button class="piece-btn black" data-type="包" data-color="black">包</button>
-        <button class="piece-btn black" data-type="卒" data-color="black">卒</button>
-        <!-- 紅：帥 仕 相 俥 傌 炮 兵 -->
-        <button class="piece-btn red" data-type="帥" data-color="red">帥</button>
-        <button class="piece-btn red" data-type="仕" data-color="red">仕</button>
-        <button class="piece-btn red" data-type="相" data-color="red">相</button>
-        <button class="piece-btn red" data-type="俥" data-color="red">俥</button>
-        <button class="piece-btn red" data-type="傌" data-color="red">傌</button>
-        <button class="piece-btn red" data-type="炮" data-color="red">炮</button>
-        <button class="piece-btn red" data-type="兵" data-color="red">兵</button>
+    <div id="status" class="status">初始化中…</div>
+
+
+    <div class="card">
+      <div id="cardTitle" class="card-title"></div>
+
+      <!-- 九宮格（上：4 / 中：2 1 3 / 下：5） -->
+      <div class="grid" aria-label="十字九宮格">
+        <div></div>
+        <div class="cell" id="pos4"><span>4</span>
+          <div class="poslabel">↑ 點選以鎖定</div>
+        </div>
+        <div></div>
+
+        <div class="cell" id="pos2"><span>2</span>
+          <div class="poslabel">←</div>
+        </div>
+        <div class="cell" id="pos1"><span>1</span>
+          <div class="poslabel">中心</div>
+        </div>
+        <div class="cell" id="pos3"><span>3</span>
+          <div class="poslabel">→</div>
+        </div>
+
+        <div></div>
+        <div class="cell" id="pos5"><span>5</span>
+          <div class="poslabel">↓</div>
+        </div>
+        <div></div>
       </div>
-    </div>
-  </div>
 
-  <!-- 底部大按鈕 -->
-  <div class="actions">
-    <button class="big" id="btnRandom">隨機</button>
-    <button class="big primary" id="btnSend">送出</button>
-    <button class="big" id="btnClear">清除</button>
+      <div class="controls">
+        <button class="btn btn-secondary" id="randomBtn">隨機</button>
+        <button class="btn btn-primary" id="sendBtn">送出</button>
+        <button class="btn btn-secondary" id="clearBtn">清除</button>
+      </div>
+
+      <div class="hint" style="text-align: left;">點選下方棋子，系統會依序放入：1 → 2 → 3 → 4 → 5</div>
+      <div class="hint" style="text-align: left;">點選「指定位置」→ 再點下方棋子</div>
+      <div class="hint-box" style="display: flex; justify-content: space-between; align-items: center;">
+        <div id="draw-mode" class="hint-version" style="text-align: left;">
+          輸入方式：手動
+        </div>
+        <div class="hint-version" id="ver" style="text-align: right;">
+        </div>
+      </div>
+
+    </div>
+
+    <!-- 棋子選擇（黑在上、紅在下） -->
+		<div class="pieces">
+		<div class="picker-wrap">
+    <div class="picker-grid" id="pickerGrid" aria-label="棋子選擇（7×2，可左右滑動）">
+			<div class="row" style="margin-bottom:8px">
+				<!-- 黑國：將 士 象 車 馬 包 卒 -->
+				<button class="piece-btn black" data-piece="將">將</button> <button class="piece-btn black" data-piece="士">士</button> <button class="piece-btn black" data-piece="象">象</button> <button class="piece-btn black" data-piece="車">車</button> <button class="piece-btn black" data-piece="馬">馬</button> <button class="piece-btn black" data-piece="包">包</button> <button class="piece-btn black" data-piece="卒">卒</button>
+
+				<!-- 紅國：帥 仕 相 俥 傌 炮 兵 -->
+				<button class="piece-btn red" data-piece="帥">帥</button> <button class="piece-btn red" data-piece="仕">仕</button> <button class="piece-btn red" data-piece="相">相</button> <button class="piece-btn red" data-piece="俥">俥</button> <button class="piece-btn red" data-piece="傌">傌</button> <button class="piece-btn red" data-piece="炮">炮</button> <button class="piece-btn red" data-piece="兵">兵</button>
+			</div>
+			<div class="footer-pad"></div>
+			</div>
+			</div>
+		</div>
+		
+		<div id="logOutput" style="white-space: pre-wrap; background:#f0f0f0; padding:10px; border:1px solid #ccc; height:150px; overflow-y:auto;"></div>
+	</div>
+
+    <div id="logOutput"
+      style="white-space: pre-wrap; background:#f0f0f0; padding:10px; border:1px solid #ccc; height:150px; overflow-y:auto;">
+    </div>
+
   </div>
 
   <script>
-    // --- 資料結構 ---
-    const slots = [null, null, null, null, null];   // 位置 1..5
-    let cursor = 0; // 下一顆要放的位置 index（0..4）
+    /** ******************************
+    *  🔧 在這裡換你的 LIFF ID & 版本
+    *********************************/
+    const LIFF_ID = "2007931033-4D50LqwM";
+    const APP_VERSION = "v1.0.1";
+    const LINE_ID = "@968noswo"; // 你的官方帳號 ID（@ 開頭）
 
-    const posEls = Array.from({ length: 5 }, (_, i) => document.getElementById('pos' + (i + 1)));
-
-    // --- 畫面渲染 ---
-    function render() {
-      for (let i = 0; i < 5; i++) {
-        const el = posEls[i];
-        const face = el.querySelector('.face');
-        // 顏色類別
-        el.classList.remove('red', 'black');
-        if (slots[i]) {
-          face.textContent = slots[i].type;
-          el.classList.add(slots[i].color);
-        } else {
-          face.textContent = String(i + 1);
-        }
-        // 游標
-        const old = el.querySelector('.cursor');
-        if (old) old.remove();
-        if (cursor === i) {
-          const tag = document.createElement('div');
-          tag.className = 'cursor';
-          tag.textContent = '正在輸入';
-          el.appendChild(tag);
-        }
-      }
-    }
-
-    // --- 放入一顆棋子（依序或指定） ---
-    function placeNext(piece) {
-      if (cursor > 4) return; // 滿了
-      slots[cursor] = piece;
-      // 游標前進到下一個空位
-      let next = cursor;
-      while (next < 5 && slots[next]) next++;
-      cursor = Math.min(next, 5);
-      if (cursor > 4) {
-        // 若全部滿了，游標留在最後
-        cursor = 4;
-      }
-      render();
-      // 滑動到游標可見（上排）
-      const el = posEls[cursor];
-      if (el) el.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
-    }
-
-    // --- 清除 ---
-    function clearAll() {
-      for (let i = 0; i < 5; i++) slots[i] = null;
-      cursor = 0;
-      render();
-    }
-
-    // --- 隨機（從 14 種中抽 5；僅示範 UI） ---
-    const ALL = [
-      { type: '將', color: 'black' }, { type: '士', color: 'black' }, { type: '象', color: 'black' },
-      { type: '車', color: 'black' }, { type: '馬', color: 'black' }, { type: '包', color: 'black' }, { type: '卒', color: 'black' },
-      { type: '帥', color: 'red' }, { type: '仕', color: 'red' }, { type: '相', color: 'red' },
-      { type: '俥', color: 'red' }, { type: '傌', color: 'red' }, { type: '炮', color: 'red' }, { type: '兵', color: 'red' }
-    ];
-    function randomFive() {
-      clearAll();
-      const bag = [...ALL];
-      for (let i = 0; i < 5; i++) {
-        const k = Math.floor(Math.random() * bag.length);
-        placeNext(bag.splice(k, 1)[0]);
-      }
-    }
-
-    // --- 事件綁定 ---
-    document.getElementById('pickerRow').addEventListener('click', e => {
-      const btn = e.target.closest('.piece-btn');
-      if (!btn) return;
-      if (cursor > 4) return; // 已滿
-      placeNext({ type: btn.dataset.type, color: btn.dataset.color });
-    });
-
-    // 點上排任一位置 → 移動游標（方便修正）
-    posEls.forEach((el, idx) => {
-      el.addEventListener('click', () => {
-        cursor = idx;
-        render();
+    /** ******************************
+    *  🧰 全套 32 枚牌堆（抽過即移除）
+    *********************************/
+    // 以整副棋的數量建立完整牌堆
+    const FULL_DECK_COUNTS = {
+      "帥": 1, "仕": 2, "相": 2, "俥": 2, "傌": 2, "炮": 2, "兵": 5,
+      "將": 1, "士": 2, "象": 2, "車": 2, "馬": 2, "包": 2, "卒": 5
+    };
+    // 依數量展開成陣列（32 枚）
+    function makeFullDeck() {
+      const arr = [];
+      Object.entries(FULL_DECK_COUNTS).forEach(([type, n]) => {
+        for (let i = 0; i < n; i++) arr.push(type);
       });
+      return arr;
+    }
+    // 目前牌堆（null 表示尚未建立或已重置）
+    let deck = null;
+
+    // 需求：第一次按「隨機」或清空後才建立牌堆
+    function ensureDeck() {
+      if (!deck || deck.length === 0) deck = makeFullDeck();
+      return deck;
+    }
+    // 從牌堆隨機抽 1 枚（會移除該枚）
+    function drawFromDeck() {
+      ensureDeck();
+      if (deck.length === 0) return null;
+      const idx = Math.floor(Math.random() * deck.length);
+      const [picked] = deck.splice(idx, 1);
+      return picked; // 回傳棋種字元
+    }
+
+    // 輸入方式（手動 / 隨機）
+    let drawMode = "手動"; // 預設手動
+    function setDrawMode(mode) {
+      drawMode = mode;
+      const dm = document.getElementById("draw-mode");
+      if (dm) dm.textContent = `輸入方式：${drawMode}`;
+    }
+	
+	// 讀寫模式
+	function applyElderMode(on) {
+		document.body.classList.toggle('mode-elder',  ! !on);
+		localStorage.setItem('elderMode', on ? '1':'0');
+
+		const btn=document.getElementById('elderToggleBtn');
+
+		if (btn) {
+			// 規則：在「放大模式」時，按鈕顯示「一般模式」；反之亦然（顯示將切換到的目標）
+			btn.textContent=on ? '一般模式': '放大模式';
+			btn.classList.remove('mode-normal', 'mode-elder');
+			btn.classList.add(on ? 'mode-normal' : 'mode-elder');
+		}
+
+		// 切到放大模式時，捲動游標所在那格到視窗中
+		if (on) {
+			const pos=selectedPos || firstEmptyPos();
+
+			if (pos) {
+				const el=document.getElementById('pos'+pos);
+
+				if (el) el.scrollIntoView( {
+						behavior:'smooth', inline:'center', block:'nearest'
+					}
+
+				);
+			}
+		}
+	}
+
+
+	function initElderMode() {
+		const saved=localStorage.getItem('elderMode')==='1';
+		applyElderMode(saved);
+	}
+
+    // ====== 狀態與工具 ======
+    const $ = (id) => document.getElementById(id);
+    const posEls = { 1: $("pos1"), 2: $("pos2"), 3: $("pos3"), 4: $("pos4"), 5: $("pos5") };
+    const statusEl = $("status");
+    const titleEl = $("cardTitle");
+
+    // 目前 5 格內容：{ type, color } 或 null
+    const picks = { 1: null, 2: null, 3: null, 4: null, 5: null };
+    let selectedPos = null; // 定位模式：使用者選的目標位置
+
+    const RED_SET = new Set(["帥", "仕", "相", "俥", "傌", "炮", "兵"]);
+    const BLACK_SET = new Set(["將", "士", "象", "車", "馬", "包", "卒"]);
+
+    // 整副棋上限
+    const PIECE_LIMITS = {
+      "帥": 1, "仕": 2, "相": 2, "俥": 2, "傌": 2, "炮": 2, "兵": 5,
+      "將": 1, "士": 2, "象": 2, "車": 2, "馬": 2, "包": 2, "卒": 5
+    };
+
+    function pieceColorOf(type) {
+      if (RED_SET.has(type)) return "red";
+      if (BLACK_SET.has(type)) return "black";
+      return null;
+    }
+    function firstEmptyPos() {
+      for (let i = 1; i <= 5; i++) if (!picks[i]) return i;
+      return null;
+    }
+    function countUsed(type) {
+      let c = 0;
+      for (let i = 1; i <= 5; i++) if (picks[i]?.type === type) c++;
+      return c;
+    }
+    function canPlace(type, pos) {
+      const limit = PIECE_LIMITS[type] ?? 0;
+      const used = countUsed(type);
+      const currentTypeAtPos = picks[pos]?.type || null;
+      if (currentTypeAtPos === type) return true; // 覆蓋同種不增加用量
+      return used < limit;
+    }
+
+		function render() {
+	 const cursorPos = selectedPos || firstEmptyPos(); // 沒鎖定就顯示下一空位
+
+	 for (let i = 1; i <= 5; i++) {
+	   const el = posEls[i];
+	   el.classList.remove("red", "black", "selected");
+
+	   if (picks[i]) {
+	     el.innerHTML = `<span>${picks[i].type}<\/span><div class="poslabel">${i}<\/div>`;
+	     el.classList.add(picks[i].color === "red" ? "red" : "black");
+	   } else {
+	     const dir = i === 1 ? "中心" : i === 2 ? "位置" : i === 3 ? "位置" : i === 4 ? "位置" : "位置";
+	     el.innerHTML = `<span>${i}<\/span><div class="poslabel">${dir}<\/div>`;
+	   }
+	   if (selectedPos === i) el.classList.add("selected");
+
+	   // 先清舊游標，再視需要加上
+	   el.querySelectorAll('.cursor').forEach(n=>n.remove());
+	   if (cursorPos === i) {
+	     const tag = document.createElement('div');
+	     tag.className = 'cursor';
+	     tag.textContent = '正在輸入';
+	     el.appendChild(tag);
+	   }
+	 }
+
+	 // 老人模式：把游標那格捲到可視範圍
+	 if (document.body.classList.contains('mode-elder') && cursorPos) {
+	   const el = document.getElementById('pos'+cursorPos);
+	   if (el) el.scrollIntoView({ behavior:'smooth', inline:'center', block:'nearest' });
+	 }
+	}
+
+    function setSelected(pos) {
+      selectedPos = (selectedPos === pos ? null : pos);
+      render();
+    }
+
+    function addPiece(type) {
+      setDrawMode("手動"); // ← 使用者點底部棋子視為手動
+      const color = pieceColorOf(type);
+      if (!color) return;
+
+      const pos = selectedPos || firstEmptyPos();
+      if (!pos) { alert("已放滿 5 格；若要重選，請按「清除」。"); return; }
+
+      if (!canPlace(type, pos)) {
+        const remain = (PIECE_LIMITS[type] - countUsed(type));
+        alert(`「${type}」可用數量不足（剩餘 ${Math.max(0, remain)}）`);
+        return;
+      }
+
+      picks[pos] = { type, color };
+      const next = firstEmptyPos();
+      selectedPos = next; // 若滿格會是 null
+      render();
+    }
+
+    function clearAll(resetMode = true, resetDeck = true) {
+      for (let i = 1; i <= 5; i++) picks[i] = null;
+      selectedPos = null;
+      if (resetMode) setDrawMode("手動"); // 清空後回到手動（可關閉）
+      if (resetDeck) deck = null;        // ★ 清空時也重置牌堆（回到 32 枚）
+      render();
+    }
+
+    function hardReload() {
+      const base = location.origin + location.pathname;
+      location.replace(base + "?t=" + Date.now()); // 破快取
+    }
+
+    function promptQuestion() {
+      const t = prompt("請輸入你的卜卦問題：", titleEl.textContent || "");
+      if (t && t.trim()) titleEl.textContent = t.trim();
+    }
+
+    // ====== 隨機 5 顆（遵守每種上限） ======
+    function randomFillAll() {
+      // 先清空五格＆重置牌堆（保留「隨機」模式）
+      clearAll(false, true);
+      setDrawMode("隨機");
+
+      // 確保有 32 枚完整牌堆
+      ensureDeck();
+
+      const order = [1, 2, 3, 4, 5];
+      for (const pos of order) {
+        const type = drawFromDeck();
+        if (!type) { alert("牌堆意外為空，請再試一次。"); ensureDeck(); break; }
+        // deck 已保證數量，理論上不會超上限；保險檢查可保留
+        if (!canPlace(type, pos)) continue;
+        picks[pos] = { type, color: pieceColorOf(type) };
+      }
+
+      selectedPos = null; // 抽滿後取消鎖定
+      render();
+    }
+
+
+    // ====== 隨機抽 1 枚（若 5 格已滿則提示） ======
+    function randomDrawOne() {
+      // 若 5 格已滿，直接提示
+      const empty = firstEmptyPos();
+      if (!empty) { alert("5 格已滿，請先「清除」再抽。"); return; }
+
+      // 定位模式優先：若鎖定的格為空，就放那格；否則放最前面空格
+      const target = (selectedPos && !picks[selectedPos]) ? selectedPos : empty;
+
+      // 抽 1 枚；若牌堆空了會自動重建
+      setDrawMode("隨機");
+      const type = drawFromDeck();
+      if (!type) { alert("牌堆已空，已重建。請再試一次。"); ensureDeck(); return; }
+
+      // 放到目標格
+      if (!canPlace(type, target)) {
+        // 理論上不會發生（因為 5 格上限遠小於整副棋數），但保險處理：
+        alert(`「${type}」已超出可用數量，改抽下一枚。`);
+        return randomDrawOne(); // 直接再抽一枚
+      }
+      picks[target] = { type, color: pieceColorOf(type) };
+
+      // 下一個預選目標 = 下一個空格（若已滿則 null）
+      selectedPos = firstEmptyPos();
+      render();
+    }
+
+    function buildImageMessage() {
+      const cells = [1, 2, 3, 4, 5].map(i => picks[i]);
+      if (cells.some(x => !x)) { alert("請先選滿 5 格再送出。"); return null; }
+
+      const toText = (cell) => ({
+        type: "text",
+        text: String(cell.type),
+        weight: "bold",
+        align: "center",
+        size: "xl",
+        color: cell.color === "red" ? "#d32f2f" : "#111111"
+      });
+
+      const t1 = toText(picks[4]);
+      const t2 = toText(picks[2]);
+      const t3 = toText(picks[1]);
+      const t4 = toText(picks[3]);
+      const t5 = toText(picks[5]);
+
+      const summary = [1, 2, 3, 4, 5].map(i => `${i}:${picks[i].type}`).join("  ");
+      printLog("抽取結果：" + summary);
+      const fiveStr = [1, 2, 3, 4, 5].map(i => picks[i].type).join(""); // 五字
+      printLog("五字：" + fiveStr);
+      const fiveParam = encodeURIComponent(fiveStr);
+      printLog("五字參數：" + fiveParam);
+      const titleText = (titleEl.textContent || "象棋卜卦-單卦").trim();
+      printLog("卜卦問題：" + titleText);
+      const titleParam = encodeURIComponent(titleText);
+      printLog("卜卦問題參數：" + titleParam);
+      const modeTag = (drawMode === "隨機" ? "隨機" : "手動"); // 要顯示的文字
+      printLog("輸入方式：" + modeTag);
+      const modeParam = encodeURIComponent(modeTag);
+      printLog("輸入方式參數：" + modeParam);
+      const modeHint = (drawMode === "隨機" ? "*隨機抽卦結果僅供參考*" : "");
+      printLog("輸入方式提示：" + modeHint);
+      const auto = (drawMode === "隨機") ? 1 : 0;
+      printLog("是否隨機產生：" + auto);
+
+      return {
+        type: 'image',
+        originalContentUrl: `https://i.imgur.com/MwS42AE.png?p=5cg&c=${fiveStr}&n=${titleText}&at=${auto}&v=${APP_VERSION}`,
+        previewImageUrl: `https://i.imgur.com/MwS42AE.png`
+      };
+    }
+
+    async function sendResult() {
+      const flex = buildImageMessage();
+      if (!flex) return;
+      try {
+        if (liff?.isInClient?.()) {
+          await liff.sendMessages([flex]);
+          alert("已送出，返回聊天室");
+          liff.closeWindow();
+        } else if (liff.isApiAvailable('shareTargetPicker')) {
+          await liff.shareTargetPicker([flex]);
+          alert("已分享");
+        } else {
+          alert("請在 LINE 內開啟此 LIFF 頁面再送出。");
+        }
+      } catch (e) {
+        const msg = (e?.message || e || '').toString();
+        if ((msg.includes('scope') || msg.includes('not in LIFF app scope')) && liff.isApiAvailable('shareTargetPicker')) {
+          await liff.shareTargetPicker([flex]);
+          alert("尚未授權 chat_message.write，已改用分享送出");
+        } else {
+          alert("sendMessages 失敗：" + msg);
+        }
+      }
+    }
+
+    async function clickBtnDebug1() {
+      const flex = {
+        "type": "flex",
+        "altText": "測試 Flex Message",
+        "contents": {
+          "type": "bubble",
+          "body": {
+            "type": "box",
+            "layout": "vertical",
+            "contents": [
+              {
+                "type": "text",
+                "text": "這是標題文字",
+                "weight": "bold",
+                "size": "lg"
+              }
+            ]
+          },
+          "footer": {
+            "type": "box",
+            "layout": "vertical",
+            "contents": [
+              {
+                "type": "button",
+                "style": "primary",
+                "action": {
+                  "type": "postback",
+                  "label": "action",
+                  "displayText": "按下按鈕",
+                  "data": "action=buy&itemid=123"
+                }
+              }
+            ]
+          }
+        }
+      };
+      printLog("sendResult flex: ", flex);
+      if (!flex) return;
+      try {
+        if (liff?.isInClient?.()) {
+          await liff.sendMessages([flex]);
+          alert("已送出，返回聊天室");
+          liff.closeWindow();
+        } else if (liff.isApiAvailable('shareTargetPicker')) {
+          await liff.shareTargetPicker([flex]);
+          alert("已分享");
+        } else {
+          alert("請在 LINE 內開啟此 LIFF 頁面再送出。");
+        }
+      } catch (e) {
+        const msg = (e?.message || e || '').toString();
+        if ((msg.includes('scope') || msg.includes('not in LIFF app scope')) && liff.isApiAvailable('shareTargetPicker')) {
+          await liff.shareTargetPicker([flex]);
+          alert("尚未授權 chat_message.write，已改用分享送出");
+        } else {
+          alert("sendMessages 失敗：" + msg);
+        }
+      }
+    }
+
+    async function clickBtnDebug2() {
+      const flex = {
+        type: "flex",
+        altText: "測試 Flex Message",
+        contents: {
+          type: "bubble",
+          body: {
+            type: "box",
+            layout: "vertical",
+            contents: [
+              {
+                type: "text",
+                text: "這是標題文字",
+                weight: "bold",
+                size: "lg"
+              }
+            ]
+          },
+          footer: {
+            type: "box",
+            layout: "vertical",
+            contents: [
+              {
+                type: "button",
+                style: "primary",
+                action: {
+                  type: "uri",
+                  label: "分享此訊息",
+                  uri: `https://liff.line.me/${LIFF_ID}?param1=value1&param2=value2` // 請替換成你的分享鏈結 
+                }
+              }
+            ]
+          }
+        }
+      };
+      printLog("sendResult flex: ", flex);
+      if (!flex) return;
+      try {
+        if (liff?.isInClient?.()) {
+          await liff.sendMessages([flex]);
+          alert("已送出，返回聊天室");
+          liff.closeWindow();
+        } else if (liff.isApiAvailable('shareTargetPicker')) {
+          await liff.shareTargetPicker([flex]);
+          alert("已分享");
+        } else {
+          alert("請在 LINE 內開啟此 LIFF 頁面再送出。");
+        }
+      } catch (e) {
+        const msg = (e?.message || e || '').toString();
+        if ((msg.includes('scope') || msg.includes('not in LIFF app scope')) && liff.isApiAvailable('shareTargetPicker')) {
+          await liff.shareTargetPicker([flex]);
+          alert("尚未授權 chat_message.write，已改用分享送出");
+        } else {
+          alert("sendMessages 失敗：" + msg);
+        }
+      }
+    }
+
+    async function clickBtnDebug3() {
+      if (!await isUserFriend()) {
+        alert("請先加入好友才能使用此功能！");
+        // 轉跳至加好友頁面 (你的官方帳號加入連結)
+        window.location.href = "https://line.me/R/ti/p/" + LINE_ID;
+        return;
+      }
+      // const flex = buildFlexMessage();
+      // printLog("sendResult flex: ", flex);
+      const flex = buildImageMessage();
+      printLog("sendResult flex: ", flex);
+      if (!flex) return;
+      try {
+        if (liff?.isInClient?.()) {
+          await liff.sendMessages([flex]);
+          alert("已送出，返回聊天室");
+          liff.closeWindow();
+        } else if (liff.isApiAvailable('shareTargetPicker')) {
+          await liff.shareTargetPicker([flex]);
+          alert("已分享");
+        } else {
+          alert("請在 LINE 內開啟此 LIFF 頁面再送出。");
+        }
+      } catch (e) {
+        const msg = (e?.message || e || '').toString();
+        if ((msg.includes('scope') || msg.includes('not in LIFF app scope')) && liff.isApiAvailable('shareTargetPicker')) {
+          await liff.shareTargetPicker([flex]);
+          alert("尚未授權 chat_message.write，已改用分享送出");
+        } else {
+          alert("sendMessages 失敗：" + msg);
+        }
+      }
+    }
+
+    // ====== LIFF 判斷是否為好友 ======
+    async function isUserFriend() {
+      const friend = await liff.getFriendship();
+      return friend.friendFlag; // true 代表是好友，false 代表不是好友
+    }
+
+    // ====== 日誌輸出 ======
+    function printLog(message) {
+      const logDiv = document.getElementById('logOutput');
+      if (logDiv) {
+        logDiv.textContent += message + "\n";
+        logDiv.scrollTop = logDiv.scrollHeight;  // 自動捲到底部
+      }
+    }
+
+    // 解析網址參數函式
+    function getQueryParam(param) {
+      const urlParams = new URLSearchParams(window.location.search);
+      return urlParams.get(param);
+    }
+
+    function getQueryParamFromShared() {
+      try {
+        // 取得目前瀏覽器網址的 search params
+        const params = new URLSearchParams(window.location.search);
+
+        // 取得 liff.state（經 URL encode）
+        let stateParam = params.get('liff.state');
+
+        if (stateParam) {
+          // 解碼參數
+          stateParam = decodeURIComponent(stateParam);
+
+          // stateParam 會是類似 /path?a=1&b=2 的URI 路徑及查詢字串
+          // 我們要把它解析成 key-value
+          const url = new URL("http://example.com" + stateParam); // 加入 domain 方便用 URL API 解析
+          const searchParams = url.searchParams;
+
+          // 範例：取得特定參數
+          const a = searchParams.get('a');
+          const b = searchParams.get('b');
+
+          printLog(`liff.state 解碼參數:\n完整路徑: ${stateParam}\na = ${a}\nb = ${b}`);
+        } else {
+          printLog('沒有 liff.state 參數');
+        }
+      } catch (error) {
+        printLog('解析 liff.state 參數失敗:', error);
+        printLog('初始化 LIFF 失敗');
+      }
+    }
+
+    // 準備要送的訊息，依參數不同決定內容
+    function prepareMessage(parameter) {
+      if (parameter === 'manually') {
+        return {
+          type: 'text',
+          text: '收到參數 manully，執行療癒分數指令！'
+        };
+      } else if (parameter === 'auto') {
+        return {
+          type: 'text',
+          text: '自動模式啟動中...'
+        };
+      } else {
+        return {
+          type: 'text',
+          text: '未帶參數或參數內容未知。'
+        };
+      }
+    }
+
+    async function validateFlexOnServerJSONP(flex) {
+      return new Promise((resolve, reject) => {
+        const url = "https://script.google.com/macros/s/AKfycbwpTCUmsM55eTsXPLpkR6qgSkr8L0KzHXf323pwBXrwvTQJ2A8L2K0XmJwhyFPYaZRwPQ/exec";
+        const cb = "cb" + Date.now();
+        window[cb] = (data) => { resolve(data); delete window[cb]; script.remove(); };
+        const u = `${url}?callback=${cb}&message=${encodeURIComponent(JSON.stringify(flex))}`;
+        const script = document.createElement("script");
+        script.src = u;
+        script.onerror = () => { reject(new Error("JSONP load error")); delete window[cb]; };
+        document.body.appendChild(script);
+      });
+    }
+
+    // ====== 綁定 UI ======
+    $("askBtn").addEventListener("click", promptQuestion);
+    $("reloadBtn").addEventListener("click", hardReload);
+    $("clearBtn").addEventListener("click", clearAll);
+    $("randomBtn").addEventListener("click", randomFillAll);
+    $("sendBtn").addEventListener("click", sendResult);
+    $("debugBtn1").addEventListener("click", clickBtnDebug1);
+    $("debugBtn2").addEventListener("click", clickBtnDebug2);
+    $("debugBtn3").addEventListener("click", clickBtnDebug3);
+
+    Object.entries(posEls).forEach(([idx, el]) => {
+      el.addEventListener("click", () => setSelected(Number(idx)));
     });
 
-    // 控制鈕
-    document.getElementById('btnClear').addEventListener('click', clearAll);
-    document.getElementById('btnRandom').addEventListener('click', randomFive);
-    document.getElementById('btnSend').addEventListener('click', () => {
-      const filled = slots.filter(Boolean).length;
-      if (filled < 5) { alert('請先選滿 5 顆棋'); return; }
-      // 這裡之後可改成呼叫 LIFF send/share；先簡單預覽
-      const s = slots.map(p => p.type).join('');
-      alert('送出棋組：' + s);
+    document.querySelectorAll(".piece-btn").forEach(btn => {
+      btn.addEventListener("click", () => addPiece(btn.dataset.piece));
+    });
+	
+	document.getElementById('elderToggleBtn').addEventListener('click', ()=> {
+        const on= !document.body.classList.contains('mode-elder');
+        applyElderMode(on);
     });
 
-    // 其他示意按鈕
-    document.getElementById('reloadBtn').addEventListener('click', () => location.reload());
-    document.getElementById('friendlyBtn').addEventListener('click', () => {
-      alert('「友善模式」只是示意；目前已採大按鈕＋左右滑動排版。可再加大字或切換兩種 UI。');
-    });
 
-    // 初始
+    // ====== 初始化 LIFF ======
+    (async () => {
+      try {
+        statusEl.textContent = "頁面初始化中…";
+        // 初始化 LIFF 附帶自動登入外部瀏覽器用戶功能
+        await liff.init({ liffId: LIFF_ID, withLoginOnExternalBrowser: true });
+        printLog("頁面初始化成功");
+
+        // 檢查是否登入，未登入導向登入
+        if (!liff.isLoggedIn()) {
+          statusEl.textContent = "未登入 → 導向登入";
+          await liff.login();  // 呼叫後會跳轉頁面，這邊後面程式碼不會繼續執行
+          return;
+        }
+
+        // 登入成功，取得使用者資訊
+        const profile = await liff.getProfile();
+        printLog("用戶名稱：" + profile.displayName);
+        statusEl.textContent = `Hello, ${profile.displayName} 👋`;
+
+        // 取得網址參數 p
+        const urlParams = new URLSearchParams(window.location.search);
+        const parameter = urlParams.get('p');
+        printLog("網址參數 p: " + parameter);
+
+        getQueryParamFromShared();
+
+        // 若有帶參數且非空，發送訊息並關閉窗口
+        if (parameter !== null && parameter !== '') {
+          printLog("sendMessages p: " + parameter);
+          try {
+            await liff.sendMessages([{ type: 'text', text: `啟動療癒分數指令 ${parameter}` }]);
+            printLog("訊息送出成功，關閉視窗");
+            liff.closeWindow();
+          } catch (sendError) {
+            printLog("sendMessages 失敗: " + sendError.message);
+            alert("訊息送出失敗:" + sendError.message);
+          }
+        }
+
+      } catch (err) {
+        printLog("初始化錯誤: " + (err?.message || err));
+        statusEl.textContent = `LIFF 初始化失敗：${err?.message || "unknown"}`;
+      }
+    })();
+
+
+    // ====== 初始狀態與版本顯示 ======
+    document.getElementById("ver").textContent = LINE_ID + " | " + APP_VERSION;
+
+    // 隱藏日誌輸出區域
+    document.getElementById("logOutput").classList.add("hidden");
+
+    // 隱藏除錯按鈕
+    document.getElementById("debugBtn1").classList.add("hidden");
+    document.getElementById("debugBtn2").classList.add("hidden");
+    document.getElementById("debugBtn3").classList.add("hidden");
+
+	initElderMode();
+    // 初次渲染
     render();
   </script>
 </body>
