@@ -1,0 +1,586 @@
+<!doctype html>
+<html lang="zh-Hant">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <title>象棋卜卦 - 安安宇宙站（DEV demo）</title>
+  <style>
+    :root {
+      --bg: #ffffff;
+      --ink: #111;
+      --line: #000;
+      --hint: #08b8cf;
+      /* 正在輸入標示藍 */
+      --panel: #faefcf;
+      /* 淡黃底 */
+      --red: #d32f2f;
+      --gap: 12px;
+      --radius: 16px;
+    }
+
+    * {
+      box-sizing: border-box
+    }
+
+    html,
+    body {
+      height: 100%
+    }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--ink);
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Noto Sans TC, Arial, sans-serif;
+    }
+
+    /* 頂部工具列（簡化版） */
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      background: #fff;
+      border-bottom: 2px solid var(--line);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 12px;
+    }
+
+    .title {
+      font-weight: 800;
+      font-size: 18px
+    }
+
+    .right-actions {
+      display: flex;
+      gap: 8px
+    }
+
+    .btn {
+      border: 2px solid var(--line);
+      background: #fff;
+      color: var(--ink);
+      padding: 8px 12px;
+      border-radius: 10px;
+      font-weight: 700;
+      font-size: 14px;
+    }
+
+    .badge {
+      border: 2px solid var(--line);
+      background: #ffeb3b;
+      font-weight: 800;
+      padding: 4px 8px;
+      border-radius: 999px;
+      font-size: 12px;
+    }
+
+    /* 區段標題與容器 */
+    .section {
+      padding: 12px
+    }
+
+    .panel {
+      background: var(--panel);
+      border: 2px solid var(--line);
+      border-radius: 12px;
+      padding: 10px;
+    }
+
+    /* 上排：五個位置（橫向卷軸） */
+    .slots {
+      display: flex;
+      gap: 10px;
+      overflow-x: auto;
+      padding: 4px;
+      scroll-snap-type: x mandatory;
+    }
+
+    .slot {
+      flex: 0 0 auto;
+      width: 84px;
+      height: 84px;
+      scroll-snap-align: center;
+      position: relative;
+      display: grid;
+      place-items: center;
+    }
+
+    /* 雙圈（外4 / 隔2 / 內2，同色） */
+    .ring {
+      position: absolute;
+      inset: 0;
+      border-radius: 999px;
+      background: var(--ink);
+      padding: 4px;
+    }
+
+    .gap {
+      width: 100%;
+      height: 100%;
+      border-radius: 999px;
+      background: #fff;
+      padding: 2px;
+    }
+
+    .inner {
+      width: 100%;
+      height: 100%;
+      border-radius: 999px;
+      background: var(--ink);
+      padding: 2px;
+    }
+
+    .face {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      height: 100%;
+      border-radius: 999px;
+      background: #fff;
+      display: grid;
+      place-items: center;
+      font-weight: 800;
+      font-size: 24px;
+    }
+
+    .slot.red .ring,
+    .slot.red .inner {
+      background: var(--red);
+    }
+
+    .slot.red .face {
+      color: var(--red);
+    }
+
+    .slot.black .ring,
+    .slot.black .inner {
+      background: var(--ink);
+    }
+
+    .slot.black .face {
+      color: var(--ink);
+    }
+
+    /* 游標提示（正在輸入） */
+    .cursor {
+      position: absolute;
+      inset: -8px -6px auto -6px;
+      background: var(--hint);
+      color: #00323a;
+      font-weight: 800;
+      font-size: 12px;
+      padding: 2px 6px;
+      border-radius: 8px;
+      text-align: center;
+    }
+
+    /* 下排：14 枚大按鈕（橫向卷軸） */
+    .picker {
+      display: flex;
+      gap: 10px;
+      overflow-x: auto;
+      padding: 6px 4px;
+      scroll-snap-type: x proximity;
+    }
+
+    .piece-btn {
+      flex: 0 0 auto;
+      min-width: 88px;
+      height: 64px;
+      border: 3px solid var(--line);
+      background: #fff;
+      border-radius: 18px;
+      display: grid;
+      place-items: center;
+      font-size: 28px;
+      font-weight: 800;
+      scroll-snap-align: center;
+    }
+
+    .piece-btn.red {
+      color: var(--red);
+    }
+
+    .piece-btn.black {
+      color: var(--ink);
+    }
+
+    /* 底部三顆大按鈕 */
+    .actions {
+      position: sticky;
+      bottom: 0;
+      background: var(--bg);
+      padding: 10px 12px;
+      border-top: 2px solid var(--line);
+      display: flex;
+      gap: 10px;
+      justify-content: space-between;
+    }
+
+    .big {
+      flex: 1 1 auto;
+      height: 56px;
+      font-size: 20px;
+      font-weight: 900;
+      border-radius: 16px;
+      border: 3px solid var(--line);
+      background: #fff;
+    }
+
+    .big.primary {
+      background: #111;
+      color: #fff;
+    }
+
+    /* --- 共用：可左右滑動的列 --- */
+    .row-scroll {
+      display: flex;
+      gap: 10px;
+      overflow-x: auto;
+      /* 開啟橫向滾動 */
+      overflow-y: hidden;
+      -webkit-overflow-scrolling: touch;
+      /* iOS 慣性捲動 */
+      scroll-snap-type: x proximity;
+      padding: 6px 4px;
+      white-space: nowrap;
+      /* 防換行導致換列 */
+    }
+
+    .row-scroll>* {
+      flex: 0 0 auto;
+      /* 子項固定寬，不被壓縮 */
+      scroll-snap-align: center;
+    }
+
+    /* 上排 5 格（橫向捲動容器） */
+    #slotsRow {
+      width: 100%;
+      max-width: 100vw;
+    }
+
+    /* 下排 14 顆放大按鈕（橫向捲動容器） */
+    #pickerRow {
+      width: 100%;
+      max-width: 100vw;
+    }
+
+    /* 放大棋子按鈕（長輩友善） */
+    .piece-btn {
+      min-width: 88px;
+      /* 固定寬度讓橫向捲動有意義 */
+      height: 64px;
+      font-size: 28px;
+      font-weight: 800;
+      border: 3px solid #000;
+      border-radius: 18px;
+      background: #fff;
+    }
+
+    /* 上排五顆圓：雙圈維持，這裡只確保不被壓縮 */
+    .slot {
+      width: 84px;
+      height: 84px;
+    }
+
+    /* --- 吸底操作列（隨機 / 送出 / 清除） --- */
+    .actions {
+      position: fixed;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      padding: 10px 12px calc(10px + env(safe-area-inset-bottom));
+      background: #fff;
+      border-top: 2px solid #000;
+      display: flex;
+      gap: 10px;
+      justify-content: space-between;
+      z-index: 20;
+    }
+
+    body {
+      /* 預留底部空間，避免內容被吸底列遮住 */
+      padding-bottom: 96px;
+    }
+
+    /* 巨型按鈕 */
+    .big {
+      flex: 1 1 auto;
+      height: 56px;
+      font-size: 20px;
+      font-weight: 900;
+      border-radius: 16px;
+      border: 3px solid #000;
+      background: #fff;
+    }
+
+    .big.primary {
+      background: #111;
+      color: #fff;
+    }
+
+    /* 避免外層 panel 把滾動吃掉 */
+    .panel {
+      overflow: visible;
+    }
+
+    .picker-scroll {
+      overflow-x: auto;
+      white-space: nowrap;
+    }
+
+    .picker-inner {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 12px;
+      min-width: 560px;
+      /* 保證超過螢幕寬才需要滑 */
+    }
+
+    .piece-btn {
+      height: 64px;
+      font-size: 28px;
+      font-weight: 800;
+      border: 3px solid #000;
+      border-radius: 18px;
+      background: #fff;
+    }
+
+    .piece-btn.red {
+      color: #d32f2f;
+    }
+
+    .piece-btn.black {
+      color: #111;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="topbar">
+    <div class="title">象棋卜卦 - 安安宇宙站</div>
+    <div class="right-actions">
+      <span class="badge">一般模式</span>
+      <button class="btn" id="friendlyBtn">友善模式</button>
+      <button class="btn" id="reloadBtn">Reload</button>
+    </div>
+  </div>
+
+  <!-- 上排：五個位置（橫向捲動） -->
+  <div class="section">
+    <div class="panel">
+      <div class="row-scroll" id="slotsRow" aria-label="已選棋子（可左右滑動）">
+        <!-- 位置 1~5 -->
+        <div class="slot" id="pos1">
+          <div class="ring">
+            <div class="gap">
+              <div class="inner"></div>
+            </div>
+          </div>
+          <div class="face">1</div>
+        </div>
+        <div class="slot" id="pos2">
+          <div class="ring">
+            <div class="gap">
+              <div class="inner"></div>
+            </div>
+          </div>
+          <div class="face">2</div>
+        </div>
+        <div class="slot" id="pos3">
+          <div class="ring">
+            <div class="gap">
+              <div class="inner"></div>
+            </div>
+          </div>
+          <div class="face">3</div>
+        </div>
+        <div class="slot" id="pos4">
+          <div class="ring">
+            <div class="gap">
+              <div class="inner"></div>
+            </div>
+          </div>
+          <div class="face">4</div>
+        </div>
+        <div class="slot" id="pos5">
+          <div class="ring">
+            <div class="gap">
+              <div class="inner"></div>
+            </div>
+          </div>
+          <div class="face">5</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 下排：14 枚棋子（橫向捲動） -->
+  <div class="section">
+    <div class="panel">
+      <div class="row-scroll" id="pickerRow" aria-label="棋子選擇（可左右滑動）">
+        <!-- 黑：將 士 象 車 馬 包 卒 -->
+        <button class="piece-btn black" data-type="將" data-color="black">將</button>
+        <button class="piece-btn black" data-type="士" data-color="black">士</button>
+        <button class="piece-btn black" data-type="象" data-color="black">象</button>
+        <button class="piece-btn black" data-type="車" data-color="black">車</button>
+        <button class="piece-btn black" data-type="馬" data-color="black">馬</button>
+        <button class="piece-btn black" data-type="包" data-color="black">包</button>
+        <button class="piece-btn black" data-type="卒" data-color="black">卒</button>
+        <!-- 紅：帥 仕 相 俥 傌 炮 兵 -->
+        <button class="piece-btn red" data-type="帥" data-color="red">帥</button>
+        <button class="piece-btn red" data-type="仕" data-color="red">仕</button>
+        <button class="piece-btn red" data-type="相" data-color="red">相</button>
+        <button class="piece-btn red" data-type="俥" data-color="red">俥</button>
+        <button class="piece-btn red" data-type="傌" data-color="red">傌</button>
+        <button class="piece-btn red" data-type="炮" data-color="red">炮</button>
+        <button class="piece-btn red" data-type="兵" data-color="red">兵</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="panel picker-scroll">
+    <div class="picker-inner" id="pickerGrid">
+      <!-- 黑 -->
+      <button class="piece-btn black" data-type="將" data-color="black">將</button>
+      <button class="piece-btn black" data-type="士" data-color="black">士</button>
+      <button class="piece-btn black" data-type="象" data-color="black">象</button>
+      <button class="piece-btn black" data-type="車" data-color="black">車</button>
+      <button class="piece-btn black" data-type="馬" data-color="black">馬</button>
+      <button class="piece-btn black" data-type="包" data-color="black">包</button>
+      <button class="piece-btn black" data-type="卒" data-color="black">卒</button>
+      <!-- 紅 -->
+      <button class="piece-btn red" data-type="帥" data-color="red">帥</button>
+      <button class="piece-btn red" data-type="仕" data-color="red">仕</button>
+      <button class="piece-btn red" data-type="相" data-color="red">相</button>
+      <button class="piece-btn red" data-type="俥" data-color="red">俥</button>
+      <button class="piece-btn red" data-type="傌" data-color="red">傌</button>
+      <button class="piece-btn red" data-type="炮" data-color="red">炮</button>
+      <button class="piece-btn red" data-type="兵" data-color="red">兵</button>
+    </div>
+  </div>
+  
+
+  <!-- 底部大按鈕 -->
+  <div class="actions">
+    <button class="big" id="btnRandom">隨機</button>
+    <button class="big primary" id="btnSend">送出</button>
+    <button class="big" id="btnClear">清除</button>
+  </div>
+
+  <script>
+    // --- 資料結構 ---
+    const slots = [null, null, null, null, null];   // 位置 1..5
+    let cursor = 0; // 下一顆要放的位置 index（0..4）
+
+    const posEls = Array.from({ length: 5 }, (_, i) => document.getElementById('pos' + (i + 1)));
+
+    // --- 畫面渲染 ---
+    function render() {
+      for (let i = 0; i < 5; i++) {
+        const el = posEls[i];
+        const face = el.querySelector('.face');
+        // 顏色類別
+        el.classList.remove('red', 'black');
+        if (slots[i]) {
+          face.textContent = slots[i].type;
+          el.classList.add(slots[i].color);
+        } else {
+          face.textContent = String(i + 1);
+        }
+        // 游標
+        const old = el.querySelector('.cursor');
+        if (old) old.remove();
+        if (cursor === i) {
+          const tag = document.createElement('div');
+          tag.className = 'cursor';
+          tag.textContent = '正在輸入';
+          el.appendChild(tag);
+        }
+      }
+    }
+
+    // --- 放入一顆棋子（依序或指定） ---
+    function placeNext(piece) {
+      if (cursor > 4) return; // 滿了
+      slots[cursor] = piece;
+      // 游標前進到下一個空位
+      let next = cursor;
+      while (next < 5 && slots[next]) next++;
+      cursor = Math.min(next, 5);
+      if (cursor > 4) {
+        // 若全部滿了，游標留在最後
+        cursor = 4;
+      }
+      render();
+      // 滑動到游標可見（上排）
+      const el = posEls[cursor];
+      if (el) el.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+    }
+
+    // --- 清除 ---
+    function clearAll() {
+      for (let i = 0; i < 5; i++) slots[i] = null;
+      cursor = 0;
+      render();
+    }
+
+    // --- 隨機（從 14 種中抽 5；僅示範 UI） ---
+    const ALL = [
+      { type: '將', color: 'black' }, { type: '士', color: 'black' }, { type: '象', color: 'black' },
+      { type: '車', color: 'black' }, { type: '馬', color: 'black' }, { type: '包', color: 'black' }, { type: '卒', color: 'black' },
+      { type: '帥', color: 'red' }, { type: '仕', color: 'red' }, { type: '相', color: 'red' },
+      { type: '俥', color: 'red' }, { type: '傌', color: 'red' }, { type: '炮', color: 'red' }, { type: '兵', color: 'red' }
+    ];
+    function randomFive() {
+      clearAll();
+      const bag = [...ALL];
+      for (let i = 0; i < 5; i++) {
+        const k = Math.floor(Math.random() * bag.length);
+        placeNext(bag.splice(k, 1)[0]);
+      }
+    }
+
+    // --- 事件綁定 ---
+    document.getElementById('pickerRow').addEventListener('click', e => {
+      const btn = e.target.closest('.piece-btn');
+      if (!btn) return;
+      if (cursor > 4) return; // 已滿
+      placeNext({ type: btn.dataset.type, color: btn.dataset.color });
+    });
+
+    // 點上排任一位置 → 移動游標（方便修正）
+    posEls.forEach((el, idx) => {
+      el.addEventListener('click', () => {
+        cursor = idx;
+        render();
+      });
+    });
+
+    // 控制鈕
+    document.getElementById('btnClear').addEventListener('click', clearAll);
+    document.getElementById('btnRandom').addEventListener('click', randomFive);
+    document.getElementById('btnSend').addEventListener('click', () => {
+      const filled = slots.filter(Boolean).length;
+      if (filled < 5) { alert('請先選滿 5 顆棋'); return; }
+      // 這裡之後可改成呼叫 LIFF send/share；先簡單預覽
+      const s = slots.map(p => p.type).join('');
+      alert('送出棋組：' + s);
+    });
+
+    // 其他示意按鈕
+    document.getElementById('reloadBtn').addEventListener('click', () => location.reload());
+    document.getElementById('friendlyBtn').addEventListener('click', () => {
+      alert('「友善模式」只是示意；目前已採大按鈕＋左右滑動排版。可再加大字或切換兩種 UI。');
+    });
+
+    // 初始
+    render();
+  </script>
+</body>
+
+</html>
