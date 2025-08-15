@@ -143,12 +143,24 @@
 		text-align: center;
 		margin: 8px 0 0;
 	}
+	
+	.hint.large {
+		font-size: 18px; /* 放大字體 */
+		color: #444;     /* 可適度調深色 */
+		font-weight: 600; /* 可加粗 */
+	}
 
 	.hint-version {
 		font-size: 8px;
 		color: #666;
 		text-align: center;
 		margin: 8px 0 0;
+	}
+	
+	.hint-version.large {
+	  font-size: 14px; /* 放大版字體大小，可以調整 */
+	  color: #444;     /* 可選調深色 */
+	  font-weight: 600; /* 可適度加粗 */
 	}
 
 	.controls {
@@ -169,12 +181,16 @@
 	.btn-primary {
 		background: #111;
 		color: #fff;
+		width:100px;
+		height: 56px;
 	}
 
 	.btn-secondary {
 		background: #f3f4f6;
 		color: #111;
 		border: 1px solid var(--border);
+		width:100px;
+		height: 56px;
 	}
 
 	.pieces {
@@ -292,7 +308,8 @@ body.mode-elder .piece-btn{
 
 /* 切換模式按鈕（依顯示文字決定配色） */
 .mode-toggle{
-  font-weight: 800;
+  font-weight: 400;
+  font-size: 18px;
   padding: 8px 12px;
   border-radius: 12px;
   border: 2px solid transparent;
@@ -324,9 +341,6 @@ body.mode-elder .piece-btn{
       <div class="title">單卦</div>
       <div class="bar-actions">
 		<button class="mode-toggle" id="elderToggleBtn">放大模式</button>
-        <button class="ghost" id="debugBtn1">Btn1</button>
-        <button class="ghost" id="debugBtn2">Btn2</button>
-        <button class="ghost" id="debugBtn3">Btn3</button>
         <button class="ghost" id="askBtn">輸入問題名稱</button>
         <button class="ghost" id="reloadBtn">Reload</button>
       </div>
@@ -411,7 +425,7 @@ body.mode-elder .piece-btn{
     *  🔧 在這裡換你的 LIFF ID & 版本
     *********************************/
     const LIFF_ID = "2007906926-NZW6EQ7P";
-    const APP_VERSION = "v1.0.1";
+    const APP_VERSION = "v1.0.2";
     const LINE_ID = "@968noswo"; // 你的官方帳號 ID（@ 開頭）
 
     /** ******************************
@@ -457,33 +471,38 @@ body.mode-elder .piece-btn{
 	
 	// 讀寫模式
 	function applyElderMode(on) {
-		document.body.classList.toggle('mode-elder',  ! !on);
-		localStorage.setItem('elderMode', on ? '1':'0');
+	  document.body.classList.toggle('mode-elder', !!on);
+	  localStorage.setItem('elderMode', on ? '1' : '0');
+	  const btn = document.getElementById('elderToggleBtn');
+	  if (btn) {
+		btn.textContent = on ? '一般模式' : '放大模式';
+		btn.classList.remove('mode-normal', 'mode-elder');
+		btn.classList.add(on ? 'mode-normal' : 'mode-elder');
+	  }
+	  
+	  // 新增：切換 .hint 元素文字大小
+	  const hints = document.querySelectorAll('.hint');
+	  hints.forEach(hint => {
+		hint.classList.toggle('large', on);
+	  });
+	  
+	  // 新增：切換 .hint-version 元素文字大小
+	  const hint_versions = document.querySelectorAll('.hint-version');
+	  hint_versions.forEach(hint => {
+		hint.classList.toggle('large', on);
+	  });
 
-		const btn=document.getElementById('elderToggleBtn');
-
-		if (btn) {
-			// 規則：在「放大模式」時，按鈕顯示「一般模式」；反之亦然（顯示將切換到的目標）
-			btn.textContent=on ? '一般模式': '放大模式';
-			btn.classList.remove('mode-normal', 'mode-elder');
-			btn.classList.add(on ? 'mode-normal' : 'mode-elder');
+	  if (on) {
+		const pos = selectedPos || firstEmptyPos();
+		if (pos) {
+		  const el = document.getElementById('pos' + pos);
+		  if (el) el.scrollIntoView({
+			behavior: 'smooth', inline: 'center', block: 'nearest'
+		  });
 		}
-
-		// 切到放大模式時，捲動游標所在那格到視窗中
-		if (on) {
-			const pos=selectedPos || firstEmptyPos();
-
-			if (pos) {
-				const el=document.getElementById('pos'+pos);
-
-				if (el) el.scrollIntoView( {
-						behavior:'smooth', inline:'center', block:'nearest'
-					}
-
-				);
-			}
-		}
+	  }
 	}
+
 
 
 	function initElderMode() {
@@ -728,159 +747,6 @@ body.mode-elder .piece-btn{
       }
     }
 
-    async function clickBtnDebug1() {
-      const flex = {
-        "type": "flex",
-        "altText": "測試 Flex Message",
-        "contents": {
-          "type": "bubble",
-          "body": {
-            "type": "box",
-            "layout": "vertical",
-            "contents": [
-              {
-                "type": "text",
-                "text": "這是標題文字",
-                "weight": "bold",
-                "size": "lg"
-              }
-            ]
-          },
-          "footer": {
-            "type": "box",
-            "layout": "vertical",
-            "contents": [
-              {
-                "type": "button",
-                "style": "primary",
-                "action": {
-                  "type": "postback",
-                  "label": "action",
-                  "displayText": "按下按鈕",
-                  "data": "action=buy&itemid=123"
-                }
-              }
-            ]
-          }
-        }
-      };
-      printLog("sendResult flex: ", flex);
-      if (!flex) return;
-      try {
-        if (liff?.isInClient?.()) {
-          await liff.sendMessages([flex]);
-          alert("已送出，返回聊天室");
-          liff.closeWindow();
-        } else if (liff.isApiAvailable('shareTargetPicker')) {
-          await liff.shareTargetPicker([flex]);
-          alert("已分享");
-        } else {
-          alert("請在 LINE 內開啟此 LIFF 頁面再送出。");
-        }
-      } catch (e) {
-        const msg = (e?.message || e || '').toString();
-        if ((msg.includes('scope') || msg.includes('not in LIFF app scope')) && liff.isApiAvailable('shareTargetPicker')) {
-          await liff.shareTargetPicker([flex]);
-          alert("尚未授權 chat_message.write，已改用分享送出");
-        } else {
-          alert("sendMessages 失敗：" + msg);
-        }
-      }
-    }
-
-    async function clickBtnDebug2() {
-      const flex = {
-        type: "flex",
-        altText: "測試 Flex Message",
-        contents: {
-          type: "bubble",
-          body: {
-            type: "box",
-            layout: "vertical",
-            contents: [
-              {
-                type: "text",
-                text: "這是標題文字",
-                weight: "bold",
-                size: "lg"
-              }
-            ]
-          },
-          footer: {
-            type: "box",
-            layout: "vertical",
-            contents: [
-              {
-                type: "button",
-                style: "primary",
-                action: {
-                  type: "uri",
-                  label: "分享此訊息",
-                  uri: `https://liff.line.me/${LIFF_ID}?param1=value1&param2=value2` // 請替換成你的分享鏈結 
-                }
-              }
-            ]
-          }
-        }
-      };
-      printLog("sendResult flex: ", flex);
-      if (!flex) return;
-      try {
-        if (liff?.isInClient?.()) {
-          await liff.sendMessages([flex]);
-          alert("已送出，返回聊天室");
-          liff.closeWindow();
-        } else if (liff.isApiAvailable('shareTargetPicker')) {
-          await liff.shareTargetPicker([flex]);
-          alert("已分享");
-        } else {
-          alert("請在 LINE 內開啟此 LIFF 頁面再送出。");
-        }
-      } catch (e) {
-        const msg = (e?.message || e || '').toString();
-        if ((msg.includes('scope') || msg.includes('not in LIFF app scope')) && liff.isApiAvailable('shareTargetPicker')) {
-          await liff.shareTargetPicker([flex]);
-          alert("尚未授權 chat_message.write，已改用分享送出");
-        } else {
-          alert("sendMessages 失敗：" + msg);
-        }
-      }
-    }
-
-    async function clickBtnDebug3() {
-      if (!await isUserFriend()) {
-        alert("請先加入好友才能使用此功能！");
-        // 轉跳至加好友頁面 (你的官方帳號加入連結)
-        window.location.href = "https://line.me/R/ti/p/" + LINE_ID;
-        return;
-      }
-      // const flex = buildFlexMessage();
-      // printLog("sendResult flex: ", flex);
-      const flex = buildImageMessage();
-      printLog("sendResult flex: ", flex);
-      if (!flex) return;
-      try {
-        if (liff?.isInClient?.()) {
-          await liff.sendMessages([flex]);
-          alert("已送出，返回聊天室");
-          liff.closeWindow();
-        } else if (liff.isApiAvailable('shareTargetPicker')) {
-          await liff.shareTargetPicker([flex]);
-          alert("已分享");
-        } else {
-          alert("請在 LINE 內開啟此 LIFF 頁面再送出。");
-        }
-      } catch (e) {
-        const msg = (e?.message || e || '').toString();
-        if ((msg.includes('scope') || msg.includes('not in LIFF app scope')) && liff.isApiAvailable('shareTargetPicker')) {
-          await liff.shareTargetPicker([flex]);
-          alert("尚未授權 chat_message.write，已改用分享送出");
-        } else {
-          alert("sendMessages 失敗：" + msg);
-        }
-      }
-    }
-
     // ====== LIFF 判斷是否為好友 ======
     async function isUserFriend() {
       const friend = await liff.getFriendship();
@@ -972,9 +838,6 @@ body.mode-elder .piece-btn{
     $("clearBtn").addEventListener("click", clearAll);
     $("randomBtn").addEventListener("click", randomFillAll);
     $("sendBtn").addEventListener("click", sendResult);
-    $("debugBtn1").addEventListener("click", clickBtnDebug1);
-    $("debugBtn2").addEventListener("click", clickBtnDebug2);
-    $("debugBtn3").addEventListener("click", clickBtnDebug3);
 
     Object.entries(posEls).forEach(([idx, el]) => {
       el.addEventListener("click", () => setSelected(Number(idx)));
@@ -990,7 +853,7 @@ body.mode-elder .piece-btn{
     });
 
 
-    // ====== 初始化 LIFF ======
+// ====== 初始化 LIFF ======
     (async () => {
       try {
         statusEl.textContent = "頁面初始化中…";
@@ -1036,17 +899,11 @@ body.mode-elder .piece-btn{
       }
     })();
 
-
     // ====== 初始狀態與版本顯示 ======
     document.getElementById("ver").textContent = LINE_ID + " | " + APP_VERSION;
 
     // 隱藏日誌輸出區域
     document.getElementById("logOutput").classList.add("hidden");
-
-    // 隱藏除錯按鈕
-    document.getElementById("debugBtn1").classList.add("hidden");
-    document.getElementById("debugBtn2").classList.add("hidden");
-    document.getElementById("debugBtn3").classList.add("hidden");
 
 	initElderMode();
     // 初次渲染
