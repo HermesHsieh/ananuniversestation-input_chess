@@ -63,7 +63,7 @@
 		border: 1px solid var(--border);
 		padding: 8px 10px;
 		border-radius: 10px;
-		font-size: 14px;
+		font-size: 20px;
 	}
 
 	.ghost:active {
@@ -143,12 +143,24 @@
 		text-align: center;
 		margin: 8px 0 0;
 	}
+	
+	.hint.large {
+		font-size: 18px; /* 放大字體 */
+		color: #444;     /* 可適度調深色 */
+		font-weight: 600; /* 可加粗 */
+	}
 
 	.hint-version {
 		font-size: 8px;
 		color: #666;
 		text-align: center;
 		margin: 8px 0 0;
+	}
+	
+	.hint-version.large {
+	  font-size: 14px; /* 放大版字體大小，可以調整 */
+	  color: #444;     /* 可選調深色 */
+	  font-weight: 600; /* 可適度加粗 */
 	}
 
 	.controls {
@@ -169,12 +181,16 @@
 	.btn-primary {
 		background: #111;
 		color: #fff;
+		width:140px;
+		height: 56px;
 	}
 
 	.btn-secondary {
 		background: #f3f4f6;
 		color: #111;
 		border: 1px solid var(--border);
+		width:140px;
+		height: 56px;
 	}
 
 	.pieces {
@@ -292,7 +308,8 @@ body.mode-elder .piece-btn{
 
 /* 切換模式按鈕（依顯示文字決定配色） */
 .mode-toggle{
-  font-weight: 800;
+  font-weight: 400;
+  font-size: 20px;
   padding: 8px 12px;
   border-radius: 12px;
   border: 2px solid transparent;
@@ -411,7 +428,7 @@ body.mode-elder .piece-btn{
     *  🔧 在這裡換你的 LIFF ID & 版本
     *********************************/
     const LIFF_ID = "2007931033-4D50LqwM";
-    const APP_VERSION = "v1.0.1";
+    const APP_VERSION = "v1.0.2";
     const LINE_ID = "@968noswo"; // 你的官方帳號 ID（@ 開頭）
 
     /** ******************************
@@ -457,33 +474,38 @@ body.mode-elder .piece-btn{
 	
 	// 讀寫模式
 	function applyElderMode(on) {
-		document.body.classList.toggle('mode-elder',  ! !on);
-		localStorage.setItem('elderMode', on ? '1':'0');
+	  document.body.classList.toggle('mode-elder', !!on);
+	  localStorage.setItem('elderMode', on ? '1' : '0');
+	  const btn = document.getElementById('elderToggleBtn');
+	  if (btn) {
+		btn.textContent = on ? '一般模式' : '放大模式';
+		btn.classList.remove('mode-normal', 'mode-elder');
+		btn.classList.add(on ? 'mode-normal' : 'mode-elder');
+	  }
+	  
+	  // 新增：切換 .hint 元素文字大小
+	  const hints = document.querySelectorAll('.hint');
+	  hints.forEach(hint => {
+		hint.classList.toggle('large', on);
+	  });
+	  
+	  // 新增：切換 .hint-version 元素文字大小
+	  const hint_versions = document.querySelectorAll('.hint-version');
+	  hint_versions.forEach(hint => {
+		hint.classList.toggle('large', on);
+	  });
 
-		const btn=document.getElementById('elderToggleBtn');
-
-		if (btn) {
-			// 規則：在「放大模式」時，按鈕顯示「一般模式」；反之亦然（顯示將切換到的目標）
-			btn.textContent=on ? '一般模式': '放大模式';
-			btn.classList.remove('mode-normal', 'mode-elder');
-			btn.classList.add(on ? 'mode-normal' : 'mode-elder');
+	  if (on) {
+		const pos = selectedPos || firstEmptyPos();
+		if (pos) {
+		  const el = document.getElementById('pos' + pos);
+		  if (el) el.scrollIntoView({
+			behavior: 'smooth', inline: 'center', block: 'nearest'
+		  });
 		}
-
-		// 切到放大模式時，捲動游標所在那格到視窗中
-		if (on) {
-			const pos=selectedPos || firstEmptyPos();
-
-			if (pos) {
-				const el=document.getElementById('pos'+pos);
-
-				if (el) el.scrollIntoView( {
-						behavior:'smooth', inline:'center', block:'nearest'
-					}
-
-				);
-			}
-		}
+	  }
 	}
+
 
 
 	function initElderMode() {
@@ -990,7 +1012,7 @@ body.mode-elder .piece-btn{
     });
 
 
-    // ====== 初始化 LIFF ======
+// ====== 初始化 LIFF ======
     (async () => {
       try {
         statusEl.textContent = "頁面初始化中…";
@@ -1035,7 +1057,6 @@ body.mode-elder .piece-btn{
         statusEl.textContent = `LIFF 初始化失敗：${err?.message || "unknown"}`;
       }
     })();
-
 
     // ====== 初始狀態與版本顯示 ======
     document.getElementById("ver").textContent = LINE_ID + " | " + APP_VERSION;
