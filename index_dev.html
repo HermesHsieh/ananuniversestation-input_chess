@@ -250,6 +250,23 @@
       /* 防換行導致換列 */
     }
 
+    .picker-inner {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 12px;
+      min-width: 560px;
+      overflow-x: auto;
+      /* 開啟橫向滾動 */
+      overflow-y: hidden;
+      -webkit-overflow-scrolling: touch;
+      /* iOS 慣性捲動 */
+      scroll-snap-type: x proximity;
+      padding: 6px 4px;
+      white-space: nowrap;
+      /* 防換行導致換列 */
+      /* 保證超過螢幕寬才需要滑 */
+    }
+
     .row-scroll>* {
       flex: 0 0 auto;
       /* 子項固定寬，不被壓縮 */
@@ -330,14 +347,6 @@
     .picker-scroll {
       overflow-x: auto;
       white-space: nowrap;
-    }
-
-    .picker-inner {
-      display: grid;
-      grid-template-columns: repeat(7, 1fr);
-      gap: 12px;
-      min-width: 560px;
-      /* 保證超過螢幕寬才需要滑 */
     }
 
     .piece-btn {
@@ -421,8 +430,8 @@
 
   <!-- 下排：14 枚棋子（橫向捲動） -->
   <div class="section">
-    <div class="panel">
-      <div class="row-scroll" id="pickerRow" aria-label="棋子選擇（可左右滑動）">
+    <div class="panel picker-scroll">
+      <div class="picker-inner" id="pickerRow" aria-label="棋子選擇（可左右滑動）">
         <!-- 黑：將 士 象 車 馬 包 卒 -->
         <button class="piece-btn black" data-type="將" data-color="black">將</button>
         <button class="piece-btn black" data-type="士" data-color="black">士</button>
@@ -442,28 +451,6 @@
       </div>
     </div>
   </div>
-
-  <div class="panel picker-scroll">
-    <div class="picker-inner" id="pickerGrid">
-      <!-- 黑 -->
-      <button class="piece-btn black" data-type="將" data-color="black">將</button>
-      <button class="piece-btn black" data-type="士" data-color="black">士</button>
-      <button class="piece-btn black" data-type="象" data-color="black">象</button>
-      <button class="piece-btn black" data-type="車" data-color="black">車</button>
-      <button class="piece-btn black" data-type="馬" data-color="black">馬</button>
-      <button class="piece-btn black" data-type="包" data-color="black">包</button>
-      <button class="piece-btn black" data-type="卒" data-color="black">卒</button>
-      <!-- 紅 -->
-      <button class="piece-btn red" data-type="帥" data-color="red">帥</button>
-      <button class="piece-btn red" data-type="仕" data-color="red">仕</button>
-      <button class="piece-btn red" data-type="相" data-color="red">相</button>
-      <button class="piece-btn red" data-type="俥" data-color="red">俥</button>
-      <button class="piece-btn red" data-type="傌" data-color="red">傌</button>
-      <button class="piece-btn red" data-type="炮" data-color="red">炮</button>
-      <button class="piece-btn red" data-type="兵" data-color="red">兵</button>
-    </div>
-  </div>
-  
 
   <!-- 底部大按鈕 -->
   <div class="actions">
