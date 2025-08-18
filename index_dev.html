@@ -469,10 +469,6 @@
     </div>
   </div>
 
-  <div id="logOutput"
-    style="white-space: pre-wrap; background:#f0f0f0; padding:10px; border:1px solid #ccc; height:150px; overflow-y:auto;">
-  </div>
-
   </div>
 
   <script>
@@ -480,7 +476,7 @@
     *  🔧 在這裡換你的 LIFF ID & 版本
     *********************************/
     const LIFF_ID = "2007931033-4D50LqwM";
-    const APP_VERSION = "v1.0.5";
+    const APP_VERSION = "v1.0.6";
     const LINE_ID = "@968noswo"; // 你的官方帳號 ID（@ 開頭）
 
     /** ******************************
@@ -522,6 +518,10 @@
       drawMode = mode;
       const dm = document.getElementById("draw-mode");
       if (dm) dm.textContent = `輸入方式：${drawMode}`;
+    }
+
+    function getSwitchModeName() {
+      return document.body.classList.contains('mode-elder') ? '放大模式' : '一般模式';
     }
 
     // 讀寫模式
@@ -757,7 +757,7 @@
       printLog("五字：" + fiveStr);
       const fiveParam = encodeURIComponent(fiveStr);
       printLog("五字參數：" + fiveParam);
-      const titleText = (titleEl.textContent || "象棋卜卦-單卦").trim();
+      const titleText = (titleEl.textContent || "").trim();
       printLog("卜卦問題：" + titleText);
       const titleParam = encodeURIComponent(titleText);
       printLog("卜卦問題參數：" + titleParam);
@@ -769,10 +769,12 @@
       printLog("輸入方式提示：" + modeHint);
       const auto = (drawMode === "隨機") ? 1 : 0;
       printLog("是否隨機產生：" + auto);
+      const isBigMode = getSwitchModeName() === "放大模式" ? 1 : 0;
+      printLog("是否為放大模式：" + isBigMode);
 
       return {
         type: 'image',
-        originalContentUrl: `https://i.imgur.com/MwS42AE.png?p=5cg&c=${fiveStr}&n=${titleText}&at=${auto}&v=${APP_VERSION}`,
+        originalContentUrl: `https://i.imgur.com/MwS42AE.png?p=5cg&c=${fiveStr}&n=${titleText}&at=${auto}&bg=${isBigMode}&v=${APP_VERSION}`,
         previewImageUrl: `https://i.imgur.com/MwS42AE.png`
       };
     }
@@ -861,7 +863,7 @@
     document.getElementById("ver").textContent = LINE_ID + " | " + APP_VERSION;
 
     // 隱藏日誌輸出區域
-    document.getElementById("logOutput").classList.add("hidden");
+    // document.getElementById("logOutput").classList.add("hidden");
 
     initElderMode();
 
