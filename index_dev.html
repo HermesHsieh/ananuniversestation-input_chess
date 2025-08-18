@@ -7,331 +7,372 @@
   <title>象棋卜卦 - 安安宇宙站</title>
   <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
   <!-- Cloudflare Web Analytics -->
-  <script defer src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "50bd6af270b7443b8b555db9457b093f"}'></script>
+  <script defer src='https://static.cloudflareinsights.com/beacon.min.js'
+    data-cf-beacon='{"token": "50bd6af270b7443b8b555db9457b093f"}'></script>
   <!-- End Cloudflare Web Analytics -->
   <style>
     :root {
-		--red: #d32f2f;
-		--black: #111;
-		--bg: #F6F7FB;
-		--card: #fff;
-		--border: #e5e7eb;
-		--accent: #2563eb;
-	}
+      --red: #d32f2f;
+      --black: #111;
+      --bg: #F6F7FB;
+      --card: #fff;
+      --border: #142445;
+      --accent: #2563eb;
+    }
 
-	body {
-		margin: 0;
-		font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans TC", sans-serif;
-		background: var(--bg);
-		color: #111;
-	}
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans TC", sans-serif;
+      background: var(--bg);
+      color: #111;
+    }
 
-	/* 定義隱藏用的 CSS */
-	.hidden {
-		display: none !important;
-	}
+    /* 定義隱藏用的 CSS */
+    .hidden {
+      display: none !important;
+    }
 
-	.wrap {
-		max-width: 480px;
-		margin: 0 auto;
-		padding: 12px 12px 28px;
-	}
+    .wrap {
+      max-width: 480px;
+      margin: 0 auto;
+      padding: 12px 12px 28px;
+    }
 
-	.topbar {
-		display: flex;
-		align-items: center;
-		justify-content: space-between;
-		gap: 8px;
-	}
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
 
-	.title {
-		font-size: 18px;
-		font-weight: 700;
-	}
+    .title {
+      font-size: 18px;
+      font-weight: 700;
+    }
 
-	.number {
-		font-size: 18px;
-	}
+    .number {
+      font-size: 18px;
+    }
 
-	.bar-actions {
-		display: flex;
-		gap: 8px;
-	}
+    .bar-actions {
+      display: flex;
+      gap: 8px;
+    }
 
-	.ghost {
-		background: transparent;
-		border: 1px solid var(--border);
-		padding: 8px 10px;
-		border-radius: 10px;
-		font-size: 14px;
-	}
+    .ghost {
+      background: transparent;
+      border: 1px solid var(--border);
+      padding: 8px 10px;
+      border-radius: 10px;
+      font-size: 14px;
+    }
 
-	.ghost:active {
-		opacity: .7;
-	}
+    .ghost:active {
+      opacity: .7;
+    }
 
-	.status {
-		margin: 6px 0 10px;
-		font-size: 12px;
-		color: #666;
-		text-align: center;
-	}
+    .status {
+      margin: 6px 0 10px;
+      font-size: 12px;
+      color: #666;
+      text-align: center;
+    }
 
-	.card {
-		background: var(--card);
-		border: 1px solid var(--border);
-		border-radius: 14px;
-		padding: 12px;
-		box-shadow: 0 1px 2px rgba(0, 0, 0, .04);
-	}
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 12px;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, .04);
+    }
 
-	.card-title {
-		font-size: 16px;
-		font-weight: 700;
-		text-align: center;
-		margin-bottom: 8px;
-	}
+    .card-title {
+      font-size: 16px;
+      font-weight: 700;
+      text-align: center;
+      margin-bottom: 8px;
+    }
 
-	.grid {
-		display: grid;
-		grid-template-columns: 1fr 1fr 1fr;
-		gap: 14px;
-		margin-top: 6px;
-	}
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 14px;
+      margin-top: 6px;
+    }
 
-	.cell {
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		flex-direction: column;
-		border: 4px dashed var(--border);
-		border-radius: 9999px;
-		background: #fff;
-		aspect-ratio: 1/1;
-		min-width: 72px;
-		min-height: 72px;
-		user-select: none;
-		cursor: pointer;
-		font-size: 36px;
-		/* 放大棋字 */
-	}
+    .cell {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      border: 4px dashed var(--border);
+      border-radius: 9999px;
+      background: #fff;
+      aspect-ratio: 1/1;
+      min-width: 72px;
+      min-height: 72px;
+      user-select: none;
+      cursor: pointer;
+      font-size: 36px;
+      /* 放大棋字 */
+    }
 
-	.cell.red {
-		color: var(--red);
-	}
+    .cell.red {
+      color: var(--red);
+    }
 
-	.cell.black {
-		color: var(--black);
-	}
+    .cell.black {
+      color: var(--black);
+    }
 
-	.cell.selected {
-		border-color: var(--accent);
-		box-shadow: 0 0 0 3px rgba(37, 99, 235, .12);
-		background-color: rgba(255, 165, 0, 0.2);
-		/* 透明淡藍色背景 */
-	}
+    .cell.selected {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, .12);
+      background-color: rgba(255, 165, 0, 0.2);
+      /* 透明淡藍色背景 */
+    }
 
-	.poslabel {
-		font-size: 20px;
-		color: #999;
-		margin-top: 2px;
-	}
+    .poslabel {
+      font-size: 20px;
+      color: #999;
+      margin-top: 2px;
+    }
 
-	.hint {
-		font-size: 12px;
-		color: #666;
-		text-align: center;
-		margin: 8px 0 0;
-	}
-	
-	.hint.large {
-		font-size: 18px; /* 放大字體 */
-		color: #444;     /* 可適度調深色 */
-		font-weight: 600; /* 可加粗 */
-	}
+    .hint {
+      font-size: 12px;
+      color: #666;
+      text-align: center;
+      margin: 8px 0 0;
+    }
 
-	.hint-version {
-		font-size: 8px;
-		color: #666;
-		text-align: center;
-		margin: 8px 0 0;
-	}
-	
-	.hint-version.large {
-	  font-size: 14px; /* 放大版字體大小，可以調整 */
-	  color: #444;     /* 可選調深色 */
-	  font-weight: 600; /* 可適度加粗 */
-	}
+    .hint.large {
+      font-size: 18px;
+      /* 放大字體 */
+      color: #444;
+      /* 可適度調深色 */
+      font-weight: 600;
+      /* 可加粗 */
+    }
 
-	.controls {
-		display: flex;
-		gap: 8px;
-		justify-content: center;
-		margin: 12px 0 8px;
-		flex-wrap: wrap;
-	}
+    .hint-version {
+      font-size: 8px;
+      color: #666;
+      text-align: center;
+      margin: 8px 0 0;
+    }
 
-	.btn {
-		border: 0;
-		border-radius: 12px;
-		padding: 12px 16px;
-		font-size: 16px;
-	}
+    .hint-version.large {
+      font-size: 14px;
+      /* 放大版字體大小，可以調整 */
+      color: #444;
+      /* 可選調深色 */
+      font-weight: 600;
+      /* 可適度加粗 */
+    }
 
-	.btn-primary {
-		background: #111;
-		color: #fff;
-		width:100px;
-		height: 56px;
-	}
+    .controls {
+      display: flex;
+      gap: 8px;
+      justify-content: center;
+      margin: 12px 0 8px;
+      flex-wrap: wrap;
+    }
 
-	.btn-secondary {
-		background: #f3f4f6;
-		color: #111;
-		border: 1px solid var(--border);
-		width:100px;
-		height: 56px;
-	}
+    .btn {
+      border: 0;
+      border-radius: 12px;
+      padding: 12px 16px;
+      font-size: 16px;
+    }
 
-	.pieces {
-		margin-top: 10px;
-	}
+    .btn-primary {
+      background: #111;
+      color: #fff;
+      width: 100px;
+      height: 56px;
+    }
 
-	.row {
-		display: grid;
-		grid-template-columns: repeat(7, 1fr);
-		gap: 8px;
-	}
+    .btn-secondary {
+      background: #f3f4f6;
+      color: #111;
+      border: 1px solid var(--border);
+      width: 100px;
+      height: 56px;
+    }
 
-	.piece-btn {
-		border: 1px solid var(--border);
-		background: #fff;
-		border-radius: 12px;
-		padding: 12px 0;
-		font-size: 28px;
-		text-align: center;
-	}
+    .pieces {
+      margin-top: 10px;
+    }
 
-	.piece-btn:active {
-		transform: scale(.98);
-	}
+    .row {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 8px;
+    }
 
-	.piece-btn.red {
-		color: var(--red);
-	}
+    .piece-btn {
+      border: 1px solid var(--border);
+      background: #fff;
+      border-radius: 12px;
+      padding: 12px 0;
+      font-size: 28px;
+      text-align: center;
+    }
 
-	.piece-btn.black {
-		color: var(--black);
-	}
+    .piece-btn:active {
+      transform: scale(.98);
+    }
 
-	.footer-pad {
-		height: 8px;
-	}
+    .piece-btn.red {
+      color: var(--red);
+    }
 
-	.ver-badge {
-		border: 1px solid var(--border);
-		border-radius: 999px;
-		padding: 6px 10px;
-		font-size: 12px;
-		color: #6b7280;
-		background: #fff;
-	}
-	
-	/* ===== 老人模式：五子改一列可滑、顯示游標 ===== */
-	body.mode-elder .grid{
-	 display:flex;
-	 gap:10px;
-	 overflow-x:auto;
-	 overflow-y:hidden;
-	 -webkit-overflow-scrolling:touch;
-	 scroll-snap-type:x proximity;
-	 padding:4px 2px;
-	}
-	/* 把原本九宮的 4 個空白格隱藏 */
-	body.mode-elder .grid > div:empty{ display:none; }
+    .piece-btn.black {
+      color: var(--black);
+    }
 
-	/* 一列時每顆固定尺寸、可居中對齊 */
-	body.mode-elder .cell{
-	 flex:0 0 auto;
-	 width:140px;
-	 height:140px;           /* 覆蓋原本 aspect-ratio 的尺寸，視覺更穩定 */
-	 scroll-snap-align:center;
-	}
+    .footer-pad {
+      height: 8px;
+    }
 
-	/* 游標（正在輸入） */
-	.cell{ position:relative; overflow:visible; } /* 讓游標可外凸 */
-	.cursor{
-	 position:absolute;
-	 top:-8px; right:6px;
-	 background:#6495ED;
-	 color:#FFFFFF;
-	 font-weight:800;
-	 font-size:16px;
-	 padding:4px 8px;
-	 border-radius:8px;
-	 z-index:5;
-	}
+    .ver-badge {
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      padding: 6px 10px;
+      font-size: 12px;
+      color: #6b7280;
+      background: #fff;
+    }
 
-	/* 一列時強制排序為 1→2→3→4→5（避免沿用九宮原本 DOM 順序） */
-	body.mode-elder #pos1{ order:1; }
-	body.mode-elder #pos2{ order:2; }
-	body.mode-elder #pos3{ order:3; }
-	body.mode-elder #pos4{ order:4; }
-	body.mode-elder #pos5{ order:5; }
+    /* ===== 老人模式：五子改一列可滑、顯示游標 ===== */
+    body.mode-elder .grid {
+      display: flex;
+      gap: 10px;
+      overflow-x: auto;
+      overflow-y: hidden;
+      -webkit-overflow-scrolling: touch;
+      scroll-snap-type: x proximity;
+      padding: 4px 2px;
+    }
 
-	
-/* ===== 放大模式：棋子選擇區改為 2×7 網格，且整體可左右滑動 ===== */
-body.mode-elder .picker-wrap{
-  overflow-x: auto;
-  overflow-y: hidden;
-  -webkit-overflow-scrolling: touch;
-  padding: 6px 4px;
-}
+    /* 把原本九宮的 4 個空白格隱藏 */
+    body.mode-elder .grid>div:empty {
+      display: none;
+    }
 
-/* 內層用固定 7 欄的網格；寬度用內容撐開，讓外層可以水平捲動 */
-body.mode-elder .picker-grid{
-  display: grid;
-  grid-template-columns: repeat(7, auto);
-  gap: 12px;
-  width: max-content;     /* 關鍵：以內容寬度為準，超過螢幕就能橫向捲動 */
-}
+    /* 一列時每顆固定尺寸、可居中對齊 */
+    body.mode-elder .cell {
+      flex: 0 0 auto;
+      width: 140px;
+      height: 140px;
+      /* 覆蓋原本 aspect-ratio 的尺寸，視覺更穩定 */
+      scroll-snap-align: center;
+    }
 
-/* 放大約 1.5 倍的按鈕尺寸與字級（放大模式專用，不影響一般模式） */
-body.mode-elder .piece-btn{
-  min-width: 100px;       /* 原本 ~80 → 120 */
-  height: 100px;           /* 原本 ~48 → 72 */
-  font-size: 48px;        /* 原本 ~20 → 32 */
-  font-weight: 800;
-  border: 3px solid #000; /* 視覺更清楚 */
-  border-radius: 18px;
-}
+    /* 游標（正在輸入） */
+    .cell {
+      position: relative;
+      overflow: visible;
+    }
 
-/* 切換模式按鈕（依顯示文字決定配色） */
-.mode-toggle{
-  font-weight: 400;
-  font-size: 18px;
-  padding: 8px 12px;
-  border-radius: 12px;
-  border: 2px solid transparent;
-  cursor: pointer;
-}
+    /* 讓游標可外凸 */
+    .cursor {
+      position: absolute;
+      top: -8px;
+      right: 6px;
+      background: #6495ED;
+      color: #FFFFFF;
+      font-weight: 800;
+      font-size: 16px;
+      padding: 4px 8px;
+      border-radius: 8px;
+      z-index: 5;
+    }
 
-/* 顯示「一般模式」時：黃底、藍字（提示按下會回到一般） */
-#elderToggleBtn.mode-normal{
-  background: #CCFF00;     /* 黃 */
-  color: #1D4ED8;          /* 藍 */
-  border-color: #CCFF00;
-}
+    /* 一列時強制排序為 1→2→3→4→5（避免沿用九宮原本 DOM 順序） */
+    body.mode-elder #pos1 {
+      order: 1;
+    }
 
-/* 顯示「放大模式」時：藍底、白字（提示按下會切到長輩） */
-#elderToggleBtn.mode-elder{
-  background: #2563EB;     /* 藍 */
-  color: #FFFFFF;          /* 白 */
-  border-color: #2563EB;
-}
+    body.mode-elder #pos2 {
+      order: 2;
+    }
 
-#elderToggleBtn:active{ transform: translateY(1px); }
+    body.mode-elder #pos3 {
+      order: 3;
+    }
 
+    body.mode-elder #pos4 {
+      order: 4;
+    }
+
+    body.mode-elder #pos5 {
+      order: 5;
+    }
+
+
+    /* ===== 放大模式：棋子選擇區改為 2×7 網格，且整體可左右滑動 ===== */
+    body.mode-elder .picker-wrap {
+      overflow-x: auto;
+      overflow-y: hidden;
+      -webkit-overflow-scrolling: touch;
+      padding: 6px 4px;
+    }
+
+    /* 內層用固定 7 欄的網格；寬度用內容撐開，讓外層可以水平捲動 */
+    body.mode-elder .picker-grid {
+      display: grid;
+      grid-template-columns: repeat(7, auto);
+      gap: 12px;
+      width: max-content;
+      /* 關鍵：以內容寬度為準，超過螢幕就能橫向捲動 */
+    }
+
+    /* 放大約 1.5 倍的按鈕尺寸與字級（放大模式專用，不影響一般模式） */
+    body.mode-elder .piece-btn {
+      min-width: 100px;
+      /* 原本 ~80 → 120 */
+      height: 100px;
+      /* 原本 ~48 → 72 */
+      font-size: 48px;
+      /* 原本 ~20 → 32 */
+      font-weight: 800;
+      border: 3px solid #000;
+      /* 視覺更清楚 */
+      border-radius: 18px;
+    }
+
+    /* 切換模式按鈕（依顯示文字決定配色） */
+    .mode-toggle {
+      font-weight: 400;
+      font-size: 18px;
+      padding: 8px 12px;
+      border-radius: 12px;
+      border: 2px solid transparent;
+      cursor: pointer;
+    }
+
+    /* 顯示「一般模式」時：黃底、藍字（提示按下會回到一般） */
+    #elderToggleBtn.mode-normal {
+      background: #CCFF00;
+      /* 黃 */
+      color: #1D4ED8;
+      /* 藍 */
+      border-color: #CCFF00;
+    }
+
+    /* 顯示「放大模式」時：藍底、白字（提示按下會切到長輩） */
+    #elderToggleBtn.mode-elder {
+      background: #2563EB;
+      /* 藍 */
+      color: #FFFFFF;
+      /* 白 */
+      border-color: #2563EB;
+    }
+
+    #elderToggleBtn:active {
+      transform: translateY(1px);
+    }
   </style>
 </head>
 
@@ -340,7 +381,7 @@ body.mode-elder .piece-btn{
     <div class="topbar">
       <div class="title">單卦</div>
       <div class="bar-actions">
-		<button class="mode-toggle" id="elderToggleBtn">放大模式</button>
+        <button class="mode-toggle" id="elderToggleBtn">放大模式</button>
         <button class="ghost" id="askBtn">輸入問題名稱</button>
         <button class="ghost" id="reloadBtn">Reload</button>
       </div>
@@ -396,27 +437,41 @@ body.mode-elder .piece-btn{
     </div>
 
     <!-- 棋子選擇（黑在上、紅在下） -->
-		<div class="pieces">
-		<div class="picker-wrap">
-    <div class="picker-grid" id="pickerGrid" aria-label="棋子選擇（7×2，可左右滑動）">
-			<div class="row" style="margin-bottom:8px">
-				<!-- 黑國：將 士 象 車 馬 包 卒 -->
-				<button class="piece-btn black" data-piece="將">將</button> <button class="piece-btn black" data-piece="士">士</button> <button class="piece-btn black" data-piece="象">象</button> <button class="piece-btn black" data-piece="車">車</button> <button class="piece-btn black" data-piece="馬">馬</button> <button class="piece-btn black" data-piece="包">包</button> <button class="piece-btn black" data-piece="卒">卒</button>
+    <div class="pieces">
+      <div class="picker-wrap">
+        <div class="picker-grid" id="pickerGrid" aria-label="棋子選擇（7×2，可左右滑動）">
+          <div class="row" style="margin-bottom:8px">
+            <!-- 黑國：將 士 象 車 馬 包 卒 -->
+            <button class="piece-btn black" data-piece="將">將</button>
+            <button class="piece-btn black" data-piece="士">士</button>
+            <button class="piece-btn black" data-piece="象">象</button>
+            <button class="piece-btn black" data-piece="車">車</button>
+            <button class="piece-btn black" data-piece="馬">馬</button>
+            <button class="piece-btn black" data-piece="包">包</button>
+            <button class="piece-btn black" data-piece="卒">卒</button>
 
-				<!-- 紅國：帥 仕 相 俥 傌 炮 兵 -->
-				<button class="piece-btn red" data-piece="帥">帥</button> <button class="piece-btn red" data-piece="仕">仕</button> <button class="piece-btn red" data-piece="相">相</button> <button class="piece-btn red" data-piece="俥">俥</button> <button class="piece-btn red" data-piece="傌">傌</button> <button class="piece-btn red" data-piece="炮">炮</button> <button class="piece-btn red" data-piece="兵">兵</button>
-			</div>
-			<div class="footer-pad"></div>
-			</div>
-			</div>
-		</div>
-		
-		<div id="logOutput" style="white-space: pre-wrap; background:#f0f0f0; padding:10px; border:1px solid #ccc; height:150px; overflow-y:auto;"></div>
-	</div>
+            <!-- 紅國：帥 仕 相 俥 傌 炮 兵 -->
+            <button class="piece-btn red" data-piece="帥">帥</button>
+            <button class="piece-btn red" data-piece="仕">仕</button>
+            <button class="piece-btn red" data-piece="相">相</button>
+            <button class="piece-btn red" data-piece="俥">俥</button>
+            <button class="piece-btn red" data-piece="傌">傌</button>
+            <button class="piece-btn red" data-piece="炮">炮</button>
+            <button class="piece-btn red" data-piece="兵">兵</button>
+          </div>
+          <div class="footer-pad"></div>
+        </div>
+      </div>
+    </div>
 
     <div id="logOutput"
       style="white-space: pre-wrap; background:#f0f0f0; padding:10px; border:1px solid #ccc; height:150px; overflow-y:auto;">
     </div>
+  </div>
+
+  <div id="logOutput"
+    style="white-space: pre-wrap; background:#f0f0f0; padding:10px; border:1px solid #ccc; height:150px; overflow-y:auto;">
+  </div>
 
   </div>
 
@@ -425,7 +480,7 @@ body.mode-elder .piece-btn{
     *  🔧 在這裡換你的 LIFF ID & 版本
     *********************************/
     const LIFF_ID = "2007931033-4D50LqwM";
-    const APP_VERSION = "v1.0.4";
+    const APP_VERSION = "v1.0.5";
     const LINE_ID = "@968noswo"; // 你的官方帳號 ID（@ 開頭）
 
     /** ******************************
@@ -468,47 +523,47 @@ body.mode-elder .piece-btn{
       const dm = document.getElementById("draw-mode");
       if (dm) dm.textContent = `輸入方式：${drawMode}`;
     }
-	
-	// 讀寫模式
-	function applyElderMode(on) {
-	  document.body.classList.toggle('mode-elder', !!on);
-	  localStorage.setItem('elderMode', on ? '1' : '0');
-	  const btn = document.getElementById('elderToggleBtn');
-	  if (btn) {
-		btn.textContent = on ? '一般模式' : '放大模式';
-		btn.classList.remove('mode-normal', 'mode-elder');
-		btn.classList.add(on ? 'mode-normal' : 'mode-elder');
-	  }
-	  
-	  // 新增：切換 .hint 元素文字大小
-	  const hints = document.querySelectorAll('.hint');
-	  hints.forEach(hint => {
-		hint.classList.toggle('large', on);
-	  });
-	  
-	  // 新增：切換 .hint-version 元素文字大小
-	  const hint_versions = document.querySelectorAll('.hint-version');
-	  hint_versions.forEach(hint => {
-		hint.classList.toggle('large', on);
-	  });
 
-	  if (on) {
-		const pos = selectedPos || firstEmptyPos();
-		if (pos) {
-		  const el = document.getElementById('pos' + pos);
-		  if (el) el.scrollIntoView({
-			behavior: 'smooth', inline: 'center', block: 'nearest'
-		  });
-		}
-	  }
-	}
+    // 讀寫模式
+    function applyElderMode(on) {
+      document.body.classList.toggle('mode-elder', !!on);
+      localStorage.setItem('elderMode', on ? '1' : '0');
+      const btn = document.getElementById('elderToggleBtn');
+      if (btn) {
+        btn.textContent = on ? '一般模式' : '放大模式';
+        btn.classList.remove('mode-normal', 'mode-elder');
+        btn.classList.add(on ? 'mode-normal' : 'mode-elder');
+      }
+
+      // 新增：切換 .hint 元素文字大小
+      const hints = document.querySelectorAll('.hint');
+      hints.forEach(hint => {
+        hint.classList.toggle('large', on);
+      });
+
+      // 新增：切換 .hint-version 元素文字大小
+      const hint_versions = document.querySelectorAll('.hint-version');
+      hint_versions.forEach(hint => {
+        hint.classList.toggle('large', on);
+      });
+
+      if (on) {
+        const pos = selectedPos || firstEmptyPos();
+        if (pos) {
+          const el = document.getElementById('pos' + pos);
+          if (el) el.scrollIntoView({
+            behavior: 'smooth', inline: 'center', block: 'nearest'
+          });
+        }
+      }
+    }
 
 
 
-	function initElderMode() {
-		const saved=localStorage.getItem('elderMode')==='1';
-		applyElderMode(saved);
-	}
+    function initElderMode() {
+      const saved = localStorage.getItem('elderMode') === '1';
+      applyElderMode(saved);
+    }
 
     // ====== 狀態與工具 ======
     const $ = (id) => document.getElementById(id);
@@ -551,38 +606,38 @@ body.mode-elder .piece-btn{
       return used < limit;
     }
 
-		function render() {
-	 const cursorPos = selectedPos || firstEmptyPos(); // 沒鎖定就顯示下一空位
+    function render() {
+      const cursorPos = selectedPos || firstEmptyPos(); // 沒鎖定就顯示下一空位
 
-	 for (let i = 1; i <= 5; i++) {
-	   const el = posEls[i];
-	   el.classList.remove("red", "black", "selected");
+      for (let i = 1; i <= 5; i++) {
+        const el = posEls[i];
+        el.classList.remove("red", "black", "selected");
 
-	   if (picks[i]) {
-	     el.innerHTML = `<span>${picks[i].type}<\/span><div class="poslabel">${i}<\/div>`;
-	     el.classList.add(picks[i].color === "red" ? "red" : "black");
-	   } else {
-	     const dir = i === 1 ? "中心" : i === 2 ? "位置" : i === 3 ? "位置" : i === 4 ? "位置" : "位置";
-	     el.innerHTML = `<span>${i}<\/span><div class="poslabel">${dir}<\/div>`;
-	   }
-	   if (selectedPos === i) el.classList.add("selected");
+        if (picks[i]) {
+          el.innerHTML = `<span>${picks[i].type}<\/span><div class="poslabel">${i}<\/div>`;
+          el.classList.add(picks[i].color === "red" ? "red" : "black");
+        } else {
+          const dir = i === 1 ? "中心" : i === 2 ? "位置" : i === 3 ? "位置" : i === 4 ? "位置" : "位置";
+          el.innerHTML = `<span>${i}<\/span><div class="poslabel">${dir}<\/div>`;
+        }
+        if (selectedPos === i) el.classList.add("selected");
 
-	   // 先清舊游標，再視需要加上
-	   el.querySelectorAll('.cursor').forEach(n=>n.remove());
-	   if (cursorPos === i) {
-	     const tag = document.createElement('div');
-	     tag.className = 'cursor';
-	     tag.textContent = '正在輸入';
-	     el.appendChild(tag);
-	   }
-	 }
+        // 先清舊游標，再視需要加上
+        el.querySelectorAll('.cursor').forEach(n => n.remove());
+        if (cursorPos === i) {
+          const tag = document.createElement('div');
+          tag.className = 'cursor';
+          tag.textContent = '正在輸入';
+          el.appendChild(tag);
+        }
+      }
 
-	 // 老人模式：把游標那格捲到可視範圍
-	 if (document.body.classList.contains('mode-elder') && cursorPos) {
-	   const el = document.getElementById('pos'+cursorPos);
-	   if (el) el.scrollIntoView({ behavior:'smooth', inline:'center', block:'nearest' });
-	 }
-	}
+      // 老人模式：把游標那格捲到可視範圍
+      if (document.body.classList.contains('mode-elder') && cursorPos) {
+        const el = document.getElementById('pos' + cursorPos);
+        if (el) el.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+      }
+    }
 
     function setSelected(pos) {
       selectedPos = (selectedPos === pos ? null : pos);
@@ -728,7 +783,6 @@ body.mode-elder .piece-btn{
       try {
         if (liff?.isInClient?.()) {
           await liff.sendMessages([flex]);
-          alert("已送出，返回聊天室");
           liff.closeWindow();
         } else if (liff.isApiAvailable('shareTargetPicker')) {
           await liff.shareTargetPicker([flex]);
@@ -747,12 +801,6 @@ body.mode-elder .piece-btn{
       }
     }
 
-    // ====== LIFF 判斷是否為好友 ======
-    async function isUserFriend() {
-      const friend = await liff.getFriendship();
-      return friend.friendFlag; // true 代表是好友，false 代表不是好友
-    }
-
     // ====== 日誌輸出 ======
     function printLog(message) {
       const logDiv = document.getElementById('logOutput');
@@ -760,76 +808,6 @@ body.mode-elder .piece-btn{
         logDiv.textContent += message + "\n";
         logDiv.scrollTop = logDiv.scrollHeight;  // 自動捲到底部
       }
-    }
-
-    // 解析網址參數函式
-    function getQueryParam(param) {
-      const urlParams = new URLSearchParams(window.location.search);
-      return urlParams.get(param);
-    }
-
-    function getQueryParamFromShared() {
-      try {
-        // 取得目前瀏覽器網址的 search params
-        const params = new URLSearchParams(window.location.search);
-
-        // 取得 liff.state（經 URL encode）
-        let stateParam = params.get('liff.state');
-
-        if (stateParam) {
-          // 解碼參數
-          stateParam = decodeURIComponent(stateParam);
-
-          // stateParam 會是類似 /path?a=1&b=2 的URI 路徑及查詢字串
-          // 我們要把它解析成 key-value
-          const url = new URL("http://example.com" + stateParam); // 加入 domain 方便用 URL API 解析
-          const searchParams = url.searchParams;
-
-          // 範例：取得特定參數
-          const a = searchParams.get('a');
-          const b = searchParams.get('b');
-
-          printLog(`liff.state 解碼參數:\n完整路徑: ${stateParam}\na = ${a}\nb = ${b}`);
-        } else {
-          printLog('沒有 liff.state 參數');
-        }
-      } catch (error) {
-        printLog('解析 liff.state 參數失敗:', error);
-        printLog('初始化 LIFF 失敗');
-      }
-    }
-
-    // 準備要送的訊息，依參數不同決定內容
-    function prepareMessage(parameter) {
-      if (parameter === 'manually') {
-        return {
-          type: 'text',
-          text: '收到參數 manully，執行療癒分數指令！'
-        };
-      } else if (parameter === 'auto') {
-        return {
-          type: 'text',
-          text: '自動模式啟動中...'
-        };
-      } else {
-        return {
-          type: 'text',
-          text: '未帶參數或參數內容未知。'
-        };
-      }
-    }
-
-    async function validateFlexOnServerJSONP(flex) {
-      return new Promise((resolve, reject) => {
-        const url = "https://script.google.com/macros/s/AKfycbwpTCUmsM55eTsXPLpkR6qgSkr8L0KzHXf323pwBXrwvTQJ2A8L2K0XmJwhyFPYaZRwPQ/exec";
-        const cb = "cb" + Date.now();
-        window[cb] = (data) => { resolve(data); delete window[cb]; script.remove(); };
-        const u = `${url}?callback=${cb}&message=${encodeURIComponent(JSON.stringify(flex))}`;
-        const script = document.createElement("script");
-        script.src = u;
-        script.onerror = () => { reject(new Error("JSONP load error")); delete window[cb]; };
-        document.body.appendChild(script);
-      });
     }
 
     // ====== 綁定 UI ======
@@ -846,14 +824,14 @@ body.mode-elder .piece-btn{
     document.querySelectorAll(".piece-btn").forEach(btn => {
       btn.addEventListener("click", () => addPiece(btn.dataset.piece));
     });
-	
-	document.getElementById('elderToggleBtn').addEventListener('click', ()=> {
-        const on= !document.body.classList.contains('mode-elder');
-        applyElderMode(on);
+
+    document.getElementById('elderToggleBtn').addEventListener('click', () => {
+      const on = !document.body.classList.contains('mode-elder');
+      applyElderMode(on);
     });
 
 
-// ====== 初始化 LIFF ======
+    // ====== 初始化 LIFF ======
     (async () => {
       try {
         statusEl.textContent = "頁面初始化中…";
@@ -873,26 +851,6 @@ body.mode-elder .piece-btn{
         printLog("用戶名稱：" + profile.displayName);
         statusEl.textContent = `Hello, ${profile.displayName} 👋`;
 
-        // 取得網址參數 p
-        const urlParams = new URLSearchParams(window.location.search);
-        const parameter = urlParams.get('p');
-        printLog("網址參數 p: " + parameter);
-
-        getQueryParamFromShared();
-
-        // 若有帶參數且非空，發送訊息並關閉窗口
-        if (parameter !== null && parameter !== '') {
-          printLog("sendMessages p: " + parameter);
-          try {
-            await liff.sendMessages([{ type: 'text', text: `啟動療癒分數指令 ${parameter}` }]);
-            printLog("訊息送出成功，關閉視窗");
-            liff.closeWindow();
-          } catch (sendError) {
-            printLog("sendMessages 失敗: " + sendError.message);
-            alert("訊息送出失敗:" + sendError.message);
-          }
-        }
-
       } catch (err) {
         printLog("初始化錯誤: " + (err?.message || err));
         statusEl.textContent = `LIFF 初始化失敗：${err?.message || "unknown"}`;
@@ -905,7 +863,8 @@ body.mode-elder .piece-btn{
     // 隱藏日誌輸出區域
     document.getElementById("logOutput").classList.add("hidden");
 
-	initElderMode();
+    initElderMode();
+
     // 初次渲染
     render();
   </script>
