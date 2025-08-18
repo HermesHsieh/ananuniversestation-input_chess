@@ -373,102 +373,123 @@
     #elderToggleBtn:active {
       transform: translateY(1px);
     }
+
+    /* ===== 刷新提示條 ===== */
+    #refreshIndicator {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 0;
+      line-height: 50px;
+      background: #4caf50;
+      color: white;
+      font-weight: bold;
+      text-align: center;
+      overflow: hidden;
+      transition: height 0.3s ease;
+      z-index: 1000;
+      user-select: none;
+    }
   </style>
 </head>
 
 <body>
-  <div class="wrap">
-    <div class="topbar">
-      <div class="title">單卦</div>
-      <div class="bar-actions">
-        <button class="mode-toggle" id="elderToggleBtn">放大模式</button>
-        <button class="ghost" id="askBtn">輸入問題名稱</button>
-        <button class="ghost" id="reloadBtn">Reload</button>
-      </div>
-    </div>
+  <div id="refreshIndicator">下拉刷新</div>
 
-    <div id="status" class="status">初始化中…</div>
-
-
-    <div class="card">
-      <div id="cardTitle" class="card-title"></div>
-
-      <!-- 九宮格（上：4 / 中：2 1 3 / 下：5） -->
-      <div class="grid" aria-label="十字九宮格">
-        <div></div>
-        <div class="cell" id="pos4"><span>4</span>
-          <div class="poslabel">↑ 點選以鎖定</div>
-        </div>
-        <div></div>
-
-        <div class="cell" id="pos2"><span>2</span>
-          <div class="poslabel">←</div>
-        </div>
-        <div class="cell" id="pos1"><span>1</span>
-          <div class="poslabel">中心</div>
-        </div>
-        <div class="cell" id="pos3"><span>3</span>
-          <div class="poslabel">→</div>
-        </div>
-
-        <div></div>
-        <div class="cell" id="pos5"><span>5</span>
-          <div class="poslabel">↓</div>
-        </div>
-        <div></div>
-      </div>
-
-      <div class="controls">
-        <button class="btn btn-secondary" id="randomBtn">隨機</button>
-        <button class="btn btn-primary" id="sendBtn">送出</button>
-        <button class="btn btn-secondary" id="clearBtn">清除</button>
-      </div>
-
-      <div class="hint" style="text-align: left;">點選下方棋子，系統會依序放入：1 → 2 → 3 → 4 → 5</div>
-      <div class="hint" style="text-align: left;">點選「指定位置」→ 再點下方棋子</div>
-      <div class="hint-box" style="display: flex; justify-content: space-between; align-items: center;">
-        <div id="draw-mode" class="hint-version" style="text-align: left;">
-          輸入方式：手動
-        </div>
-        <div class="hint-version" id="ver" style="text-align: right;">
+  <div id="mainContent">
+    <div class="wrap">
+      <div class="topbar">
+        <div class="title">單卦</div>
+        <div class="bar-actions">
+          <button class="mode-toggle" id="elderToggleBtn">放大模式</button>
+          <button class="ghost" id="askBtn">輸入問題名稱</button>
+          <button class="ghost" id="reloadBtn">Reload</button>
         </div>
       </div>
 
-    </div>
+      <div id="status" class="status">初始化中…</div>
 
-    <!-- 棋子選擇（黑在上、紅在下） -->
-    <div class="pieces">
-      <div class="picker-wrap">
-        <div class="picker-grid" id="pickerGrid" aria-label="棋子選擇（7×2，可左右滑動）">
-          <div class="row" style="margin-bottom:8px">
-            <!-- 黑國：將 士 象 車 馬 包 卒 -->
-            <button class="piece-btn black" data-piece="將">將</button>
-            <button class="piece-btn black" data-piece="士">士</button>
-            <button class="piece-btn black" data-piece="象">象</button>
-            <button class="piece-btn black" data-piece="車">車</button>
-            <button class="piece-btn black" data-piece="馬">馬</button>
-            <button class="piece-btn black" data-piece="包">包</button>
-            <button class="piece-btn black" data-piece="卒">卒</button>
 
-            <!-- 紅國：帥 仕 相 俥 傌 炮 兵 -->
-            <button class="piece-btn red" data-piece="帥">帥</button>
-            <button class="piece-btn red" data-piece="仕">仕</button>
-            <button class="piece-btn red" data-piece="相">相</button>
-            <button class="piece-btn red" data-piece="俥">俥</button>
-            <button class="piece-btn red" data-piece="傌">傌</button>
-            <button class="piece-btn red" data-piece="炮">炮</button>
-            <button class="piece-btn red" data-piece="兵">兵</button>
+      <div class="card">
+        <div id="cardTitle" class="card-title"></div>
+
+        <!-- 九宮格（上：4 / 中：2 1 3 / 下：5） -->
+        <div class="grid" aria-label="十字九宮格">
+          <div></div>
+          <div class="cell" id="pos4"><span>4</span>
+            <div class="poslabel">↑ 點選以鎖定</div>
           </div>
-          <div class="footer-pad"></div>
+          <div></div>
+
+          <div class="cell" id="pos2"><span>2</span>
+            <div class="poslabel">←</div>
+          </div>
+          <div class="cell" id="pos1"><span>1</span>
+            <div class="poslabel">中心</div>
+          </div>
+          <div class="cell" id="pos3"><span>3</span>
+            <div class="poslabel">→</div>
+          </div>
+
+          <div></div>
+          <div class="cell" id="pos5"><span>5</span>
+            <div class="poslabel">↓</div>
+          </div>
+          <div></div>
+        </div>
+
+        <div class="controls">
+          <button class="btn btn-secondary" id="randomBtn">隨機</button>
+          <button class="btn btn-primary" id="sendBtn">送出</button>
+          <button class="btn btn-secondary" id="clearBtn">清除</button>
+        </div>
+
+        <div class="hint" style="text-align: left;">點選下方棋子，系統會依序放入：1 → 2 → 3 → 4 → 5</div>
+        <div class="hint" style="text-align: left;">點選「指定位置」→ 再點下方棋子</div>
+        <div class="hint-box" style="display: flex; justify-content: space-between; align-items: center;">
+          <div id="draw-mode" class="hint-version" style="text-align: left;">
+            輸入方式：手動
+          </div>
+          <div class="hint-version" id="ver" style="text-align: right;">
+          </div>
+        </div>
+
+      </div>
+
+      <!-- 棋子選擇（黑在上、紅在下） -->
+      <div class="pieces">
+        <div class="picker-wrap">
+          <div class="picker-grid" id="pickerGrid" aria-label="棋子選擇（7×2，可左右滑動）">
+            <div class="row" style="margin-bottom:8px">
+              <!-- 黑國：將 士 象 車 馬 包 卒 -->
+              <button class="piece-btn black" data-piece="將">將</button>
+              <button class="piece-btn black" data-piece="士">士</button>
+              <button class="piece-btn black" data-piece="象">象</button>
+              <button class="piece-btn black" data-piece="車">車</button>
+              <button class="piece-btn black" data-piece="馬">馬</button>
+              <button class="piece-btn black" data-piece="包">包</button>
+              <button class="piece-btn black" data-piece="卒">卒</button>
+
+              <!-- 紅國：帥 仕 相 俥 傌 炮 兵 -->
+              <button class="piece-btn red" data-piece="帥">帥</button>
+              <button class="piece-btn red" data-piece="仕">仕</button>
+              <button class="piece-btn red" data-piece="相">相</button>
+              <button class="piece-btn red" data-piece="俥">俥</button>
+              <button class="piece-btn red" data-piece="傌">傌</button>
+              <button class="piece-btn red" data-piece="炮">炮</button>
+              <button class="piece-btn red" data-piece="兵">兵</button>
+            </div>
+            <div class="footer-pad"></div>
+          </div>
         </div>
       </div>
-    </div>
 
-    <div id="logOutput"
-      style="white-space: pre-wrap; background:#f0f0f0; padding:10px; border:1px solid #ccc; height:150px; overflow-y:auto;">
+      <div id="logOutput"
+        style="white-space: pre-wrap; background:#f0f0f0; padding:10px; border:1px solid #ccc; height:150px; overflow-y:auto;">
+      </div>
     </div>
   </div>
-
   </div>
 
   <script>
@@ -476,7 +497,7 @@
     *  🔧 在這裡換你的 LIFF ID & 版本
     *********************************/
     const LIFF_ID = "2007931033-4D50LqwM";
-    const APP_VERSION = "v1.0.6";
+    const APP_VERSION = "v1.0.8";
     const LINE_ID = "@968noswo"; // 你的官方帳號 ID（@ 開頭）
 
     /** ******************************
@@ -558,11 +579,58 @@
       }
     }
 
-
-
     function initElderMode() {
       const saved = localStorage.getItem('elderMode') === '1';
       applyElderMode(saved);
+    }
+
+    // 下拉刷新初始化
+    let startY = 0;
+    let isPulling = false;
+    const refreshThreshold = 60; // 下拉多少距離觸發刷新
+    const refreshElement = document.getElementById('refreshIndicator');
+
+    window.addEventListener('touchstart', (e) => {
+      if (window.scrollY === 0) {
+        startY = e.touches[0].clientY;
+        isPulling = true;
+      }
+    });
+
+    window.addEventListener('touchmove', (e) => {
+      if (!isPulling) return;
+      let currentY = e.touches.clientY;
+      let diff = currentY - startY;
+      if (diff > 0) {
+        refreshElement.style.height = diff + 'px';
+        if (diff > refreshThreshold) {
+          refreshElement.textContent = '釋放刷新';
+        } else {
+          refreshElement.textContent = '下拉刷新';
+        }
+      }
+    });
+
+    window.addEventListener('touchend', (e) => {
+      if (!isPulling) return;
+      let endY = e.changedTouches[0].clientY;
+      let diff = endY - startY;
+      if (diff > refreshThreshold) {
+        refreshElement.textContent = '正在刷新...';
+        doRefresh().then(() => {
+          refreshElement.style.height = '0px';
+          isPulling = false;
+        });
+      } else {
+        refreshElement.style.height = '0px';
+        isPulling = false;
+      }
+    });
+
+    function doRefresh() {
+      return new Promise((resolve) => {
+        hardReload()
+      });
     }
 
     // ====== 狀態與工具 ======
