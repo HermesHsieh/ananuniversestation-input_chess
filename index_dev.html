@@ -403,9 +403,8 @@
       <div class="topbar">
         <div class="title">單卦</div>
         <div class="bar-actions">
-          <button class="mode-toggle" id="elderToggleBtn">放大模式</button>
           <button class="ghost" id="askBtn">輸入問題名稱</button>
-          <button class="ghost" id="reloadBtn">Reload</button>
+          <button class="mode-toggle" id="elderToggleBtn">放大模式</button>
         </div>
       </div>
 
@@ -498,7 +497,7 @@
     *  🔧 在這裡換你的 LIFF ID & 版本
     *********************************/
     const LIFF_ID = "2007931033-4D50LqwM";
-    const APP_VERSION = "v1.0.9";
+    const APP_VERSION = "v1.0.3";
     const LINE_ID = "@968noswo"; // 你的官方帳號 ID（@ 開頭）
 
     /** ******************************
@@ -932,7 +931,7 @@
     document.getElementById("ver").textContent = LINE_ID + " | " + APP_VERSION;
 
     // 隱藏日誌輸出區域
-    // document.getElementById("logOutput").classList.add("hidden");
+    document.getElementById("logOutput").classList.add("hidden");
 
     initElderMode();
 
