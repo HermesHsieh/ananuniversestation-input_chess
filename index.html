@@ -498,7 +498,7 @@
     /** 2007906926-NZW6EQ7P Production **/
     /** 2007931033-4D50LqwM Dev **/
     const LIFF_ID = "2007931033-4D50LqwM";
-    const APP_VERSION = "v1.0.3";
+    const APP_VERSION = "v1.0.4";
     const LINE_ID = "@968noswo"; // 你的官方帳號 ID（@ 開頭）
 
     /** ******************************
@@ -921,6 +921,17 @@
         const profile = await liff.getProfile();
         printLog("用戶名稱：" + profile.displayName);
         statusEl.textContent = `Hello, ${profile.displayName} 👋`;
+
+        // 取得網址參數
+        const urlParams = new URLSearchParams(window.location.search);
+        const uuid = urlParams.get('uuid'); // 取得 uuid 參數
+
+        if (uuid) {
+          document.body.insertAdjacentHTML('beforeend', `<p>取得的 UUID: ${uuid}</p>`);
+          // 這邊可用 uuid 去呼叫 Google Sheets API 查詢資料
+        } else {
+          document.body.insertAdjacentHTML('beforeend', '<p>沒有收到 UUID 參數</p>');
+        }
 
       } catch (err) {
         printLog("初始化錯誤: " + (err?.message || err));
