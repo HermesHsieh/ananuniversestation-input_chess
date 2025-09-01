@@ -498,7 +498,7 @@
     /** 2007906926-NZW6EQ7P Production **/
     /** 2007931033-4D50LqwM Dev **/
     const LIFF_ID = "2007931033-4D50LqwM";
-    const APP_VERSION = "v1.0.4";
+    const APP_VERSION = "v1.0.5";
     const LINE_ID = "@968noswo"; // 你的官方帳號 ID（@ 開頭）
 
     /** ******************************
@@ -924,13 +924,29 @@
 
         // 取得網址參數
         const urlParams = new URLSearchParams(window.location.search);
-        const uuid = urlParams.get('uuid'); // 取得 uuid 參數
+        const action = urlParams.get('a'); // 取得 action 參數 share
+        const parameter = urlParams.get('p'); // 取得 parameter 參數 5cg
+        const chessText = urlParams.get('c'); // 取得 5 chess text 參數
+        const titleName = urlParams.get('n'); // 取得 name (title) 參數
+        const cVersion = urlParams.get('v'); // 取得 version 參數
+        const createTime = urlParams.get('tm'); // 取得 create time 參數
+        const auto = urlParams.get('at'); // 取得 是否為 auto 參數
+        const baseScore = urlParams.get('bs'); // 取得 base score 參數
+        const penaltyScroe = urlParams.get('ps'); // 取得 penalty score 參數
 
-        if (uuid) {
-          document.body.insertAdjacentHTML('beforeend', `<p>取得的 UUID: ${uuid}</p>`);
+        if (parameter === '5cg' && chessText && chessText.length === 5) {
+          document.body.insertAdjacentHTML('beforeend', `<p>取得的 parameter: action = ${action}</p>`);
+          document.body.insertAdjacentHTML('beforeend', `<p>取得的 parameter: parameter = ${parameter}</p>`);
+          document.body.insertAdjacentHTML('beforeend', `<p>取得的 parameter: chessText = ${chessText}</p>`);
+          document.body.insertAdjacentHTML('beforeend', `<p>取得的 parameter: titleName = ${titleName}</p>`);
+          document.body.insertAdjacentHTML('beforeend', `<p>取得的 parameter: cVersion = ${cVersion}</p>`);
+          document.body.insertAdjacentHTML('beforeend', `<p>取得的 parameter: createTime = ${createTime}</p>`);
+          document.body.insertAdjacentHTML('beforeend', `<p>取得的 parameter: auto = ${auto}</p>`);
+          document.body.insertAdjacentHTML('beforeend', `<p>取得的 parameter: baseScore = ${baseScore}</p>`);
+          document.body.insertAdjacentHTML('beforeend', `<p>取得的 parameter: penaltyScroe = ${penaltyScroe}</p>`);
           // 這邊可用 uuid 去呼叫 Google Sheets API 查詢資料
         } else {
-          document.body.insertAdjacentHTML('beforeend', '<p>沒有收到 UUID 參數</p>');
+          document.body.insertAdjacentHTML('beforeend', '<p>沒有收到 parameter 參數</p>');
         }
 
       } catch (err) {
