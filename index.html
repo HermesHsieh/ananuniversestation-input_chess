@@ -489,6 +489,47 @@
       </div>
     </div>
   </div>
+  <!-- 🔄 分享模式佈局（預設隱藏；?action=share 或 ?a=share 時顯示） -->
+  <div id="shareContent" class="wrap hidden" aria-label="分享設定區">
+    <div class="topbar">
+      <div class="title">分享設定</div>
+      <div class="bar-actions">
+        <span class="ver-badge">Share Panel</span>
+      </div>
+    </div>
+
+    <div class="status">設定要分享的內容，按下「分享」送出</div>
+
+    <div class="card" role="region" aria-label="選項">
+      <div class="card-title">要顯示什麼？</div>
+      <div style="display:grid;grid-template-columns:1.2fr 2fr;gap:8px;align-items:center;">
+        <label>
+          <input type="checkbox" id="chkTitle" checked />
+          顯示問題名稱
+        </label>
+        <input type="text" id="shareTitle" placeholder="問題名稱（預設帶入畫面上的標題或網址參數）"
+          style="padding:10px;border:1px solid var(--border);border-radius:10px;">
+        <label>
+          <input type="checkbox" id="chkScore" checked />
+          顯示療癒分數
+        </label>
+        <input type="text" id="shareScore" placeholder="療癒分數（預設帶入狀態或網址參數）"
+          style="padding:10px;border:1px solid var(--border);border-radius:10px;">
+      </div>
+    </div>
+
+    <div class="card" role="region" aria-label="預覽">
+      <div class="card-title">分享預覽</div>
+      <pre id="sharePreview"
+        style="white-space:pre-wrap;background:#f9fafb;border:1px dashed var(--border);padding:12px;border-radius:8px;min-height:84px;"></pre>
+    </div>
+
+    <div class="controls" style="margin-top:12px;display:flex;gap:8px;">
+      <button class="btn btn-primary" id="btnShare">分享</button>
+      <button class="btn btn-secondary" id="btnBack">返回</button>
+    </div>
+  </div>
+
   </div>
 
   <script>
@@ -498,7 +539,7 @@
     /** 2007906926-NZW6EQ7P Production **/
     /** 2007931033-4D50LqwM Dev **/
     const LIFF_ID = "2007931033-4D50LqwM";
-    const APP_VERSION = "v1.0.13";
+    const APP_VERSION = "v1.0.14";
     const LINE_ID = "@968noswo"; // 你的官方帳號 ID（@ 開頭）
 
     /** ******************************
@@ -910,6 +951,8 @@
         finalScoreText = `${finalScore}分`;
       }
 
+      // 將分數曝露到全域，分享面板可自動帶入
+      window.latestHealingScore = finalScoreText;
       document.body.insertAdjacentHTML('beforeend', `<p>取得的 parameter: action = ${action}</p>`);
       document.body.insertAdjacentHTML('beforeend', `<p>取得的 parameter: parameter = ${parameter}</p>`);
       document.body.insertAdjacentHTML('beforeend', `<p>取得的 parameter: chessText = ${chessText}</p>`);
@@ -1257,6 +1300,128 @@
     initElderMode();
     // 初次渲染
     render();
+
+    // ===== 分享模式：參數解析與 UI 切換 =====
+    (function setupShareModePanel() {
+      const qs = new URLSearchParams(location.search);
+      const actionA = qs.get('a');      // 既有參數：a=share
+      const actionB = qs.get('action'); // 新參數：action=share
+      const isShareMode = (actionA === 'share' || actionB === 'share');
+
+      // 兩個容器：主畫面 & 分享畫面
+      const mainEl = document.getElementById('mainContent');
+      const shareEl = document.getElementById('shareContent');
+      const refreshEl = document.getElementById('refreshIndicator');
+
+      if (!isShareMode || !shareEl) return;
+
+      // 隱藏原本所有畫面元件，只顯示分享面板
+      if (mainEl) mainEl.classList.add('hidden');
+      if (refreshEl) refreshEl.classList.add('hidden');
+      shareEl.classList.remove('hidden');
+
+      // ==== 預設值：從網址或目前狀態帶入 ====
+      const chkTitle = document.getElementById('chkTitle');
+      const chkScore = document.getElementById('chkScore');
+      const inputTitle = document.getElementById('shareTitle');
+      const inputScore = document.getElementById('shareScore');
+      const previewEl = document.getElementById('sharePreview');
+      const btnShare = document.getElementById('btnShare');
+      const btnBack = document.getElementById('btnBack');
+
+      // 先帶入：?n=（舊參數名稱）或 ?title=
+      inputTitle.value = qs.get('n') || qs.get('title')
+        || (document.getElementById('cardTitle')?.textContent?.trim() || '')
+        || '';
+
+      // 接上現有分數邏輯：
+      // 1) 若網址給了 bs/ps（base / penalty），照既有規則推 finalScoreText
+      // 2) 否則讀全域 window.latestHealingScore / window.healingScore
+      // 3) 都沒有則留空（可手動輸入）
+      (function fillScoreFromState() {
+        const bs = qs.get('bs'), ps = qs.get('ps');
+        if (bs !== null && ps !== null) {
+          const base = Number(bs), pen = Number(ps);
+          if (!isNaN(base) && !isNaN(pen)) {
+            if (base < 60) {
+              inputScore.value = '需調整';
+            } else {
+              inputScore.value = String(base - pen) + '分';
+            }
+            return;
+          }
+        }
+        if (typeof window.latestHealingScore !== 'undefined' && window.latestHealingScore !== null) {
+          inputScore.value = String(window.latestHealingScore);
+          return;
+        }
+        if (typeof window.healingScore !== 'undefined' && window.healingScore !== null) {
+          inputScore.value = String(window.healingScore);
+          return;
+        }
+        // 若你的分數顯示在某個 DOM 節點，可在此補上 query 取得，例如：
+        // const n = document.querySelector('#healingScore');
+        // if (n) inputScore.value = n.textContent.trim();
+      })();
+
+      if (qs.has('showTitle')) chkTitle.checked = qs.get('showTitle') !== '0';
+      if (qs.has('showScore')) chkScore.checked = qs.get('showScore') !== '0';
+
+      function buildShareText() {
+        const lines = [];
+        const t = (inputTitle.value || '').trim();
+        const s = (inputScore.value || '').trim();
+        if (chkTitle.checked && t) lines.push('📌 問題：' + t);
+        if (chkScore.checked && s) lines.push('💗 療癒分數：' + s);
+        lines.push('');
+        lines.push('🔮 象棋卜卦 - 單卦 AI 療癒算分');
+        lines.push(location.origin + location.pathname);
+        return lines.join('\n');
+      }
+      function refreshPreview() { previewEl.textContent = buildShareText(); }
+      [chkTitle, chkScore, inputTitle, inputScore].forEach(el => {
+        el?.addEventListener('input', refreshPreview);
+        el?.addEventListener('change', refreshPreview);
+      });
+      refreshPreview();
+
+      let __liffReady = false;
+      async function ensureLiff() {
+        if (__liffReady) return;
+        if (!window.liff) throw new Error('LIFF SDK 未載入');
+        try { await liff.init({ liffId: LIFF_ID }); } catch (e) { }
+        __liffReady = true;
+      }
+
+      async function doShare() {
+        try {
+          await ensureLiff();
+          const text = buildShareText();
+          if (liff.isInClient() && await liff.canShareTargetPicker()) {
+            await liff.shareTargetPicker([{ type: 'text', text }]);
+            alert('已嘗試送出分享！');
+          } else if (liff.isInClient()) {
+            await liff.sendMessages([{ type: 'text', text }]);
+            alert('已發送訊息！');
+          } else {
+            alert('請在 LINE App 內開啟本頁以使用分享功能。');
+          }
+        } catch (err) {
+          console.error(err);
+          alert('分享失敗：' + (err?.message || String(err)));
+        }
+      }
+
+      btnShare?.addEventListener('click', doShare);
+      btnBack?.addEventListener('click', () => {
+        shareEl.classList.add('hidden');
+        if (refreshEl) refreshEl.classList.remove('hidden');
+        if (mainEl) mainEl.classList.remove('hidden');
+        const url = new URL(location.href);
+        ['action', 'a', 'title', 'n', 'bs', 'ps', 'showTitle', 'showScore'].forEach(k => url.searchParams.delete(k));
+        history.replaceState(null, '', url.toString());
+      });
+    })();
   </script>
 </body>
 
