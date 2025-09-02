@@ -498,7 +498,7 @@
     /** 2007906926-NZW6EQ7P Production **/
     /** 2007931033-4D50LqwM Dev **/
     const LIFF_ID = "2007931033-4D50LqwM";
-    const APP_VERSION = "v1.0.5";
+    const APP_VERSION = "v1.0.6";
     const LINE_ID = "@968noswo"; // 你的官方帳號 ID（@ 開頭）
 
     /** ******************************
@@ -733,6 +733,12 @@
       render();
     }
 
+    function createPiece(type) {
+      const color = pieceColorOf(type);
+      if (!color) return;
+      return { type, color };
+    }
+
     function clearAll(resetMode = true, resetDeck = true) {
       for (let i = 1; i <= 5; i++) picks[i] = null;
       selectedPos = null;
@@ -849,7 +855,73 @@
     }
 
     // ====== Flex 送出 ======
-    function buildFlexMessage() {
+    function buildFlexMessage(urlParams) {
+      // 取得網址參數
+      const action = urlParams.get('a'); // 取得 action 參數 share
+      const parameter = urlParams.get('p'); // 取得 parameter 參數 5cg
+      const chessText = urlParams.get('c'); // 取得 5 chess text 參數
+      const titleName = urlParams.get('n'); // 取得 name (title) 參數
+      const cVersion = urlParams.get('v'); // 取得 version 參數
+      const createTime = urlParams.get('tm'); // 取得 create time 參數
+      const auto = urlParams.get('at'); // 取得 是否為 auto 參數
+      const baseScore = urlParams.get('bs'); // 取得 base score 參數
+      const penaltyScroe = urlParams.get('ps'); // 取得 penalty score 參數
+
+      if (parameter === null) {
+        document.body.insertAdjacentHTML('beforeend', '<p>沒有收到 parameter 參數</p>');
+        return null;
+      }
+
+      if (parameter !== '5cg') {
+        document.body.insertAdjacentHTML('beforeend', '<p>parameter 參數錯誤</p>');
+        return null;
+      }
+
+      if (chessText === null) {
+        document.body.insertAdjacentHTML('beforeend', '<p>沒有收到 chessText 參數</p>');
+        return null;
+      }
+
+      if (chessText.length !== 5) {
+        document.body.insertAdjacentHTML('beforeend', '<p>chessText 參數長度錯誤</p>');
+        return null;
+      }
+
+
+      if (baseScore === null || penaltyScroe === null) {
+        document.body.insertAdjacentHTML('beforeend', '<p>沒有收到 baseScore 或 penaltyScroe 參數</p>');
+        return null;
+      }
+
+      let finalScore = 0;
+      let finalScoreText = ""
+      let finalScoreDetail = ""
+      let mEmoji = ''
+      // 基本分數 小於 60 分為 需調整
+      if (baseScore < 60) {
+        mEmoji = '😞'
+        finalScoreText = "需調整";
+        finalScoreDetail = ""
+      } else {
+        finalScore = baseScore - penaltyScroe; // 計算 final score
+        if (penaltyScroe > 0) {
+          finalScoreDetail = `${baseScore} - ${penaltyScroe}`; // final score 詳細計算
+        }
+        finalScoreText = `${finalScore}分`;
+      }
+
+      document.body.insertAdjacentHTML('beforeend', `<p>取得的 parameter: action = ${action}</p>`);
+      document.body.insertAdjacentHTML('beforeend', `<p>取得的 parameter: parameter = ${parameter}</p>`);
+      document.body.insertAdjacentHTML('beforeend', `<p>取得的 parameter: chessText = ${chessText}</p>`);
+      document.body.insertAdjacentHTML('beforeend', `<p>取得的 parameter: titleName = ${titleName}</p>`);
+      document.body.insertAdjacentHTML('beforeend', `<p>取得的 parameter: cVersion = ${cVersion}</p>`);
+      document.body.insertAdjacentHTML('beforeend', `<p>取得的 parameter: createTime = ${createTime}</p>`);
+      document.body.insertAdjacentHTML('beforeend', `<p>取得的 parameter: auto = ${auto}</p>`);
+      document.body.insertAdjacentHTML('beforeend', `<p>取得的 parameter: baseScore = ${baseScore}</p>`);
+      document.body.insertAdjacentHTML('beforeend', `<p>取得的 parameter: penaltyScroe = ${penaltyScroe}</p>`);
+
+      const create = [1, 2, 3, 4, 5].map(i => picks[i] = createPiece(chessText.charAt(i)));
+
       const cells = [1, 2, 3, 4, 5].map(i => picks[i]);
       if (cells.some(x => !x)) { alert("請先選滿 5 格再送出。"); return null; }
 
@@ -874,14 +946,12 @@
       printLog("五字：" + fiveStr);
       const fiveParam = encodeURIComponent(fiveStr);
       printLog("五字參數：" + fiveParam);
-      const titleText = (titleEl.textContent || "象棋卜卦-單掛").trim();
+      const titleText = (titleName || "象棋卜卦-單掛").trim();
       printLog("卜卦問題：" + titleText);
-      const modeTag = (drawMode === "隨機" ? "隨機" : "手動"); // 要顯示的文字
-      printLog("輸入方式：" + modeTag);
-      const modeParam = encodeURIComponent(modeTag);
-      printLog("輸入方式參數：" + modeParam);
-      const modeHint = (drawMode === "隨機" ? "*隨機抽卦結果僅供參考*" : "");
+      const titleParam = encodeURIComponent(titleText);
+      const modeHint = (auto === "1" ? "*隨機抽卦結果僅供參考*" : "");
       printLog("輸入方式提示：" + modeHint);
+      const modeHintParam = encodeURIComponent(auto === "1" ? "*隨機抽卦結果僅供參考*" : "");
 
       // ★ 圓圈尺寸（可調）：建議 72~90px
       const CIRCLE_SIZE = "80px";
@@ -957,9 +1027,35 @@
               { type: "box", layout: "horizontal", justifyContent: "center", contents: [circ5] },
 
               { type: "separator", margin: "md" },
-              { type: "text", text: APP_VERSION, size: "xs", color: "#9ca3af", align: "end" },
+
+              {
+                type: "box",
+                layout: "vertical",
+                spacing: "sm",
+                contents: [
+                  {
+                    type: "box",
+                    layout: "horizontal",
+                    spacing: "md",
+                    contents: [
+                      { type: "text", text: createTime, size: "xs", color: "#9ca3af", align: "start" },
+                      { type: "text", text: cVersion, size: "xs", color: "#9ca3af", align: "end" }
+                    ]
+                  }
+                ]
+              },
               { type: "text", text: summary, size: "sm", color: "#6b7280", wrap: true },
-              { type: "text", text: modeHint, size: "sm", color: "#6b7280", wrap: true }
+              { type: "text", text: modeHint, size: "sm", color: "#6b7280", wrap: true },
+              {
+                type: "box",
+                layout: "horizontal",
+                spacing: "md",
+                contents: [
+                  { type: "text", text: `療癒成效：emoji`, size: "lg", color: "#111111", gravity: "center", wrap: true, flex: 1, align: "start" },
+                  { type: "text", text: finalScoreText, size: "xxl", color: "#111111", gravity: "center", wrap: true, flex: 1, align: "end" }
+                ]
+              },
+              { type: "text", text: finalScoreDetail, size: "sm", color: "#111111", align: "end" }
             ]
           },
           footer: {
@@ -968,24 +1064,11 @@
             spacing: "sm",
             contents: [
               { type: "text", text: "Anan Universe Station Generated.", size: "xxs", color: "#9ca3af", align: "end" },
+              { type: "text", text: "你也有不會算療癒分數的困擾?", size: "md", color: "#4169E1", align: "center" },
               {
-                type: "box",
-                layout: "horizontal",   // 改成水平排列
-                spacing: "md",          // 按鈕間距
-                contents: [
-                  {
-                    type: "button",
-                    style: "primary",
-                    flex: 1,
-                    action: { type: "uri", label: "療癒分數", uri: `https://liff.line.me/${LIFF_ID}` }
-                  },
-                  {
-                    type: "button",
-                    style: "secondary",
-                    flex: 1,
-                    action: { type: "uri", label: "再一次", uri: `https://liff.line.me/${LIFF_ID}` }
-                  }
-                ]
+                type: "button",
+                style: "primary",
+                action: { type: "uri", label: "試試象卦AI療癒算分", uri: `https://liff.line.me/${LIFF_ID}` }
               }
             ]
           }
@@ -1091,6 +1174,30 @@
           document.body.insertAdjacentHTML('beforeend', `<p>取得的 parameter: baseScore = ${baseScore}</p>`);
           document.body.insertAdjacentHTML('beforeend', `<p>取得的 parameter: penaltyScroe = ${penaltyScroe}</p>`);
           // 這邊可用 uuid 去呼叫 Google Sheets API 查詢資料
+          if (action === 'share') {
+            const flex = buildFlexMessage(urlParams);
+            if (!flex) return;
+            try {
+              if (liff?.isInClient?.()) {
+                await liff.sendMessages([flex]);
+                printLog("sendMessages 成功");
+                liff.closeWindow();
+              } else if (liff.isApiAvailable('shareTargetPicker')) {
+                await liff.shareTargetPicker([flex]);
+                alert("已分享");
+              } else {
+                alert("請在 LINE 內開啟此 LIFF 頁面再送出。");
+              }
+            } catch (e) {
+              const msg = (e?.message || e || '').toString();
+              if ((msg.includes('scope') || msg.includes('not in LIFF app scope')) && liff.isApiAvailable('shareTargetPicker')) {
+                await liff.shareTargetPicker([flex]);
+                alert("尚未授權 chat_message.write，已改用分享送出");
+              } else {
+                alert("sendMessages 失敗：" + msg);
+              }
+            }
+          }
         } else {
           document.body.insertAdjacentHTML('beforeend', '<p>沒有收到 parameter 參數</p>');
         }
