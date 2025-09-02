@@ -539,7 +539,7 @@
     /** 2007906926-NZW6EQ7P Production **/
     /** 2007931033-4D50LqwM Dev **/
     const LIFF_ID = "2007931033-4D50LqwM";
-    const APP_VERSION = "v1.0.17";
+    const APP_VERSION = "v1.0.18";
     const LINE_ID = "@968noswo"; // 你的官方帳號 ID（@ 開頭）
 
     /** ******************************
@@ -1083,63 +1083,80 @@
       const circ3 = toCircle(picks[3]);
       const circ5 = toCircle(picks[5]);
 
+      const contents = [];
+
+      // 1) 標題
+      if (showTitle) {
+        contents.push({ type: "text", text: titleText, weight: "bold", size: "lg", wrap: true });
+      }
+
+      // 2) 盤面
+      contents.push(
+        { type: "box", layout: "horizontal", justifyContent: "center", contents: [circ4] },
+        { type: "box", layout: "horizontal", spacing: "md", justifyContent: "center", contents: [circ2, circ1, circ3] },
+        { type: "box", layout: "horizontal", justifyContent: "center", contents: [circ5] },
+        { type: "separator", margin: "md" },
+        {
+          type: "box",
+          layout: "vertical",
+          spacing: "sm",
+          contents: [{
+            type: "box",
+            layout: "horizontal",
+            spacing: "md",
+            contents: [
+              { type: "text", text: createTime, size: "xs", color: "#9ca3af", align: "start" },
+              { type: "text", text: cVersion, size: "xs", color: "#9ca3af", align: "end" }
+            ]
+          }]
+        },
+        { type: "text", text: summary, size: "sm", color: "#6b7280", wrap: true },
+        { type: "text", text: modeHint, size: "sm", color: "#6b7280", wrap: true }
+      );
+
+      // 3) 分數列
+      if (showScore) {
+        contents.push({
+          type: "box",
+          layout: "horizontal",
+          spacing: "md",
+          contents: [
+            { type: "text", text: `療癒成效：emoji`, size: "lg", color: "#111111", gravity: "center", wrap: true, flex: 1, align: "start" },
+            { type: "text", text: finalScoreText, size: "xxl", color: "#111111", gravity: "center", wrap: true, flex: 1, align: "end" }
+          ]
+        });
+
+        if (finalScoreDetail !== "") {
+          // 若要一起顯示/隱藏分數明細
+          contents.push({ type: "text", text: finalScoreDetail, size: "sm", color: "#111111", align: "end" });
+        }
+      }
+
+      // 4) 組回 body
+      const bodyContents = {
+        type: "box",
+        layout: "vertical",
+        spacing: "md",
+        contents: contents
+      };
+
+      let sendTitle = ""
+      if (showTitle) {
+        sendTitle = `${titleText} ${summary}`
+      } else {
+        sendTitle = `${summary}`
+      }
+
       return {
         type: "flex",
-        altText: `${titleText} ${summary}`,
+        altText: `${sendTitle}`,
         contents: {
           type: "bubble",
           styles: { // ★ 設定柔和的背景色
             body: { backgroundColor: FLEX_BG },
             footer: { backgroundColor: FLEX_BG }
           },
-          body: {
-            type: "box",
-            layout: "vertical",
-            spacing: "md",
-            contents: [
-              { type: "text", text: titleText, weight: "bold", size: "lg", wrap: true },
-
-              // 上：4（置中）
-              { type: "box", layout: "horizontal", justifyContent: "center", contents: [circ4] },
-
-              // 中：2 1 3（間距一致）
-              { type: "box", layout: "horizontal", spacing: "md", justifyContent: "center", contents: [circ2, circ1, circ3] },
-
-              // 下：5（置中）
-              { type: "box", layout: "horizontal", justifyContent: "center", contents: [circ5] },
-
-              { type: "separator", margin: "md" },
-
-              {
-                type: "box",
-                layout: "vertical",
-                spacing: "sm",
-                contents: [
-                  {
-                    type: "box",
-                    layout: "horizontal",
-                    spacing: "md",
-                    contents: [
-                      { type: "text", text: createTime, size: "xs", color: "#9ca3af", align: "start" },
-                      { type: "text", text: cVersion, size: "xs", color: "#9ca3af", align: "end" }
-                    ]
-                  }
-                ]
-              },
-              { type: "text", text: summary, size: "sm", color: "#6b7280", wrap: true },
-              { type: "text", text: modeHint, size: "sm", color: "#6b7280", wrap: true },
-              {
-                type: "box",
-                layout: "horizontal",
-                spacing: "md",
-                contents: [
-                  { type: "text", text: `療癒成效：emoji`, size: "lg", color: "#111111", gravity: "center", wrap: true, flex: 1, align: "start" },
-                  { type: "text", text: finalScoreText, size: "xxl", color: "#111111", gravity: "center", wrap: true, flex: 1, align: "end" }
-                ]
-              },
-              { type: "text", text: finalScoreDetail, size: "sm", color: "#111111", align: "end" }
-            ]
-          },
+          body: bodyContents,
           footer: {
             type: "box",
             layout: "vertical",
