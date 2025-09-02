@@ -396,6 +396,31 @@
     .off {
       opacity: .5;
     }
+
+    /* ✅ 分享面板內的唯讀棋盤（小一號、不可點） */
+    .share-board .grid {
+      gap: 10px;
+      margin: 8px 0 12px;
+    }
+
+    .share-board .cell {
+      min-width: 56px;
+      min-height: 56px;
+      font-size: 28px;
+      border-style: solid;
+      cursor: default;
+    }
+
+    .share-board .cell.ro {
+      pointer-events: none;
+    }
+
+    /* 禁止操作 */
+    .share-board .poslabel {
+      font-size: 12px;
+      color: #aaa;
+      margin-top: 2px;
+    }
   </style>
 </head>
 
@@ -506,6 +531,32 @@
 
     <div class="card" role="region" aria-label="選項">
       <div class="card-title">要顯示什麼？</div>
+      <!-- ✅ 唯讀十字棋盤（顯示剛剛要分享的 1-5 棋子），不可操作 -->
+      <div id="shareBoard" class="share-board" aria-label="分享棋盤（唯讀）">
+        <div class="grid">
+          <div></div>
+          <div class="cell ro" id="spos4"><span>4</span>
+            <div class="poslabel">↑</div>
+          </div>
+          <div></div>
+
+          <div class="cell ro" id="spos2"><span>2</span>
+            <div class="poslabel">←</div>
+          </div>
+          <div class="cell ro" id="spos1"><span>1</span>
+            <div class="poslabel">中心</div>
+          </div>
+          <div class="cell ro" id="spos3"><span>3</span>
+            <div class="poslabel">→</div>
+          </div>
+
+          <div></div>
+          <div class="cell ro" id="spos5"><span>5</span>
+            <div class="poslabel">↓</div>
+          </div>
+          <div></div>
+        </div>
+      </div>
       <div style="display:grid;grid-template-columns:1.2fr 2fr;gap:8px;align-items:center;">
         <label>
           <input type="checkbox" id="chkTitle" checked />
@@ -524,12 +575,6 @@
       </div>
     </div>
 
-    <div class="card" role="region" aria-label="預覽">
-      <div class="card-title">分享預覽</div>
-      <pre id="sharePreview"
-        style="white-space:pre-wrap;background:#f9fafb;border:1px dashed var(--border);padding:12px;border-radius:8px;min-height:84px;"></pre>
-    </div>
-
     <div class="controls" style="margin-top:12px;display:flex;gap:8px;">
       <button class="btn btn-primary" id="btnShare">分享</button>
       <button class="btn btn-secondary" id="btnCancel">取消</button>
@@ -545,7 +590,7 @@
     /** 2007906926-NZW6EQ7P Production **/
     /** 2007931033-4D50LqwM Dev **/
     const LIFF_ID = "2007931033-4D50LqwM";
-    const APP_VERSION = "v1.0.19";
+    const APP_VERSION = "v1.0.20";
     const LINE_ID = "@968noswo"; // 你的官方帳號 ID（@ 開頭）
 
     /** ******************************
@@ -1186,7 +1231,6 @@
       };
     }
 
-
     async function sendResult() {
       const flex = buildImageMessage();
       if (!flex) return;
@@ -1208,6 +1252,23 @@
           alert("尚未授權 chat_message.write，已改用分享送出");
         } else {
           alert("sendMessages 失敗：" + msg);
+        }
+      }
+    }
+
+    // ✅ 依主畫面的 picks，將棋子顯示到分享面板的唯讀棋盤
+    function renderShareBoardFromPicks() {
+      const idMap = { 1: 'spos1', 2: 'spos2', 3: 'spos3', 4: 'spos4', 5: 'spos5' };
+      for (let i = 1; i <= 5; i++) {
+        const el = document.getElementById(idMap[i]);
+        if (!el) continue;
+        el.classList.remove('red', 'black');
+        const span = el.querySelector('span');
+        if (picks[i]) {
+          span.textContent = picks[i].type;
+          el.classList.add(picks[i].color === 'red' ? 'red' : 'black');
+        } else {
+          span.textContent = String(i); // 沒選到就顯示位置序號
         }
       }
     }
@@ -1346,12 +1407,14 @@
       if (refreshEl) refreshEl.classList.add('hidden');
       shareEl.classList.remove('hidden');
 
+      // ✅ 顯示唯讀棋盤內容
+      renderShareBoardFromPicks();
+
       // ==== 預設值：從網址或目前狀態帶入 ====
       const chkTitle = document.getElementById('chkTitle');
       const chkScore = document.getElementById('chkScore');
       const inputTitle = document.getElementById('shareTitleText');
       const inputScore = document.getElementById('shareScoreText');
-      const previewEl = document.getElementById('sharePreview');
       const btnShare = document.getElementById('btnShare');
       const btnCancel = document.getElementById('btnCancel');
 
@@ -1392,32 +1455,6 @@
 
       if (qs.has('showTitle')) chkTitle.checked = qs.get('showTitle') !== '0';
       if (qs.has('showScore')) chkScore.checked = qs.get('showScore') !== '0';
-
-      function buildShareText() {
-        const lines = [];
-        const t = (inputTitle.textContent || '').trim();
-        const s = (inputScore.textContent || '').trim();
-        if (chkTitle.checked && inputTitle.textContent.trim()) {
-          lines.push('📌 ' + inputTitle.textContent.trim());
-        }
-        if (chkScore.checked && inputScore.textContent.trim()) {
-          lines.push('💗 療癒分數：' + inputScore.textContent.trim());
-        }
-        lines.push('');
-        lines.push('🔮 象棋卜卦 - 單卦 AI 療癒算分');
-        lines.push(location.origin + location.pathname);
-        return lines.join('\n');
-      }
-      function refreshPreview() {
-        previewEl.textContent = buildShareText();
-        if (inputTitle) inputTitle.classList.toggle('off', !chkTitle.checked);
-        if (inputScore) inputScore.classList.toggle('off', !chkScore.checked);
-
-      }
-      [chkTitle, chkScore].forEach(el => {
-        el && el.addEventListener('change', refreshPreview);
-      });
-      refreshPreview();
 
       let __liffReady = false;
       async function ensureLiff() {
