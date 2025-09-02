@@ -498,7 +498,7 @@
     /** 2007906926-NZW6EQ7P Production **/
     /** 2007931033-4D50LqwM Dev **/
     const LIFF_ID = "2007931033-4D50LqwM";
-    const APP_VERSION = "v1.0.7";
+    const APP_VERSION = "v1.0.8";
     const LINE_ID = "@968noswo"; // 你的官方帳號 ID（@ 開頭）
 
     /** ******************************
@@ -921,7 +921,10 @@
       document.body.insertAdjacentHTML('beforeend', `<p>取得的 parameter: penaltyScroe = ${penaltyScroe}</p>`);
 
       for(let i = 1; i < 6; i++) {
-        picks[i] = createPiece(chessText.charAt(i))
+        document.body.insertAdjacentHTML('beforeend', `<p>chess[${i}] text = ${chessText.charAt(i)}</p>`);
+        document.body.insertAdjacentHTML('beforeend', `<p>create piece[${i}] = ${createPiece(chessText.charAt(i))}</p>`);
+        picks[i] = createPiece(chessText.charAt(i));
+        document.body.insertAdjacentHTML('beforeend', `<p>pick[${i}] = ${picks[i]}</p>`);
       }
 
       const cells = [1, 2, 3, 4, 5].map(i => picks[i]);
