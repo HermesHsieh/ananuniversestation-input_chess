@@ -392,6 +392,10 @@
       z-index: 1000;
       user-select: none;
     }
+
+    .off {
+      opacity: .5;
+    }
   </style>
 </head>
 
@@ -507,14 +511,16 @@
           <input type="checkbox" id="chkTitle" checked />
           顯示問題名稱
         </label>
-        <input type="text" id="shareTitle" placeholder="問題名稱（預設帶入畫面上的標題或網址參數）"
-          style="padding:10px;border:1px solid var(--border);border-radius:10px;">
+        <div id="shareTitleText" class="ro-field"
+          style="padding:10px;border:1px solid var(--border);border-radius:10px;background:#f9fafb;min-height:40px;display:flex;align-items:center;">
+        </div>
         <label>
           <input type="checkbox" id="chkScore" checked />
           顯示療癒分數
         </label>
-        <input type="text" id="shareScore" placeholder="療癒分數（預設帶入狀態或網址參數）"
-          style="padding:10px;border:1px solid var(--border);border-radius:10px;">
+        <div id="shareScoreText" class="ro-field"
+          style="padding:10px;border:1px solid var(--border);border-radius:10px;background:#f9fafb;min-height:40px;display:flex;align-items:center;">
+        </div>
       </div>
     </div>
 
@@ -526,7 +532,7 @@
 
     <div class="controls" style="margin-top:12px;display:flex;gap:8px;">
       <button class="btn btn-primary" id="btnShare">分享</button>
-      <button class="btn btn-secondary" id="btnBack">返回</button>
+      <button class="btn btn-secondary" id="btnCancel">取消</button>
     </div>
   </div>
 
@@ -539,7 +545,7 @@
     /** 2007906926-NZW6EQ7P Production **/
     /** 2007931033-4D50LqwM Dev **/
     const LIFF_ID = "2007931033-4D50LqwM";
-    const APP_VERSION = "v1.0.18";
+    const APP_VERSION = "v1.0.19";
     const LINE_ID = "@968noswo"; // 你的官方帳號 ID（@ 開頭）
 
     /** ******************************
@@ -946,7 +952,7 @@
       } else {
         finalScore = baseScore - penaltyScroe; // 計算 final score
         if (penaltyScroe > 0) {
-          finalScoreDetail = `${baseScore} - ${penaltyScroe}`; // final score 詳細計算
+          finalScoreDetail = `${baseScore}-${penaltyScroe}`; // final score 詳細計算
         }
         finalScoreText = `${finalScore}分`;
       }
@@ -1163,9 +1169,8 @@
             spacing: "sm",
             contents: [
               { type: "text", text: "@968noswo Generated.", size: "xxs", color: "#9ca3af", align: "end" },
-              { type: "text", text: " ", size: "xs" },
+              { type: "text", text: " ", size: "xxs" },
               { type: "text", text: "試試象卦AI療癒算分?", weight: "bold", size: "md", color: "#4169E1", align: "center" },
-              { type: "text", text: " ", size: "xs" },
               {
                 type: "button",
                 style: "primary",
@@ -1344,14 +1349,14 @@
       // ==== 預設值：從網址或目前狀態帶入 ====
       const chkTitle = document.getElementById('chkTitle');
       const chkScore = document.getElementById('chkScore');
-      const inputTitle = document.getElementById('shareTitle');
-      const inputScore = document.getElementById('shareScore');
+      const inputTitle = document.getElementById('shareTitleText');
+      const inputScore = document.getElementById('shareScoreText');
       const previewEl = document.getElementById('sharePreview');
       const btnShare = document.getElementById('btnShare');
-      const btnBack = document.getElementById('btnBack');
+      const btnCancel = document.getElementById('btnCancel');
 
       // 先帶入：?n=（舊參數名稱）或 ?title=
-      inputTitle.value = qs.get('n') || qs.get('title')
+      inputTitle.textContent = qs.get('n') || qs.get('title')
         || (document.getElementById('cardTitle')?.textContent?.trim() || '')
         || '';
 
@@ -1365,24 +1370,24 @@
           const base = Number(bs), pen = Number(ps);
           if (!isNaN(base) && !isNaN(pen)) {
             if (base < 60) {
-              inputScore.value = '需調整';
+              inputScore.textContent = '需調整';
             } else {
-              inputScore.value = String(base - pen) + '分';
+              inputScore.textContent = String(base - pen) + '分';
             }
             return;
           }
         }
         if (typeof window.latestHealingScore !== 'undefined' && window.latestHealingScore !== null) {
-          inputScore.value = String(window.latestHealingScore);
+          inputScore.textContent = String(window.latestHealingScore);
           return;
         }
         if (typeof window.healingScore !== 'undefined' && window.healingScore !== null) {
-          inputScore.value = String(window.healingScore);
+          inputScore.textContent = String(window.healingScore);
           return;
         }
         // 若你的分數顯示在某個 DOM 節點，可在此補上 query 取得，例如：
         // const n = document.querySelector('#healingScore');
-        // if (n) inputScore.value = n.textContent.trim();
+        // if (n) inputScore.textContent = n.textContent.trim();
       })();
 
       if (qs.has('showTitle')) chkTitle.checked = qs.get('showTitle') !== '0';
@@ -1390,19 +1395,27 @@
 
       function buildShareText() {
         const lines = [];
-        const t = (inputTitle.value || '').trim();
-        const s = (inputScore.value || '').trim();
-        if (chkTitle.checked && t) lines.push('📌 問題：' + t);
-        if (chkScore.checked && s) lines.push('💗 療癒分數：' + s);
+        const t = (inputTitle.textContent || '').trim();
+        const s = (inputScore.textContent || '').trim();
+        if (chkTitle.checked && inputTitle.textContent.trim()) {
+          lines.push('📌 ' + inputTitle.textContent.trim());
+        }
+        if (chkScore.checked && inputScore.textContent.trim()) {
+          lines.push('💗 療癒分數：' + inputScore.textContent.trim());
+        }
         lines.push('');
         lines.push('🔮 象棋卜卦 - 單卦 AI 療癒算分');
         lines.push(location.origin + location.pathname);
         return lines.join('\n');
       }
-      function refreshPreview() { previewEl.textContent = buildShareText(); }
-      [chkTitle, chkScore, inputTitle, inputScore].forEach(el => {
-        el?.addEventListener('input', refreshPreview);
-        el?.addEventListener('change', refreshPreview);
+      function refreshPreview() {
+        previewEl.textContent = buildShareText();
+        if (inputTitle) inputTitle.classList.toggle('off', !chkTitle.checked);
+        if (inputScore) inputScore.classList.toggle('off', !chkScore.checked);
+
+      }
+      [chkTitle, chkScore].forEach(el => {
+        el && el.addEventListener('change', refreshPreview);
       });
       refreshPreview();
 
@@ -1437,13 +1450,19 @@
       }
 
       btnShare?.addEventListener('click', doShare);
-      btnBack?.addEventListener('click', () => {
-        shareEl.classList.add('hidden');
-        if (refreshEl) refreshEl.classList.remove('hidden');
-        if (mainEl) mainEl.classList.remove('hidden');
-        const url = new URL(location.href);
-        ['action', 'a', 'title', 'n', 'bs', 'ps', 'showTitle', 'showScore'].forEach(k => url.searchParams.delete(k));
-        history.replaceState(null, '', url.toString());
+      btnCancel?.addEventListener('click', () => {
+        try {
+          if (window.liff && typeof liff.closeWindow === 'function') {
+            liff.closeWindow(); // 在 LINE App 內直接關閉
+            return;
+          }
+        } catch (_) { }
+        // 後備方案：非 LINE App 或 closeWindow 失敗
+        window.close();
+        if (!document.hidden) { // 多數瀏覽器不允許 window.close() 關閉非 script-opened 視窗
+          if (history.length > 1) history.back();
+          else location.href = 'about:blank';
+        }
       });
     })();
   </script>
