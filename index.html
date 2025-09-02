@@ -637,7 +637,7 @@
     /** 2007906926-NZW6EQ7P Production **/
     /** 2007931033-4D50LqwM Dev **/
     const LIFF_ID = "2007931033-4D50LqwM";
-    const APP_VERSION = "v1.0.28";
+    const APP_VERSION = "v1.0.29";
     const LINE_ID = "@968noswo"; // 你的官方帳號 ID（@ 開頭）
 
     /** ******************************
@@ -1005,6 +1005,7 @@
       const auto = urlParams.get('at'); // 取得 是否為 auto 參數
       const baseScore = urlParams.get('bs'); // 取得 base score 參數
       const penaltyScroe = urlParams.get('ps'); // 取得 penalty score 參數
+      const mFace = urlParams.get('f'); // 取得 emoji face
 
       if (parameter === null) {
         document.body.insertAdjacentHTML('beforeend', '<p>沒有收到 parameter 參數</p>');
@@ -1203,7 +1204,7 @@
           layout: "horizontal",
           spacing: "md",
           contents: [
-            { type: "text", text: `療癒成效：emoji`, size: "lg", color: "#111111", gravity: "center", wrap: true, flex: 1, align: "start" },
+            { type: "text", text: `療癒成效：${mFace}`, size: "lg", color: "#111111", gravity: "center", wrap: true, flex: 1, align: "start" },
             { type: "text", text: finalScoreText, size: "xxl", color: "#111111", gravity: "center", wrap: true, flex: 1, align: "end" }
           ]
         });
@@ -1507,6 +1508,7 @@
           if (liff.isApiAvailable('shareTargetPicker')) {
             await liff.shareTargetPicker([flex]);
             alert("分享成功，可於聊天視窗中查看");
+            liff.closeWindow();
           } else {
             alert("請在 LINE 內開啟此 LIFF 頁面再送出。");
           }
