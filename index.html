@@ -498,7 +498,7 @@
     /** 2007906926-NZW6EQ7P Production **/
     /** 2007931033-4D50LqwM Dev **/
     const LIFF_ID = "2007931033-4D50LqwM";
-    const APP_VERSION = "v1.0.9";
+    const APP_VERSION = "v1.0.10";
     const LINE_ID = "@968noswo"; // 你的官方帳號 ID（@ 開頭）
 
     /** ******************************
@@ -920,10 +920,10 @@
       document.body.insertAdjacentHTML('beforeend', `<p>取得的 parameter: baseScore = ${baseScore}</p>`);
       document.body.insertAdjacentHTML('beforeend', `<p>取得的 parameter: penaltyScroe = ${penaltyScroe}</p>`);
 
-      for(let i = 0; i < 5; i++) {
+      for (let i = 0; i < 5; i++) {
         document.body.insertAdjacentHTML('beforeend', `<p>chess[${i}] text = ${chessText.charAt(i)}</p>`);
         document.body.insertAdjacentHTML('beforeend', `<p>create piece[${i}] = ${createPiece(chessText.charAt(i))}</p>`);
-        
+
         let nextI = i + 1;
         picks[nextI] = createPiece(chessText.charAt(i));
 
@@ -968,35 +968,64 @@
       // ★ 舒服背景色（Flex bubble 的 body）
       const FLEX_BG = "#F6F7FB"; // 微藍灰，耐看
 
-      // 產生：黑外圈 + 白內圈 + 中央字
+      // 建議固定圈厚度，維持比例
+      const OUTER_RING_PX = 4;  // 最外圈粗度
+      const GAP_PX = 2;  // 兩圈間距
+      const INNER_RING_PX = 2;  // 內圈粗度
+
       const toCircle = (cell) => {
-        const pieceColor = (cell.color === "red") ? "#d32f2f" : "#111111";
+        const pieceColor = cell.color === "red" ? "#d32f2f" : "#111111";
+        const GAP_BG = typeof FLEX_BG === "string" ? FLEX_BG : "#F6F7FB"; // 間隔顏色＝卡片背景色
+
         return {
           type: "box",
           layout: "vertical",
           width: CIRCLE_SIZE,
           height: CIRCLE_SIZE,
           cornerRadius: "999px",
-          backgroundColor: "#111111",     // 黑色外圈
-          paddingAll: "3px",               // 外圈厚度
+          backgroundColor: pieceColor,                 // ★ 外圈顏色（同字色）
+          paddingAll: OUTER_RING_PX + "px",            // ★ 外圈粗度
           contents: [
             {
               type: "box",
               layout: "vertical",
-              width: "100%", height: "100%",
+              width: "100%",
+              height: "100%",
               cornerRadius: "999px",
-              backgroundColor: "#FFFFFF",  // 白色內圈
+              backgroundColor: GAP_BG,                 // ★ 兩圈間隔（用卡片底色製造縫）
+              paddingAll: GAP_PX + "px",               // ★ 間隔厚度
               contents: [
-                { type: "filler" },
                 {
-                  type: "text",
-                  text: String(cell.type),
-                  weight: "bold",
-                  align: "center",
-                  size: PIECE_TEXT_SIZE,
-                  color: pieceColor
-                },
-                { type: "filler" }
+                  type: "box",
+                  layout: "vertical",
+                  width: "100%",
+                  height: "100%",
+                  cornerRadius: "999px",
+                  backgroundColor: pieceColor,         // ★ 內圈顏色（同字色）
+                  paddingAll: INNER_RING_PX + "px",    // ★ 內圈粗度
+                  contents: [
+                    {
+                      type: "box",
+                      layout: "vertical",
+                      width: "100%",
+                      height: "100%",
+                      cornerRadius: "999px",
+                      backgroundColor: "#FFFFFF",      // ★ 棋面底色（白底）
+                      contents: [
+                        { type: "filler" },
+                        {
+                          type: "text",
+                          text: String(cell.type),
+                          weight: "bold",
+                          align: "center",
+                          size: PIECE_TEXT_SIZE,
+                          color: pieceColor            // ★ 字色與圓圈同色
+                        },
+                        { type: "filler" }
+                      ]
+                    }
+                  ]
+                }
               ]
             }
           ]
@@ -1186,11 +1215,7 @@
             const flex = buildFlexMessage(urlParams);
             if (!flex) return;
             try {
-              if (liff?.isInClient?.()) {
-                await liff.sendMessages([flex]);
-                printLog("sendMessages 成功");
-                liff.closeWindow();
-              } else if (liff.isApiAvailable('shareTargetPicker')) {
+              if (liff.isApiAvailable('shareTargetPicker')) {
                 await liff.shareTargetPicker([flex]);
                 alert("已分享");
               } else {
