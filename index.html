@@ -498,7 +498,7 @@
     /** 2007906926-NZW6EQ7P Production **/
     /** 2007931033-4D50LqwM Dev **/
     const LIFF_ID = "2007931033-4D50LqwM";
-    const APP_VERSION = "v1.0.10";
+    const APP_VERSION = "v1.0.11";
     const LINE_ID = "@968noswo"; // 你的官方帳號 ID（@ 開頭）
 
     /** ******************************
@@ -1100,12 +1100,17 @@
             layout: "vertical",
             spacing: "sm",
             contents: [
-              { type: "text", text: "Anan Universe Station Generated.", size: "xxs", color: "#9ca3af", align: "end" },
-              { type: "text", text: "你也有不會算療癒分數的困擾?", size: "md", color: "#4169E1", align: "center" },
+              { type: "text", text: "@968noswo Generated.", size: "xxs", color: "#9ca3af", align: "end" },
+              { type: "separator", margin: "md" },
+              { type: "text", text: "試試象卦AI療癒算分?", weight: "bold", size: "md", color: "#4169E1", align: "center" },
+              { type: "separator", margin: "md" },
               {
                 type: "button",
-                style: "primary",
-                action: { type: "uri", label: "試試象卦AI療癒算分", uri: `https://liff.line.me/${LIFF_ID}` }
+                action: {
+                  type: "uri",
+                  label: "前往",
+                  uri: "line://ti/p/@968noswo"
+                }
               }
             ]
           }
