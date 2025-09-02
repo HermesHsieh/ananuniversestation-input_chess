@@ -498,7 +498,7 @@
     /** 2007906926-NZW6EQ7P Production **/
     /** 2007931033-4D50LqwM Dev **/
     const LIFF_ID = "2007931033-4D50LqwM";
-    const APP_VERSION = "v1.0.6";
+    const APP_VERSION = "v1.0.7";
     const LINE_ID = "@968noswo"; // 你的官方帳號 ID（@ 開頭）
 
     /** ******************************
@@ -920,7 +920,9 @@
       document.body.insertAdjacentHTML('beforeend', `<p>取得的 parameter: baseScore = ${baseScore}</p>`);
       document.body.insertAdjacentHTML('beforeend', `<p>取得的 parameter: penaltyScroe = ${penaltyScroe}</p>`);
 
-      const create = [1, 2, 3, 4, 5].map(i => picks[i] = createPiece(chessText.charAt(i)));
+      for(let i = 1; i < 6; i++) {
+        picks[i] = createPiece(chessText.charAt(i))
+      }
 
       const cells = [1, 2, 3, 4, 5].map(i => picks[i]);
       if (cells.some(x => !x)) { alert("請先選滿 5 格再送出。"); return null; }
