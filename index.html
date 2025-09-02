@@ -424,6 +424,8 @@
 
     /* 棋子格子的紅色／黑色外框 */
     .share-board .cell.red {
+      width: 32px;
+      height: 32px;
       border: 2px solid #d32f2f;
       /* 紅色外框 */
       box-shadow: 0 0 4px rgba(211, 47, 47, 0.6);
@@ -431,62 +433,12 @@
     }
 
     .share-board .cell.black {
+      width: 32px;
+      height: 32px;
       border: 2px solid #111;
       /* 黑色外框 */
       box-shadow: 0 0 4px rgba(0, 0, 0, 0.5);
       /* 可選：黑色陰影 */
-    }
-
-    /* ✅ 調整唯讀棋盤上的棋子圓圈大小（不改 HTML） */
-    .share-board {
-      --piece-size: 36px;
-      /* ← 想再小一點就改這裡，例如 32px */
-      --piece-font: 18px;
-      /* ← 圓圈裡字的大小 */
-      --ring: 2px;
-      /* ← 圓圈邊框粗細 */
-    }
-
-    /* 讓 span 長得像一顆圓形棋子（縮小版） */
-    .share-board .cell {
-      position: relative;
-      /* 若先前把外框畫在 cell 上，建議保留為淡色，避免和圓圈重疊太搶戲 */
-      /* border-color: #e5e7eb; */
-    }
-
-    .share-board .cell>span {
-      width: var(--piece-size);
-      height: var(--piece-size);
-      border-radius: 50%;
-      border: var(--ring) solid #9ca3af;
-      /* 預設淡灰色圓圈 */
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      font-size: var(--piece-font);
-      line-height: 1;
-      background: #fff;
-    }
-
-    /* 依棋子顏色切換圓圈顏色（外框＋字色） */
-    .share-board .cell.red>span {
-      border-color: #d32f2f;
-      color: #d32f2f;
-    }
-
-    .share-board .cell.black>span {
-      border-color: #111111;
-      color: #111111;
-    }
-
-    /* 可選：略微縮小格子的間距，讓比例更緊湊 */
-    .share-board .grid {
-      gap: 8px;
-    }
-
-    /* 你現有的 poslabel 可以保留；若覺得擠，可把字再小一點 */
-    .share-board .poslabel {
-      font-size: 14px;
     }
   </style>
 </head>
@@ -655,7 +607,7 @@
     /** 2007906926-NZW6EQ7P Production **/
     /** 2007931033-4D50LqwM Dev **/
     const LIFF_ID = "2007931033-4D50LqwM";
-    const APP_VERSION = "v1.0.23";
+    const APP_VERSION = "v1.0.24";
     const LINE_ID = "@968noswo"; // 你的官方帳號 ID（@ 開頭）
 
     /** ******************************
