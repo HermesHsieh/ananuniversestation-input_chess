@@ -421,6 +421,21 @@
       color: #aaa;
       margin-top: 2px;
     }
+
+    /* 棋子格子的紅色／黑色外框 */
+    .share-board .cell.red {
+      border: 2px solid #d32f2f;
+      /* 紅色外框 */
+      box-shadow: 0 0 4px rgba(211, 47, 47, 0.6);
+      /* 可選：紅色陰影 */
+    }
+
+    .share-board .cell.black {
+      border: 2px solid #111;
+      /* 黑色外框 */
+      box-shadow: 0 0 4px rgba(0, 0, 0, 0.5);
+      /* 可選：黑色陰影 */
+    }
   </style>
 </head>
 
@@ -536,23 +551,21 @@
         <div class="grid">
           <div></div>
           <div class="cell ro" id="spos4"><span>4</span>
-            <div class="poslabel">↑</div>
+            <div class="poslabel">4</div>
           </div>
           <div></div>
-
           <div class="cell ro" id="spos2"><span>2</span>
-            <div class="poslabel">←</div>
+            <div class="poslabel">2</div>
           </div>
           <div class="cell ro" id="spos1"><span>1</span>
-            <div class="poslabel">中心</div>
+            <div class="poslabel">1</div>
           </div>
           <div class="cell ro" id="spos3"><span>3</span>
-            <div class="poslabel">→</div>
+            <div class="poslabel">3</div>
           </div>
-
           <div></div>
           <div class="cell ro" id="spos5"><span>5</span>
-            <div class="poslabel">↓</div>
+            <div class="poslabel">5</div>
           </div>
           <div></div>
         </div>
@@ -590,7 +603,7 @@
     /** 2007906926-NZW6EQ7P Production **/
     /** 2007931033-4D50LqwM Dev **/
     const LIFF_ID = "2007931033-4D50LqwM";
-    const APP_VERSION = "v1.0.21";
+    const APP_VERSION = "v1.0.22";
     const LINE_ID = "@968noswo"; // 你的官方帳號 ID（@ 開頭）
 
     /** ******************************
