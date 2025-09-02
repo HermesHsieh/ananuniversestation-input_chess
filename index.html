@@ -539,7 +539,7 @@
     /** 2007906926-NZW6EQ7P Production **/
     /** 2007931033-4D50LqwM Dev **/
     const LIFF_ID = "2007931033-4D50LqwM";
-    const APP_VERSION = "v1.0.14";
+    const APP_VERSION = "v1.0.15";
     const LINE_ID = "@968noswo"; // 你的官方帳號 ID（@ 開頭）
 
     /** ******************************
@@ -1259,28 +1259,28 @@
           document.body.insertAdjacentHTML('beforeend', `<p>取得的 parameter: auto = ${auto}</p>`);
           document.body.insertAdjacentHTML('beforeend', `<p>取得的 parameter: baseScore = ${baseScore}</p>`);
           document.body.insertAdjacentHTML('beforeend', `<p>取得的 parameter: penaltyScroe = ${penaltyScroe}</p>`);
-          // 這邊可用 uuid 去呼叫 Google Sheets API 查詢資料
-          if (action === 'share') {
-            const flex = buildFlexMessage(urlParams);
-            if (!flex) return;
-            try {
-              if (liff.isApiAvailable('shareTargetPicker')) {
-                await liff.shareTargetPicker([flex]);
-                alert("已分享");
-                liff.closeWindow();
-              } else {
-                alert("請在 LINE 內開啟此 LIFF 頁面再送出。");
-              }
-            } catch (e) {
-              const msg = (e?.message || e || '').toString();
-              if ((msg.includes('scope') || msg.includes('not in LIFF app scope')) && liff.isApiAvailable('shareTargetPicker')) {
-                await liff.shareTargetPicker([flex]);
-                alert("尚未授權 chat_message.write，已改用分享送出");
-              } else {
-                alert("sendMessages 失敗：" + msg);
-              }
-            }
-          }
+
+          // if (action === 'share') {
+          //   const flex = buildFlexMessage(urlParams);
+          //   if (!flex) return;
+          //   try {
+          //     if (liff.isApiAvailable('shareTargetPicker')) {
+          //       await liff.shareTargetPicker([flex]);
+          //       alert("已分享");
+          //       liff.closeWindow();
+          //     } else {
+          //       alert("請在 LINE 內開啟此 LIFF 頁面再送出。");
+          //     }
+          //   } catch (e) {
+          //     const msg = (e?.message || e || '').toString();
+          //     if ((msg.includes('scope') || msg.includes('not in LIFF app scope')) && liff.isApiAvailable('shareTargetPicker')) {
+          //       await liff.shareTargetPicker([flex]);
+          //       alert("尚未授權 chat_message.write，已改用分享送出");
+          //     } else {
+          //       alert("sendMessages 失敗：" + msg);
+          //     }
+          //   }
+          // }
         } else {
           document.body.insertAdjacentHTML('beforeend', '<p>沒有收到 parameter 參數</p>');
         }
