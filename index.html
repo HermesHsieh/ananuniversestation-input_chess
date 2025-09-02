@@ -498,7 +498,7 @@
     /** 2007906926-NZW6EQ7P Production **/
     /** 2007931033-4D50LqwM Dev **/
     const LIFF_ID = "2007931033-4D50LqwM";
-    const APP_VERSION = "v1.0.12";
+    const APP_VERSION = "v1.0.13";
     const LINE_ID = "@968noswo"; // 你的官方帳號 ID（@ 開頭）
 
     /** ******************************
@@ -1101,9 +1101,9 @@
             spacing: "sm",
             contents: [
               { type: "text", text: "@968noswo Generated.", size: "xxs", color: "#9ca3af", align: "end" },
-              { type: "text", text: " ", size: "md" },
+              { type: "text", text: " ", size: "xs" },
               { type: "text", text: "試試象卦AI療癒算分?", weight: "bold", size: "md", color: "#4169E1", align: "center" },
-              { type: "text", text: " ", size: "md" },
+              { type: "text", text: " ", size: "xs" },
               {
                 type: "button",
                 style: "primary",
@@ -1224,6 +1224,7 @@
               if (liff.isApiAvailable('shareTargetPicker')) {
                 await liff.shareTargetPicker([flex]);
                 alert("已分享");
+                liff.closeWindow();
               } else {
                 alert("請在 LINE 內開啟此 LIFF 頁面再送出。");
               }
