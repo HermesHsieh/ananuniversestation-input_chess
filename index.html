@@ -539,7 +539,7 @@
     /** 2007906926-NZW6EQ7P Production **/
     /** 2007931033-4D50LqwM Dev **/
     const LIFF_ID = "2007931033-4D50LqwM";
-    const APP_VERSION = "v1.0.16";
+    const APP_VERSION = "v1.0.17";
     const LINE_ID = "@968noswo"; // 你的官方帳號 ID（@ 開頭）
 
     /** ******************************
@@ -1218,6 +1218,7 @@
       applyElderMode(on);
     });
 
+    let gUrlParams = null; // 儲存 URL 參數物件
 
     // ====== 初始化 LIFF ======
     (async () => {
@@ -1241,6 +1242,7 @@
 
         // 取得網址參數
         const urlParams = new URLSearchParams(window.location.search);
+        gUrlParams = urlParams; // 儲存起來給其他函式用
         const action = urlParams.get('a'); // 取得 action 參數 share
         const parameter = urlParams.get('p'); // 取得 parameter 參數 5cg
         const chessText = urlParams.get('c'); // 取得 5 chess text 參數
@@ -1252,15 +1254,15 @@
         const penaltyScroe = urlParams.get('ps'); // 取得 penalty score 參數
 
         if (parameter === '5cg' && chessText && chessText.length === 5) {
-          document.body.insertAdjacentHTML('beforeend', `<p>取得的 parameter: action = ${action}</p>`);
-          document.body.insertAdjacentHTML('beforeend', `<p>取得的 parameter: parameter = ${parameter}</p>`);
-          document.body.insertAdjacentHTML('beforeend', `<p>取得的 parameter: chessText = ${chessText}</p>`);
-          document.body.insertAdjacentHTML('beforeend', `<p>取得的 parameter: titleName = ${titleName}</p>`);
-          document.body.insertAdjacentHTML('beforeend', `<p>取得的 parameter: cVersion = ${cVersion}</p>`);
-          document.body.insertAdjacentHTML('beforeend', `<p>取得的 parameter: createTime = ${createTime}</p>`);
-          document.body.insertAdjacentHTML('beforeend', `<p>取得的 parameter: auto = ${auto}</p>`);
-          document.body.insertAdjacentHTML('beforeend', `<p>取得的 parameter: baseScore = ${baseScore}</p>`);
-          document.body.insertAdjacentHTML('beforeend', `<p>取得的 parameter: penaltyScroe = ${penaltyScroe}</p>`);
+          // document.body.insertAdjacentHTML('beforeend', `<p>取得的 parameter: action = ${action}</p>`);
+          // document.body.insertAdjacentHTML('beforeend', `<p>取得的 parameter: parameter = ${parameter}</p>`);
+          // document.body.insertAdjacentHTML('beforeend', `<p>取得的 parameter: chessText = ${chessText}</p>`);
+          // document.body.insertAdjacentHTML('beforeend', `<p>取得的 parameter: titleName = ${titleName}</p>`);
+          // document.body.insertAdjacentHTML('beforeend', `<p>取得的 parameter: cVersion = ${cVersion}</p>`);
+          // document.body.insertAdjacentHTML('beforeend', `<p>取得的 parameter: createTime = ${createTime}</p>`);
+          // document.body.insertAdjacentHTML('beforeend', `<p>取得的 parameter: auto = ${auto}</p>`);
+          // document.body.insertAdjacentHTML('beforeend', `<p>取得的 parameter: baseScore = ${baseScore}</p>`);
+          // document.body.insertAdjacentHTML('beforeend', `<p>取得的 parameter: penaltyScroe = ${penaltyScroe}</p>`);
 
           // if (action === 'share') {
           //   const flex = buildFlexMessage(urlParams);
@@ -1305,19 +1307,10 @@
 
     // ===== 分享模式：參數解析與 UI 切換 =====
     (function setupShareModePanel() {
-      // 取得網址參數
-      const urlParams = new URLSearchParams(window.location.search);
-      const action = urlParams.get('a'); // 取得 action 參數 share
-      const parameter = urlParams.get('p'); // 取得 parameter 參數 5cg
-      const chessText = urlParams.get('c'); // 取得 5 chess text 參數
-      const titleName = urlParams.get('n'); // 取得 name (title) 參數
-      const cVersion = urlParams.get('v'); // 取得 version 參數
-      const createTime = urlParams.get('tm'); // 取得 create time 參數
-      const auto = urlParams.get('at'); // 取得 是否為 auto 參數
-      const baseScore = urlParams.get('bs'); // 取得 base score 參數
-      const penaltyScroe = urlParams.get('ps'); // 取得 penalty score 參數
-
-      const isShareMode = action === 'share';
+      const qs = new URLSearchParams(location.search);
+      const actionA = qs.get('a');      // 既有參數：a=share
+      const actionB = qs.get('action'); // 新參數：action=share
+      const isShareMode = (actionA === 'share' || actionB === 'share');
 
       // 兩個容器：主畫面 & 分享畫面
       const mainEl = document.getElementById('mainContent');
@@ -1405,8 +1398,7 @@
       }
 
       async function doShare() {
-        const urlParams = new URLSearchParams(window.location.search);
-        const flex = buildFlexMessage(urlParams, chkTitle.checked, chkScore.checked);
+        const flex = buildFlexMessage(gUrlParams, chkTitle.checked, chkScore.checked);
         if (!flex) return;
         try {
           if (liff.isApiAvailable('shareTargetPicker')) {
