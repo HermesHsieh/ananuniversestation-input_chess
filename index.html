@@ -637,7 +637,7 @@
     /** 2007906926-NZW6EQ7P Production **/
     /** 2007931033-4D50LqwM Dev **/
     const LIFF_ID = "2007931033-4D50LqwM";
-    const APP_VERSION = "v1.0.26";
+    const APP_VERSION = "v1.0.27";
     const LINE_ID = "@968noswo"; // 你的官方帳號 ID（@ 開頭）
 
     /** ******************************
@@ -1506,7 +1506,6 @@
         try {
           if (liff.isApiAvailable('shareTargetPicker')) {
             await liff.shareTargetPicker([flex]);
-            alert("已分享");
             liff.closeWindow();
           } else {
             alert("請在 LINE 內開啟此 LIFF 頁面再送出。");
