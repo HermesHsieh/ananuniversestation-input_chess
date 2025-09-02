@@ -539,7 +539,7 @@
     /** 2007906926-NZW6EQ7P Production **/
     /** 2007931033-4D50LqwM Dev **/
     const LIFF_ID = "2007931033-4D50LqwM";
-    const APP_VERSION = "v1.0.15";
+    const APP_VERSION = "v1.0.16";
     const LINE_ID = "@968noswo"; // 你的官方帳號 ID（@ 開頭）
 
     /** ******************************
@@ -896,7 +896,7 @@
     }
 
     // ====== Flex 送出 ======
-    function buildFlexMessage(urlParams) {
+    function buildFlexMessage(urlParams, showTitle, showScore) {
       // 取得網址參數
       const action = urlParams.get('a'); // 取得 action 參數 share
       const parameter = urlParams.get('p'); // 取得 parameter 參數 5cg
@@ -962,6 +962,8 @@
       document.body.insertAdjacentHTML('beforeend', `<p>取得的 parameter: auto = ${auto}</p>`);
       document.body.insertAdjacentHTML('beforeend', `<p>取得的 parameter: baseScore = ${baseScore}</p>`);
       document.body.insertAdjacentHTML('beforeend', `<p>取得的 parameter: penaltyScroe = ${penaltyScroe}</p>`);
+      document.body.insertAdjacentHTML('beforeend', `<p>取得的 parameter: showTitle = ${showTitle}</p>`);
+      document.body.insertAdjacentHTML('beforeend', `<p>取得的 parameter: showScore = ${showScore}</p>`);
 
       for (let i = 0; i < 5; i++) {
         document.body.insertAdjacentHTML('beforeend', `<p>chess[${i}] text = ${chessText.charAt(i)}</p>`);
@@ -1303,10 +1305,19 @@
 
     // ===== 分享模式：參數解析與 UI 切換 =====
     (function setupShareModePanel() {
-      const qs = new URLSearchParams(location.search);
-      const actionA = qs.get('a');      // 既有參數：a=share
-      const actionB = qs.get('action'); // 新參數：action=share
-      const isShareMode = (actionA === 'share' || actionB === 'share');
+      // 取得網址參數
+      const urlParams = new URLSearchParams(window.location.search);
+      const action = urlParams.get('a'); // 取得 action 參數 share
+      const parameter = urlParams.get('p'); // 取得 parameter 參數 5cg
+      const chessText = urlParams.get('c'); // 取得 5 chess text 參數
+      const titleName = urlParams.get('n'); // 取得 name (title) 參數
+      const cVersion = urlParams.get('v'); // 取得 version 參數
+      const createTime = urlParams.get('tm'); // 取得 create time 參數
+      const auto = urlParams.get('at'); // 取得 是否為 auto 參數
+      const baseScore = urlParams.get('bs'); // 取得 base score 參數
+      const penaltyScroe = urlParams.get('ps'); // 取得 penalty score 參數
+
+      const isShareMode = action === 'share';
 
       // 兩個容器：主畫面 & 分享畫面
       const mainEl = document.getElementById('mainContent');
@@ -1394,21 +1405,25 @@
       }
 
       async function doShare() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const flex = buildFlexMessage(urlParams, chkTitle.checked, chkScore.checked);
+        if (!flex) return;
         try {
-          await ensureLiff();
-          const text = buildShareText();
-          if (liff.isInClient() && await liff.canShareTargetPicker()) {
-            await liff.shareTargetPicker([{ type: 'text', text }]);
-            alert('已嘗試送出分享！');
-          } else if (liff.isInClient()) {
-            await liff.sendMessages([{ type: 'text', text }]);
-            alert('已發送訊息！');
+          if (liff.isApiAvailable('shareTargetPicker')) {
+            await liff.shareTargetPicker([flex]);
+            alert("已分享");
+            liff.closeWindow();
           } else {
-            alert('請在 LINE App 內開啟本頁以使用分享功能。');
+            alert("請在 LINE 內開啟此 LIFF 頁面再送出。");
           }
-        } catch (err) {
-          console.error(err);
-          alert('分享失敗：' + (err?.message || String(err)));
+        } catch (e) {
+          const msg = (e?.message || e || '').toString();
+          if ((msg.includes('scope') || msg.includes('not in LIFF app scope')) && liff.isApiAvailable('shareTargetPicker')) {
+            await liff.shareTargetPicker([flex]);
+            alert("尚未授權 chat_message.write，已改用分享送出");
+          } else {
+            alert("sendMessages 失敗：" + msg);
+          }
         }
       }
 
