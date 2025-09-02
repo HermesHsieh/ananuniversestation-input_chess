@@ -399,8 +399,8 @@
 
     /* ✅ 分享面板內的唯讀棋盤（小一號、不可點） */
     .share-board .grid {
-      gap: 10px;
-      margin: 8px 0 12px;
+      gap: 20px;
+      margin: 4px 0 12px;
     }
 
     .share-board .cell {
@@ -422,23 +422,59 @@
       margin-top: 2px;
     }
 
-    /* 棋子格子的紅色／黑色外框 */
+    /* 確保棋子格子是圓形，並可放內圈 */
+    .share-board .cell {
+      position: relative;
+      border-radius: 50%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      /* 若想更穩定等比：*/
+      /* aspect-ratio: 1 / 1; */
+    }
+
+    .share-board .cell>* {
+      position: relative;
+      z-index: 1;
+    }
+
+    /* 內容在內圈之上 */
+
+    /* 棋子格子的紅色／黑色外框（外圈） */
     .share-board .cell.red {
-      width: 32px;
-      height: 32px;
-      border: 2px solid #d32f2f;
-      /* 紅色外框 */
+      border: 5px solid #d32f2f;
+      color: #d32f2f;
+      font-size: 68px;
       box-shadow: 0 0 4px rgba(211, 47, 47, 0.6);
-      /* 可選：紅色陰影 */
     }
 
     .share-board .cell.black {
-      width: 32px;
-      height: 32px;
-      border: 2px solid #111;
-      /* 黑色外框 */
+      border: 5px solid #111;
+      color: #111;
+      font-size: 68px;
       box-shadow: 0 0 4px rgba(0, 0, 0, 0.5);
-      /* 可選：黑色陰影 */
+    }
+
+    /* 兩個可調參數：內圈離外圈間距、內圈線寬 */
+    .share-board {
+      --inner-gap: 5px;
+      --inner-width: 3px;
+    }
+
+    .share-board .cell.red::after,
+    .share-board .cell.black::after {
+      content: "";
+      position: absolute;
+      top: var(--inner-gap);
+      right: var(--inner-gap);
+      bottom: var(--inner-gap);
+      left: var(--inner-gap);
+      border: var(--inner-width) solid currentColor;
+      /* ✅ 同外圈顏色 */
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 0;
+      /* 在內容下方 */
     }
   </style>
 </head>
@@ -549,27 +585,21 @@
     <div class="status">設定要分享的內容，按下「分享」送出</div>
 
     <div class="card" role="region" aria-label="選項">
-      <div class="card-title">要顯示什麼？</div>
       <!-- ✅ 唯讀十字棋盤（顯示剛剛要分享的 1-5 棋子），不可操作 -->
       <div id="shareBoard" class="share-board" aria-label="分享棋盤（唯讀）">
         <div class="grid">
           <div></div>
           <div class="cell ro" id="spos4"><span>4</span>
-            <div class="poslabel">4</div>
           </div>
           <div></div>
           <div class="cell ro" id="spos2"><span>2</span>
-            <div class="poslabel">2</div>
           </div>
           <div class="cell ro" id="spos1"><span>1</span>
-            <div class="poslabel">1</div>
           </div>
           <div class="cell ro" id="spos3"><span>3</span>
-            <div class="poslabel">3</div>
           </div>
           <div></div>
           <div class="cell ro" id="spos5"><span>5</span>
-            <div class="poslabel">5</div>
           </div>
           <div></div>
         </div>
@@ -607,7 +637,7 @@
     /** 2007906926-NZW6EQ7P Production **/
     /** 2007931033-4D50LqwM Dev **/
     const LIFF_ID = "2007931033-4D50LqwM";
-    const APP_VERSION = "v1.0.24";
+    const APP_VERSION = "v1.0.25";
     const LINE_ID = "@968noswo"; // 你的官方帳號 ID（@ 開頭）
 
     /** ******************************
