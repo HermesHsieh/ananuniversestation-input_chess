@@ -590,7 +590,7 @@
     /** 2007906926-NZW6EQ7P Production **/
     /** 2007931033-4D50LqwM Dev **/
     const LIFF_ID = "2007931033-4D50LqwM";
-    const APP_VERSION = "v1.0.20";
+    const APP_VERSION = "v1.0.21";
     const LINE_ID = "@968noswo"; // 你的官方帳號 ID（@ 開頭）
 
     /** ******************************
@@ -1257,7 +1257,11 @@
     }
 
     // ✅ 依主畫面的 picks，將棋子顯示到分享面板的唯讀棋盤
-    function renderShareBoardFromPicks() {
+    function renderShareBoardFromPicks(chessText) {
+      for (let i = 0; i < 5; i++) {
+        let nextI = i + 1;
+        picks[nextI] = createPiece(chessText.charAt(i));
+      }
       const idMap = { 1: 'spos1', 2: 'spos2', 3: 'spos3', 4: 'spos4', 5: 'spos5' };
       for (let i = 1; i <= 5; i++) {
         const el = document.getElementById(idMap[i]);
@@ -1393,6 +1397,7 @@
       const qs = new URLSearchParams(location.search);
       const actionA = qs.get('a');      // 既有參數：a=share
       const actionB = qs.get('action'); // 新參數：action=share
+      const chessText = qs.get('c'); // 新參數：c=XXXXX
       const isShareMode = (actionA === 'share' || actionB === 'share');
 
       // 兩個容器：主畫面 & 分享畫面
@@ -1408,7 +1413,7 @@
       shareEl.classList.remove('hidden');
 
       // ✅ 顯示唯讀棋盤內容
-      renderShareBoardFromPicks();
+      renderShareBoardFromPicks(chessText);
 
       // ==== 預設值：從網址或目前狀態帶入 ====
       const chkTitle = document.getElementById('chkTitle');
