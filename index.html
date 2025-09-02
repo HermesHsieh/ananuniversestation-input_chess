@@ -444,14 +444,14 @@
     .share-board .cell.red {
       border: 5px solid #d32f2f;
       color: #d32f2f;
-      font-size: 68px;
+      font-size: 48px;
       box-shadow: 0 0 4px rgba(211, 47, 47, 0.6);
     }
 
     .share-board .cell.black {
       border: 5px solid #111;
       color: #111;
-      font-size: 68px;
+      font-size: 48px;
       box-shadow: 0 0 4px rgba(0, 0, 0, 0.5);
     }
 
@@ -637,7 +637,7 @@
     /** 2007906926-NZW6EQ7P Production **/
     /** 2007931033-4D50LqwM Dev **/
     const LIFF_ID = "2007931033-4D50LqwM";
-    const APP_VERSION = "v1.0.25";
+    const APP_VERSION = "v1.0.26";
     const LINE_ID = "@968noswo"; // 你的官方帳號 ID（@ 開頭）
 
     /** ******************************
@@ -1051,26 +1051,10 @@
 
       // 將分數曝露到全域，分享面板可自動帶入
       window.latestHealingScore = finalScoreText;
-      document.body.insertAdjacentHTML('beforeend', `<p>取得的 parameter: action = ${action}</p>`);
-      document.body.insertAdjacentHTML('beforeend', `<p>取得的 parameter: parameter = ${parameter}</p>`);
-      document.body.insertAdjacentHTML('beforeend', `<p>取得的 parameter: chessText = ${chessText}</p>`);
-      document.body.insertAdjacentHTML('beforeend', `<p>取得的 parameter: titleName = ${titleName}</p>`);
-      document.body.insertAdjacentHTML('beforeend', `<p>取得的 parameter: cVersion = ${cVersion}</p>`);
-      document.body.insertAdjacentHTML('beforeend', `<p>取得的 parameter: createTime = ${createTime}</p>`);
-      document.body.insertAdjacentHTML('beforeend', `<p>取得的 parameter: auto = ${auto}</p>`);
-      document.body.insertAdjacentHTML('beforeend', `<p>取得的 parameter: baseScore = ${baseScore}</p>`);
-      document.body.insertAdjacentHTML('beforeend', `<p>取得的 parameter: penaltyScroe = ${penaltyScroe}</p>`);
-      document.body.insertAdjacentHTML('beforeend', `<p>取得的 parameter: showTitle = ${showTitle}</p>`);
-      document.body.insertAdjacentHTML('beforeend', `<p>取得的 parameter: showScore = ${showScore}</p>`);
-
+      
       for (let i = 0; i < 5; i++) {
-        document.body.insertAdjacentHTML('beforeend', `<p>chess[${i}] text = ${chessText.charAt(i)}</p>`);
-        document.body.insertAdjacentHTML('beforeend', `<p>create piece[${i}] = ${createPiece(chessText.charAt(i))}</p>`);
-
         let nextI = i + 1;
         picks[nextI] = createPiece(chessText.charAt(i));
-
-        document.body.insertAdjacentHTML('beforeend', `<p>pick[${nextI}] = ${picks[nextI]}</p>`);
       }
 
       const cells = [1, 2, 3, 4, 5].map(i => picks[i]);
@@ -1288,7 +1272,7 @@
           liff.closeWindow();
         } else if (liff.isApiAvailable('shareTargetPicker')) {
           await liff.shareTargetPicker([flex]);
-          alert("已分享");
+          liff.closeWindow();
         } else {
           alert("請在 LINE 內開啟此 LIFF 頁面再送出。");
         }
@@ -1420,7 +1404,7 @@
           //   }
           // }
         } else {
-          document.body.insertAdjacentHTML('beforeend', '<p>沒有收到 parameter 參數</p>');
+          // document.body.insertAdjacentHTML('beforeend', '<p>沒有收到 parameter 參數</p>');
         }
 
       } catch (err) {
