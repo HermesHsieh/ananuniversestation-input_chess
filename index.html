@@ -482,7 +482,7 @@
 <body>
   <div id="refreshIndicator">下拉刷新</div>
 
-  <div id="mainContent">
+  <div id="mainContent" class="wrap hidden" aria-label="五子棋顯示區">
     <div class="wrap">
       <div class="topbar">
         <div class="title">單卦</div>
@@ -637,7 +637,7 @@
     /** 2007906926-NZW6EQ7P Production **/
     /** 2007931033-4D50LqwM Dev **/
     const LIFF_ID = "2007931033-4D50LqwM";
-    const APP_VERSION = "v1.0.30";
+    const APP_VERSION = "v1.0.31";
     const LINE_ID = "@968noswo"; // 你的官方帳號 ID（@ 開頭）
 
     /** ******************************
@@ -1419,10 +1419,6 @@
 
     // 隱藏日誌輸出區域
     document.getElementById("logOutput").classList.add("hidden");
-
-    // 兩個容器：主畫面 & 分享畫面
-    document.getElementById('mainContent').classList.add("hidden");
-    document.getElementById('shareContent').classList.add("hidden");
 
     initElderMode();
     // 初次渲染
