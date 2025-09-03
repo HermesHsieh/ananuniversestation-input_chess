@@ -523,13 +523,43 @@
         </div>
 
         <div class="controls">
-          <button class="btn btn-secondary" id="randomBtn">隨機</button>
-          <button class="btn btn-primary" id="sendBtn">送出</button>
-          <button class="btn btn-secondary" id="clearBtn">清除</button>
+          <button class="btn btn-secondary" style="width:130px;margin-left:6px;margin-right:6px;"
+            id="randomBtn">隨機</button>
+          <button class="btn btn-primary" style="width:130px;margin-left:6px;margin-right:6px;" id="sendBtn">送出</button>
+          <button class="btn btn-secondary" style="width:130px;margin-left:6px;margin-right:6px;"
+            id="clearBtn">清除</button>
         </div>
 
-        <div class="hint" style="text-align: left;">點選下方棋子，系統會依序放入：1 → 2 → 3 → 4 → 5</div>
-        <div class="hint" style="text-align: left;">點選「指定位置」→ 再點下方棋子</div>
+        <!-- 棋子選擇（黑在上、紅在下） -->
+        <div class="pieces">
+          <div class="picker-wrap">
+            <div class="picker-grid" id="pickerGrid" aria-label="棋子選擇（7×2，可左右滑動）">
+              <div class="row" style="margin-bottom:12px;margin-top:12px;">
+                <!-- 黑國：將 士 象 車 馬 包 卒 -->
+                <button class="piece-btn black" data-piece="將">將</button>
+                <button class="piece-btn black" data-piece="士">士</button>
+                <button class="piece-btn black" data-piece="象">象</button>
+                <button class="piece-btn black" data-piece="車">車</button>
+                <button class="piece-btn black" data-piece="馬">馬</button>
+                <button class="piece-btn black" data-piece="包">包</button>
+                <button class="piece-btn black" data-piece="卒">卒</button>
+
+                <!-- 紅國：帥 仕 相 俥 傌 炮 兵 -->
+                <button class="piece-btn red" data-piece="帥">帥</button>
+                <button class="piece-btn red" data-piece="仕">仕</button>
+                <button class="piece-btn red" data-piece="相">相</button>
+                <button class="piece-btn red" data-piece="俥">俥</button>
+                <button class="piece-btn red" data-piece="傌">傌</button>
+                <button class="piece-btn red" data-piece="炮">炮</button>
+                <button class="piece-btn red" data-piece="兵">兵</button>
+              </div>
+              <div class="footer-pad"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="hint" style="text-align: left;">點選上方棋子，系統會依序放入：1 → 2 → 3 → 4 → 5</div>
+        <div class="hint" style="text-align: left;">點選「指定位置」→ 再點上方棋子</div>
         <div class="hint-box" style="display: flex; justify-content: space-between; align-items: center;">
           <div id="draw-mode" class="hint-version" style="text-align: left;">
             輸入方式：手動
@@ -538,34 +568,6 @@
           </div>
         </div>
 
-      </div>
-
-      <!-- 棋子選擇（黑在上、紅在下） -->
-      <div class="pieces">
-        <div class="picker-wrap">
-          <div class="picker-grid" id="pickerGrid" aria-label="棋子選擇（7×2，可左右滑動）">
-            <div class="row" style="margin-bottom:8px">
-              <!-- 黑國：將 士 象 車 馬 包 卒 -->
-              <button class="piece-btn black" data-piece="將">將</button>
-              <button class="piece-btn black" data-piece="士">士</button>
-              <button class="piece-btn black" data-piece="象">象</button>
-              <button class="piece-btn black" data-piece="車">車</button>
-              <button class="piece-btn black" data-piece="馬">馬</button>
-              <button class="piece-btn black" data-piece="包">包</button>
-              <button class="piece-btn black" data-piece="卒">卒</button>
-
-              <!-- 紅國：帥 仕 相 俥 傌 炮 兵 -->
-              <button class="piece-btn red" data-piece="帥">帥</button>
-              <button class="piece-btn red" data-piece="仕">仕</button>
-              <button class="piece-btn red" data-piece="相">相</button>
-              <button class="piece-btn red" data-piece="俥">俥</button>
-              <button class="piece-btn red" data-piece="傌">傌</button>
-              <button class="piece-btn red" data-piece="炮">炮</button>
-              <button class="piece-btn red" data-piece="兵">兵</button>
-            </div>
-            <div class="footer-pad"></div>
-          </div>
-        </div>
       </div>
 
       <div id="logOutput"
@@ -637,7 +639,7 @@
     /** 2007906926-NZW6EQ7P Production **/
     /** 2007931033-4D50LqwM Dev **/
     const LIFF_ID = "2007931033-4D50LqwM";
-    const APP_VERSION = "v1.0.31";
+    const APP_VERSION = "v1.0.32";
     const LINE_ID = "@968noswo"; // 你的官方帳號 ID（@ 開頭）
 
     /** ******************************
