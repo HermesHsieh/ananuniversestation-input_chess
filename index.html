@@ -637,7 +637,7 @@
     /** 2007906926-NZW6EQ7P Production **/
     /** 2007931033-4D50LqwM Dev **/
     const LIFF_ID = "2007931033-4D50LqwM";
-    const APP_VERSION = "v1.0.29";
+    const APP_VERSION = "v1.0.30";
     const LINE_ID = "@968noswo"; // 你的官方帳號 ID（@ 開頭）
 
     /** ******************************
@@ -1052,7 +1052,7 @@
 
       // 將分數曝露到全域，分享面板可自動帶入
       window.latestHealingScore = finalScoreText;
-      
+
       for (let i = 0; i < 5; i++) {
         let nextI = i + 1;
         picks[nextI] = createPiece(chessText.charAt(i));
@@ -1420,6 +1420,11 @@
     // 隱藏日誌輸出區域
     document.getElementById("logOutput").classList.add("hidden");
 
+
+    // 兩個容器：主畫面 & 分享畫面
+    document.getElementById('mainContent').classList.add("hidden");
+    document.getElementById('shareContent').classList.add("hidden");
+
     initElderMode();
     // 初次渲染
     render();
@@ -1437,7 +1442,10 @@
       const shareEl = document.getElementById('shareContent');
       const refreshEl = document.getElementById('refreshIndicator');
 
-      if (!isShareMode || !shareEl) return;
+      if (!isShareMode || !shareEl) {
+        mainEl.classList.remove('hidden');
+        return;
+      }
 
       // 隱藏原本所有畫面元件，只顯示分享面板
       if (mainEl) mainEl.classList.add('hidden');
