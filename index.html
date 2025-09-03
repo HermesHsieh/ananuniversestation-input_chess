@@ -172,10 +172,24 @@
 
     .controls {
       display: flex;
+      width: 100%;
       gap: 8px;
       justify-content: center;
       margin: 12px 0 8px;
       flex-wrap: wrap;
+    }
+
+    .controls button {
+      flex: 1;
+      /* 等分寬度 */
+      margin: 0 6px;
+      /* 左右外距維持間距 */
+      max-width: none;
+      /* 移除原來設定的 max-width 限制 */
+      width: auto;
+      /* 移除硬編寫寬度，使用 flex 覆蓋 */
+      box-sizing: border-box;
+      /* 計入內邊距和邊框 */
     }
 
     .btn {
@@ -523,11 +537,9 @@
         </div>
 
         <div class="controls">
-          <button class="btn btn-secondary" style="width:130px;margin-left:6px;margin-right:6px;"
-            id="randomBtn">隨機</button>
-          <button class="btn btn-primary" style="width:130px;margin-left:6px;margin-right:6px;" id="sendBtn">送出</button>
-          <button class="btn btn-secondary" style="width:130px;margin-left:6px;margin-right:6px;"
-            id="clearBtn">清除</button>
+          <button class="btn btn-secondary" id="randomBtn">隨機</button>
+          <button class="btn btn-primary" id="sendBtn">送出</button>
+          <button class="btn btn-secondary" id="clearBtn">清除</button>
         </div>
 
         <!-- 棋子選擇（黑在上、紅在下） -->
@@ -639,7 +651,7 @@
     /** 2007906926-NZW6EQ7P Production **/
     /** 2007931033-4D50LqwM Dev **/
     const LIFF_ID = "2007931033-4D50LqwM";
-    const APP_VERSION = "v1.0.32";
+    const APP_VERSION = "v1.0.33";
     const LINE_ID = "@968noswo"; // 你的官方帳號 ID（@ 開頭）
 
     /** ******************************
