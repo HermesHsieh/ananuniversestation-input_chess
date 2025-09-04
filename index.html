@@ -10,7 +10,7 @@
   <script defer src='https://static.cloudflareinsights.com/beacon.min.js'
     data-cf-beacon='{"token": "50bd6af270b7443b8b555db9457b093f"}'></script>
   <!-- End Cloudflare Web Analytics -->
-  
+
   <style>
     :root {
       --red: #d32f2f;
@@ -652,7 +652,7 @@
     /** 2007906926-NZW6EQ7P Production **/
     /** 2007931033-4D50LqwM Dev **/
     const LIFF_ID = "2007931033-4D50LqwM";
-    const APP_VERSION = "v1.0.3-41";
+    const APP_VERSION = "v1.0.3-42";
     const LINE_ID = "@968noswo"; // 你的官方帳號 ID（@ 開頭）
 
     /** ******************************
@@ -1395,22 +1395,22 @@
         setStatus("頁面初始化中…");
 
         // 1) 環境守門員：非手機 LINE 直接擋下，不做 init
-        // if (!isMobileLineUA()) {
-        //   const deeplink = buildDeeplink(LIFF_ID);
-        //   // 若你有遮罩 UI，這裡顯示並設定按鈕連結
-        //   const mask = document.getElementById("onlyInApp");
-        //   const openBtn = document.getElementById("openInLine");
-        //   if (openBtn) openBtn.href = deeplink;
-        //   if (mask) mask.classList.remove("hidden");
+        if (!isMobileLineUA()) {
+          const deeplink = buildDeeplink(LIFF_ID);
+          // 若你有遮罩 UI，這裡顯示並設定按鈕連結
+          const mask = document.getElementById("onlyInApp");
+          const openBtn = document.getElementById("openInLine");
+          if (openBtn) openBtn.href = deeplink;
+          if (mask) mask.classList.remove("hidden");
 
-        //   // 可選：自動嘗試跳轉回 LINE
-        //   try { location.href = deeplink; } catch (_) { }
+          // 可選：自動嘗試跳轉回 LINE
+          try { location.href = deeplink; } catch (_) { }
 
-        //   setStatus("請在手機 LINE 中開啟此頁面");
-        //   // 設記號，避免後續任何功能誤跑
-        //   window.__BLOCKED_OUT_OF_LINE__ = true;
-        //   return;
-        // }
+          setStatus("請在手機 LINE 中開啟此頁面");
+          // 設記號，避免後續任何功能誤跑
+          window.__BLOCKED_OUT_OF_LINE__ = true;
+          return;
+        }
 
         // 2) 真正初始化（僅此一次；關閉外部瀏覽器自動登入）
         await liff.init({ liffId: LIFF_ID, withLoginOnExternalBrowser: false });
