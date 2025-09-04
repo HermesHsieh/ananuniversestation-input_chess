@@ -651,7 +651,7 @@
     /** 2007906926-NZW6EQ7P Production **/
     /** 2007931033-4D50LqwM Dev **/
     const LIFF_ID = "2007931033-4D50LqwM";
-    const APP_VERSION = "v1.0.34";
+    const APP_VERSION = "v1.0.35";
     const LINE_ID = "@968noswo"; // 你的官方帳號 ID（@ 開頭）
 
     /** ******************************
@@ -1415,6 +1415,33 @@
       inputTitle.textContent = qs.get('n') || qs.get('title')
         || (document.getElementById('cardTitle')?.textContent?.trim() || '')
         || '';
+
+      // 接上現有分數邏輯：
+      // 1) 若網址給了 bs/ps（base / penalty），照既有規則推 finalScoreText
+      // 2) 否則讀全域 window.latestHealingScore / window.healingScore
+      // 3) 都沒有則留空（可手動輸入）
+      (function fillScoreFromState() {
+        const bs = qs.get('bs'), ps = qs.get('ps');
+        if (bs !== null && ps !== null) {
+          const base = Number(bs), pen = Number(ps);
+          if (!isNaN(base) && !isNaN(pen)) {
+            if (base < 60) {
+              inputScore.textContent = '需調整';
+            } else {
+              inputScore.textContent = String(base - pen) + '分';
+            }
+            return;
+          }
+        }
+        if (typeof window.latestHealingScore !== 'undefined' && window.latestHealingScore !== null) {
+          inputScore.textContent = String(window.latestHealingScore);
+          return;
+        }
+        if (typeof window.healingScore !== 'undefined' && window.healingScore !== null) {
+          inputScore.textContent = String(window.healingScore);
+          return;
+        }
+      })();
 
       if (qs.has('showTitle')) chkTitle.checked = qs.get('showTitle') !== '0';
       if (qs.has('showScore')) chkScore.checked = qs.get('showScore') !== '0';
