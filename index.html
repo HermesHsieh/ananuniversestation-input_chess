@@ -660,7 +660,7 @@
     /** 2007906926-NZW6EQ7P Production **/
     /** 2007931033-4D50LqwM Dev **/
     const LIFF_ID = "2007931033-4D50LqwM";
-    const APP_VERSION = "v1.0.36";
+    const APP_VERSION = "v1.0.37";
     const LINE_ID = "@968noswo"; // 你的官方帳號 ID（@ 開頭）
 
     /** ******************************
@@ -1347,18 +1347,57 @@
 
     let gUrlParams = null; // 儲存 URL 參數物件
 
+    // ✅ 最小守門員：只允許「手機 LINE App 內」打開
+    async function guardMobileLineOnly(liffId) {
+      try {
+        // 只為了拿 isInClient / getOS；禁用外部瀏覽器自動登入
+        await liff.init({ liffId, withLoginOnExternalBrowser: false });
+      } catch (_) { /* 重複 init 無妨 */ }
+
+      const inClient = !!(window.liff && liff.isInClient());
+      const os = window.liff ? liff.getOS() : 'web';  // 'ios' | 'android' | 'web'
+      const isMobileLine = inClient && (os === 'ios' || os === 'android');
+
+      if (!isMobileLine) {
+        // 引導回 LINE（會把目前的 querystring 一起帶回）
+        const deeplink = `line://app/${liffId}${location.search || ''}`;
+
+        // 若頁面有你之前做的遮罩按鈕，順手掛連結顯示
+        const mask = document.getElementById('onlyInApp');
+        const openBtn = document.getElementById('openInLine');
+        if (openBtn) openBtn.href = deeplink;
+        if (mask) mask.classList.remove('hidden');
+
+        // 也可直接嘗試跳轉
+        try { location.href = deeplink; } catch (_) { }
+
+        // 設置旗標，讓其他初始化邏輯一律停止
+        window.__BLOCKED_OUT_OF_LINE__ = true;
+        return false;
+      }
+      return true;
+    }
+
     // ====== 初始化 LIFF ======
     (async () => {
       try {
         statusEl.textContent = "頁面初始化中…";
-        // 初始化 LIFF 附帶自動登入外部瀏覽器用戶功能
-        await liff.init({ liffId: LIFF_ID, withLoginOnExternalBrowser: true });
+
+        // ★ 先做「只能在手機 LINE」的環境檢查
+        const ok = await guardMobileLineOnly(LIFF_ID);
+        if (!ok) {
+          statusEl.textContent = "請在手機 LINE 中開啟此頁面";
+          return; // ★ 直接停止，不做後續登入/渲染
+        }
+
+        // ★ 真正的初始化（關掉外部瀏覽器自動登入）
+        await liff.init({ liffId: LIFF_ID, withLoginOnExternalBrowser: false });
         printLog("頁面初始化成功");
 
-        // 檢查是否登入，未登入導向登入
+        // ★ 這裡一定是在 LINE App 內了，才允許登入
         if (!liff.isLoggedIn()) {
           statusEl.textContent = "未登入 → 導向登入";
-          await liff.login();  // 呼叫後會跳轉頁面，這邊後面程式碼不會繼續執行
+          await liff.login(); // 會跳轉，後面不會繼續
           return;
         }
 
@@ -1375,39 +1414,6 @@
         statusEl.textContent = `LIFF 初始化失敗：${err?.message || "unknown"}`;
       }
     })();
-
-    (async function guardInMobileLineOnly() {
-      const LIFF_ID = window.LIFF_ID || "2007931033-4D50LqwM";
-
-      // 已有初始化就不重複；沒有的話嘗試 init
-      try { if (!window.liff?._initDone) await liff.init({ liffId: LIFF_ID }); } catch (e) { }
-
-      const inClient = !!(window.liff && liff.isInClient()); // 是否在 LINE WebView
-      const os = window.liff ? liff.getOS() : 'web';         // 'ios' | 'android' | 'web'
-      const isMobileLine = inClient && (os === 'ios' || os === 'android');
-
-      if (!isMobileLine) {
-        // 產出深連結：會把目前 query 一起帶過去
-        const q = location.search ? location.search : '';
-        const deeplink = `line://app/${LIFF_ID}${q}`;
-
-        // 顯示遮罩與「在 LINE 開啟」
-        const mask = document.getElementById('onlyInApp');
-        const openBtn = document.getElementById('openInLine');
-        if (openBtn) openBtn.href = deeplink;
-        if (mask) mask.classList.remove('hidden');
-
-        // 也可直接嘗試跳轉（某些環境會彈選擇開啟 App）
-        try { location.href = deeplink; } catch (_) { }
-
-        // 阻擋下面的功能繼續跑（例如避免初始化主畫面）
-        window.__BLOCKED_OUT_OF_LINE__ = true;
-        return;
-      }
-
-      // ✅ 通過：在手機 LINE 內，允許繼續載入頁面
-    })();
-
 
     // ====== 初始狀態與版本顯示 ======
     document.getElementById("ver").textContent = LINE_ID + " | " + APP_VERSION;
@@ -1535,11 +1541,12 @@
       });
     })();
   </script>
+
   <div id="onlyInApp" class="wrap hidden"
     style="position:fixed;inset:0;background:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:9999;text-align:center;padding:24px;">
     <div class="card" style="max-width:520px;">
       <div class="card-title">請在「手機 LINE」中開啟</div>
-      <p class="status">本服務僅支援在 LINE App 內開啟。請點擊下方按鈕或用手機掃描 QR 開啟。</p>
+      <p class="status">本服務僅支援在 LINE App 內開啟。點擊下方按鈕回到 LINE。</p>
       <div style="margin-top:12px">
         <a id="openInLine" class="btn btn-primary" href="#">在 LINE 開啟</a>
       </div>
