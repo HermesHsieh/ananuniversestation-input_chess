@@ -660,7 +660,7 @@
     /** 2007906926-NZW6EQ7P Production **/
     /** 2007931033-4D50LqwM Dev **/
     const LIFF_ID = "2007931033-4D50LqwM";
-    const APP_VERSION = "v1.0.38";
+    const APP_VERSION = "v1.0.39";
     const LINE_ID = "@968noswo"; // 你的官方帳號 ID（@ 開頭）
 
     /** ******************************
@@ -1378,40 +1378,78 @@
       return true;
     }
 
-    // ====== 初始化 LIFF ======
+    // 小工具：安全設定狀態文字（避免 statusEl 尚未存在時拋錯）
+    function setStatus(txt) {
+      try { if (statusEl) statusEl.textContent = txt; } catch (_) { }
+      try { console.log(txt); } catch (_) { }
+    }
+
+    // 判斷是否為「手機 LINE App 內」(不需先 init)
+    function isMobileLineUA() {
+      const ua = (navigator.userAgent || "").toLowerCase();
+      const inLine = ua.includes(" line/");       // LINE WebView/瀏覽器
+      const isMobile = /android|iphone|ipad|ipod/.test(ua);
+      return inLine && isMobile;
+    }
+
+    // 產生 deeplink（把現有 query 原封不動帶回）
+    function buildDeeplink(liffId) {
+      return `line://app/${liffId}${location.search || ""}`;
+    }
+
+    // ====== 初始化 LIFF（只允許手機 LINE）======
     (async () => {
       try {
-        statusEl.textContent = "頁面初始化中…";
+        setStatus("頁面初始化中…");
 
-        // ★ 先做「只能在手機 LINE」的環境檢查
-        const ok = await guardMobileLineOnly(LIFF_ID);
-        if (!ok) {
-          statusEl.textContent = "請在手機 LINE 中開啟此頁面";
-          return; // ★ 直接停止，不做後續登入/渲染
-        }
+        // 1) 環境守門員：非手機 LINE 直接擋下，不做 init
+        if (!isMobileLineUA()) {
+          const deeplink = buildDeeplink(LIFF_ID);
+          // 若你有遮罩 UI，這裡顯示並設定按鈕連結
+          const mask = document.getElementById("onlyInApp");
+          const openBtn = document.getElementById("openInLine");
+          if (openBtn) openBtn.href = deeplink;
+          if (mask) mask.classList.remove("hidden");
 
-        // ★ 真正的初始化（關掉外部瀏覽器自動登入）
-        await liff.init({ liffId: LIFF_ID, withLoginOnExternalBrowser: false });
-        printLog("頁面初始化成功");
+          // 可選：自動嘗試跳轉回 LINE
+          try { location.href = deeplink; } catch (_) { }
 
-        // ★ 這裡一定是在 LINE App 內了，才允許登入
-        if (!liff.isLoggedIn()) {
-          statusEl.textContent = "未登入 → 導向登入";
-          await liff.login(); // 會跳轉，後面不會繼續
+          setStatus("請在手機 LINE 中開啟此頁面");
+          // 設記號，避免後續任何功能誤跑
+          window.__BLOCKED_OUT_OF_LINE__ = true;
           return;
         }
 
-        // 登入成功，取得使用者資訊
+        // 2) 真正初始化（僅此一次；關閉外部瀏覽器自動登入）
+        await liff.init({ liffId: LIFF_ID, withLoginOnExternalBrowser: false });
+        // （部分 SDK 會在重複 init 拋錯，若你擔心，可先 if (liff._initDone) return;）
+
+        // 3) 確認在 LINE WebView 內（雙保險；正常此時一定是 true）
+        if (!liff.isInClient()) {
+          setStatus("偵測到非 LINE App 內，請改用 LINE 開啟");
+          return;
+        }
+
+        // 4) 登入流程（只在 LINE 內進行）
+        if (!liff.isLoggedIn()) {
+          setStatus("未登入 → 導向登入");
+          await liff.login();  // 導回後會再跑一次本段
+          return;
+        }
+
+        // 5) 已登入：取得使用者資訊
         const profile = await liff.getProfile();
         printLog("用戶名稱：" + profile.displayName);
-        statusEl.textContent = `Hello, ${profile.displayName} 👋`;
+        setStatus(`Hello, ${profile.displayName} 👋`);
 
-        // 取得網址參數
-        const urlParams = new URLSearchParams(window.location.search);
-        gUrlParams = urlParams; // 儲存起來給其他函式用
+        // 6) 取得網址參數
+        gUrlParams = new URLSearchParams(window.location.search);
+
       } catch (err) {
-        printLog("初始化錯誤: " + (err?.message || err));
-        statusEl.textContent = `LIFF 初始化失敗：${err?.message || "unknown"}`;
+        // 顯示更完整的錯誤碼/錯誤訊息，方便定位
+        console.error("LIFF init error:", err);
+        printLog("初始化錯誤: " + (err?.code ? `${err.code} - ` : "") + (err?.message || err));
+        setStatus(`LIFF 初始化失敗：${err?.code ? `${err.code} - ` : ""}${err?.message || "unknown"}`);
       }
     })();
 
