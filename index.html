@@ -660,7 +660,7 @@
     /** 2007906926-NZW6EQ7P Production **/
     /** 2007931033-4D50LqwM Dev **/
     const LIFF_ID = "2007931033-4D50LqwM";
-    const APP_VERSION = "v1.0.37";
+    const APP_VERSION = "v1.0.38";
     const LINE_ID = "@968noswo"; // 你的官方帳號 ID（@ 開頭）
 
     /** ******************************
@@ -1348,10 +1348,10 @@
     let gUrlParams = null; // 儲存 URL 參數物件
 
     // ✅ 最小守門員：只允許「手機 LINE App 內」打開
-    async function guardMobileLineOnly(liffId) {
+    async function guardMobileLineOnly(_liffId) {
       try {
         // 只為了拿 isInClient / getOS；禁用外部瀏覽器自動登入
-        await liff.init({ liffId, withLoginOnExternalBrowser: false });
+        await liff.init({ liffId: _liffId, withLoginOnExternalBrowser: false });
       } catch (_) { /* 重複 init 無妨 */ }
 
       const inClient = !!(window.liff && liff.isInClient());
@@ -1360,7 +1360,7 @@
 
       if (!isMobileLine) {
         // 引導回 LINE（會把目前的 querystring 一起帶回）
-        const deeplink = `line://app/${liffId}${location.search || ''}`;
+        const deeplink = `line://app/${_liffId}${location.search || ''}`;
 
         // 若頁面有你之前做的遮罩按鈕，順手掛連結顯示
         const mask = document.getElementById('onlyInApp');
