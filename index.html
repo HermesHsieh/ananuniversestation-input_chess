@@ -10,6 +10,15 @@
   <script defer src='https://static.cloudflareinsights.com/beacon.min.js'
     data-cf-beacon='{"token": "50bd6af270b7443b8b555db9457b093f"}'></script>
   <!-- End Cloudflare Web Analytics -->
+  <meta http-equiv="Content-Security-Policy" content="
+  default-src 'self';
+  img-src 'self' data: https:;
+  script-src 'self' https://static.line-scdn.net 'unsafe-inline';
+  style-src  'self' 'unsafe-inline';
+  connect-src 'self' https://api.line.me https://hermeshsieh.github.io;
+  frame-ancestors 'none';
+  base-uri 'none';">
+
   <style>
     :root {
       --red: #d32f2f;
@@ -651,7 +660,7 @@
     /** 2007906926-NZW6EQ7P Production **/
     /** 2007931033-4D50LqwM Dev **/
     const LIFF_ID = "2007931033-4D50LqwM";
-    const APP_VERSION = "v1.0.35";
+    const APP_VERSION = "v1.0.36";
     const LINE_ID = "@968noswo"; // 你的官方帳號 ID（@ 開頭）
 
     /** ******************************
@@ -1367,6 +1376,39 @@
       }
     })();
 
+    (async function guardInMobileLineOnly() {
+      const LIFF_ID = window.LIFF_ID || "2007931033-4D50LqwM";
+
+      // 已有初始化就不重複；沒有的話嘗試 init
+      try { if (!window.liff?._initDone) await liff.init({ liffId: LIFF_ID }); } catch (e) { }
+
+      const inClient = !!(window.liff && liff.isInClient()); // 是否在 LINE WebView
+      const os = window.liff ? liff.getOS() : 'web';         // 'ios' | 'android' | 'web'
+      const isMobileLine = inClient && (os === 'ios' || os === 'android');
+
+      if (!isMobileLine) {
+        // 產出深連結：會把目前 query 一起帶過去
+        const q = location.search ? location.search : '';
+        const deeplink = `line://app/${LIFF_ID}${q}`;
+
+        // 顯示遮罩與「在 LINE 開啟」
+        const mask = document.getElementById('onlyInApp');
+        const openBtn = document.getElementById('openInLine');
+        if (openBtn) openBtn.href = deeplink;
+        if (mask) mask.classList.remove('hidden');
+
+        // 也可直接嘗試跳轉（某些環境會彈選擇開啟 App）
+        try { location.href = deeplink; } catch (_) { }
+
+        // 阻擋下面的功能繼續跑（例如避免初始化主畫面）
+        window.__BLOCKED_OUT_OF_LINE__ = true;
+        return;
+      }
+
+      // ✅ 通過：在手機 LINE 內，允許繼續載入頁面
+    })();
+
+
     // ====== 初始狀態與版本顯示 ======
     document.getElementById("ver").textContent = LINE_ID + " | " + APP_VERSION;
 
@@ -1493,6 +1535,17 @@
       });
     })();
   </script>
+  <div id="onlyInApp" class="wrap hidden"
+    style="position:fixed;inset:0;background:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:9999;text-align:center;padding:24px;">
+    <div class="card" style="max-width:520px;">
+      <div class="card-title">請在「手機 LINE」中開啟</div>
+      <p class="status">本服務僅支援在 LINE App 內開啟。請點擊下方按鈕或用手機掃描 QR 開啟。</p>
+      <div style="margin-top:12px">
+        <a id="openInLine" class="btn btn-primary" href="#">在 LINE 開啟</a>
+      </div>
+    </div>
+  </div>
+
 </body>
 
 </html>
