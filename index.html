@@ -491,6 +491,52 @@
       z-index: 0;
       /* 在內容下方 */
     }
+	
+	/* 4x8 暗棋面板樣式 */
+.dark-grid{
+  display:grid;
+  grid-template-columns:repeat(4, minmax(64px,1fr));
+  gap:12px;
+  justify-items:center;
+  align-items:center;
+  padding:8px 4px;
+}
+.dark-cell{
+flex-direction: column;
+  width:72px; height:72px; border-radius:50%;
+  border:4px solid #9ca3af; background:#fff;
+  display:flex; align-items:center; justify-content:center;
+  font-size:36px; line-height:1; user-select:none; cursor:pointer;
+  position:relative; box-shadow:0 1px 2px rgba(0,0,0,.06) inset;
+}
+.dark-cell.face-down::after{
+  content:""; position:absolute; inset:10px; border-radius:50%;
+  border:2px dashed #c7ced6; background:#f3f4f6;
+}
+.dark-cell.flipped{ cursor:default; }
+.dark-cell.red.flipped  { color:#d32f2f; border-color:#d32f2f; }
+.dark-cell.black.flipped{ color:#111111; border-color:#111111; }
+.dark-cell.disabled{ pointer-events:none; opacity:.6; }
+
+/* 可依需求微調尺寸 */
+@media (max-width: 380px){
+  .dark-cell{ width:64px; height:64px; font-size:24px; }
+}
+
+/* 棋字本體 */
+.dark-cell .piece-text {
+  font-size: 1em;           /* 沿用 .dark-cell 的字體大小（36px / 或媒體查詢後的 24px） */
+  line-height: 1;
+}
+
+/* 序號（小一點、淡一點），置於棋字下方一點 */
+.dark-cell .flip-order {
+  font-size: 16px;
+  line-height: 1;
+  margin-top: 4px;              /* ⬅「下面一點」 */
+  color: #666;
+}
+
   </style>
 </head>
 
@@ -1319,7 +1365,7 @@
     // ====== 綁定 UI ======
     $("askBtn").addEventListener("click", promptQuestion);
     $("clearBtn").addEventListener("click", clearAll);
-    $("randomBtn").addEventListener("click", randomFillAll);
+    // $("randomBtn").addEventListener("click", randomFillAll);
     $("sendBtn").addEventListener("click", sendResult);
 
     Object.entries(posEls).forEach(([idx, el]) => {
@@ -1367,43 +1413,6 @@
       }
       return true;
     }
-
-    // ====== 初始化 LIFF ======
-    (async () => {
-      try {
-        statusEl.textContent = "頁面初始化中…";
-
-        // ★ 先做「只能在手機 LINE」的環境檢查
-        const ok = await guardMobileLineOnly(LIFF_ID);
-        if (!ok) {
-          statusEl.textContent = "請在手機 LINE 中開啟此頁面";
-          return; // ★ 直接停止，不做後續登入/渲染
-        }
-
-        // ★ 真正的初始化（關掉外部瀏覽器自動登入）
-        await liff.init({ liffId: LIFF_ID, withLoginOnExternalBrowser: false });
-        printLog("頁面初始化成功");
-
-        // ★ 這裡一定是在 LINE App 內了，才允許登入
-        if (!liff.isLoggedIn()) {
-          statusEl.textContent = "未登入 → 導向登入";
-          await liff.login(); // 會跳轉，後面不會繼續
-          return;
-        }
-
-        // 登入成功，取得使用者資訊
-        const profile = await liff.getProfile();
-        printLog("用戶名稱：" + profile.displayName);
-        statusEl.textContent = `Hello, ${profile.displayName} 👋`;
-
-        // 取得網址參數
-        const urlParams = new URLSearchParams(window.location.search);
-        gUrlParams = urlParams; // 儲存起來給其他函式用
-      } catch (err) {
-        printLog("初始化錯誤: " + (err?.message || err));
-        statusEl.textContent = `LIFF 初始化失敗：${err?.message || "unknown"}`;
-      }
-    })();
 
     // ====== 初始狀態與版本顯示 ======
     document.getElementById("ver").textContent = LINE_ID + " | " + APP_VERSION;
@@ -1530,7 +1539,188 @@
         }
       });
     })();
-  </script>
+
+// ===== 暗棋 32 子（固定矩陣；可自行調整順序）=====
+// 8 rows × 4 columns，每格 { t: 棋子字, color: 'red'|'black' }
+const DARK_CHESS_32 = [
+  [ {t:"士",c:"black"}, {t:"象",c:"black"}, {t:"馬",c:"black"}, {t:"車",c:"black"} ],
+  [ {t:"包",c:"black"}, {t:"卒",c:"black"}, {t:"卒",c:"black"}, {t:"卒",c:"black"} ],
+  [ {t:"卒",c:"black"}, {t:"卒",c:"black"}, {t:"包",c:"black"}, {t:"將",c:"black"} ],
+  [ {t:"象",c:"black"}, {t:"士",c:"black"}, {t:"車",c:"black"}, {t:"馬",c:"black"} ],
+
+  [ {t:"仕",c:"red"},   {t:"相",c:"red"},   {t:"傌",c:"red"},   {t:"俥",c:"red"} ],
+  [ {t:"炮",c:"red"},   {t:"兵",c:"red"},   {t:"兵",c:"red"},   {t:"兵",c:"red"} ],
+  [ {t:"兵",c:"red"},   {t:"兵",c:"red"},   {t:"炮",c:"red"},   {t:"帥",c:"red"} ],
+  [ {t:"相",c:"red"},   {t:"仕",c:"red"},   {t:"俥",c:"red"},   {t:"傌",c:"red"} ],
+];
+
+// ===== 狀態 =====
+let flipSelections = []; // 使用者已翻的 5 顆（照順序）
+const gridEl = () => document.getElementById('darkGrid');
+const gridView = () => document.getElementById('randomGridView');
+const mainView = () => document.getElementById('mainContent'); // 你的主畫面容器 id
+
+// 目前棋盤對應的 32 顆（本次面板用的隨機結果）
+let shuffledPieces = [];
+
+// Fisher–Yates 洗牌：把 DARK_CHESS_32 攤平後打亂
+function shuffleDeck() {
+  const arr = [];
+  for (let r = 0; r < 8; r++) {
+    for (let c = 0; c < 4; c++) {
+      arr.push(DARK_CHESS_32[r][c]); // { t, c }
+    }
+  }
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+
+// ===== 入口：開啟 4x8 棋盤流程 =====
+function openRandomGrid(){
+  flipSelections = [];
+  updateFlipCount(0);
+  shuffledPieces = shuffleDeck();     // ← 這次面板要用的隨機結果
+  
+  // 顯示/隱藏
+  mainView()?.classList.add('hidden');
+  gridView()?.classList.remove('hidden');
+  // 渲染棋盤
+  renderDarkGrid();
+}
+
+// ===== 渲染 4x8 棋盤（全部朝下） =====
+function renderDarkGrid(){
+  const el = gridEl();
+  if(!el) return;
+  el.innerHTML = "";
+  for(let r=0; r<8; r++){
+    for(let c=0; c<4; c++){
+      const idx = r * 4 + c;
+      const p = shuffledPieces[idx] || DARK_CHESS_32[r][c]; // 保底
+      const cell = document.createElement('div');
+      cell.className = 'dark-cell face-down';
+      cell.dataset.r = r;
+      cell.dataset.c = c;
+      cell.dataset.t = p.t;
+      cell.dataset.color = p.c;
+      cell.addEventListener('click', onCellClick);
+      el.appendChild(cell);
+    }
+  }
+  // 控制按鈕初始狀態
+  document.getElementById('btnUseSelected')?.setAttribute('disabled','');
+}
+
+// ===== 點格子翻子（最多 5 顆）=====
+function onCellClick(e){
+  const cell = e.currentTarget;
+  if(cell.classList.contains('flipped')) return;
+  if(flipSelections.length >= 5) return;
+
+  // 翻開
+  cell.classList.remove('face-down');
+  cell.classList.add('flipped', cell.dataset.color);
+  //cell.textContent = cell.dataset.t;
+ const order = flipSelections.length + 1; // 這是第幾顆
+ cell.innerHTML = `
+   <div class="piece-text">${cell.dataset.t}</div>
+   <div class="flip-order">${order}</div>
+ `;
+  // 紀錄
+  flipSelections.push({
+    t: cell.dataset.t,
+    color: cell.dataset.color,
+    r: Number(cell.dataset.r),
+    c: Number(cell.dataset.c),
+	order          // ← 可留著備查（不影響後續）
+  });
+
+  const n = flipSelections.length;
+  updateFlipCount(n);
+
+  // 滿 5 顆：鎖住其他格子 + 啟用「使用這 5 顆」
+  if(n >= 5){
+    gridEl()?.querySelectorAll('.dark-cell:not(.flipped)')
+      .forEach(node => node.classList.add('disabled'));
+    document.getElementById('btnUseSelected')?.removeAttribute('disabled');
+  }
+}
+
+// ===== 更新顯示「已翻 N/5」 =====
+function updateFlipCount(n){ 
+  const c = document.getElementById('flipCount');
+  if(c) c.textContent = String(n);
+}
+
+// ===== 取消：回主畫面、清空狀態 =====
+function cancelRandomGrid(){
+  gridView()?.classList.add('hidden');
+  mainView()?.classList.remove('hidden');
+  flipSelections = [];
+}
+
+// ✅ 使用這 5 顆：餵回主畫面的 picks[1..5]，並回主畫面
+function useFiveAndBack() {
+  if (flipSelections.length < 5) {
+    alert('請先翻滿 5 顆');
+    return;
+  }
+
+  // 你的頁面有頂層 const picks（不是 window.picks）
+  // 這裡優先寫入 picks；若不存在再退回 window.picks
+  const targetPicks =
+    (typeof picks !== 'undefined' && picks) ||
+    (window.picks ||= { 1: null, 2: null, 3: null, 4: null, 5: null });
+
+  // 依點擊順序塞進 1..5
+  for (let i = 0; i < 5; i++) {
+    const p = flipSelections[i]; // { t, color, r, c }
+    targetPicks[i + 1] = { type: p.t, color: p.color };
+  }
+
+  // 重新渲染主畫面
+  try { if (typeof render === 'function') render(); } catch (_) {}
+
+  // 回主畫面
+  cancelRandomGrid();
+}
+
+
+// ===== 把「隨機」按鈕改成開啟新面板 =====
+// 若你的按鈕 id 不是 btnRandom，請把選擇器換成你實際的
+const randomBtn = document.getElementById('randomBtn') 
+                || document.querySelector('[data-action="random"]') 
+                || document.querySelector('.btn-random');
+randomBtn?.addEventListener('click', (e)=>{ e.preventDefault(); openRandomGrid(); });
+
+// ✅ 事件委派：即使按鈕是之後才顯示，也能接到點擊
+document.addEventListener('click', function (e) {
+  const t = e.target;
+  if (!t) return;
+
+  // 取消
+  const cancelBtn = t.closest?.('#btnCancelGrid');
+  if (cancelBtn) {
+    e.preventDefault();
+    cancelRandomGrid();
+    return;
+  }
+
+  // 使用這 5 顆（需非 disabled）
+  const useBtn = t.closest?.('#btnUseSelected');
+  if (useBtn) {
+    e.preventDefault();
+    if (!useBtn.hasAttribute('disabled') && !useBtn.disabled) {
+      useFiveAndBack();
+    }
+  }
+});
+
+
+</script>
 
   <div id="onlyInApp" class="wrap hidden"
     style="position:fixed;inset:0;background:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:9999;text-align:center;padding:24px;">
@@ -1542,6 +1732,28 @@
       </div>
     </div>
   </div>
+
+<!-- 隨機翻子面板：4x8 棋盤（預設隱藏） -->
+<div id="randomGridView" class="wrap hidden" aria-label="隨機翻 5 顆">
+  <div class="topbar">
+    <div class="title">請翻 5 顆棋子</div>
+    <div class="bar-actions"></div>
+  </div>
+
+  <div class="status">
+    已翻 <span id="flipCount">0</span> / 5
+  </div>
+
+  <div class="card">
+    <div class="card-title">4 × 8 棋盤</div>
+    <div id="darkGrid" class="dark-grid"></div>
+  </div>
+
+  <div class="controls" style="margin-top:12px;">
+    <button class="btn btn-secondary" id="btnCancelGrid">取消</button>
+    <button class="btn btn-primary" id="btnUseSelected" disabled>使用這 5 顆</button>
+  </div>
+</div>
 
 </body>
 
