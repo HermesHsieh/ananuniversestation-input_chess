@@ -557,6 +557,7 @@ flex-direction: column;
 
       <div class="card">
         <div id="cardTitle" class="card-title"></div>
+		<button class="btn btn-secondary" id="chessMatrixBtn">模擬抽卦</button>
 
         <!-- 九宮格（上：4 / 中：2 1 3 / 下：5） -->
         <div class="grid" aria-label="十字九宮格">
@@ -584,7 +585,7 @@ flex-direction: column;
         </div>
 
         <div class="controls">
-          <button class="btn btn-secondary" id="randomBtn">隨機</button>
+          <button class="btn btn-secondary" id="randomBtn">一鍵隨機</button>
           <button class="btn btn-primary" id="sendBtn">送出</button>
           <button class="btn btn-secondary" id="clearBtn">清除</button>
         </div>
@@ -1365,7 +1366,7 @@ flex-direction: column;
     // ====== 綁定 UI ======
     $("askBtn").addEventListener("click", promptQuestion);
     $("clearBtn").addEventListener("click", clearAll);
-    // $("randomBtn").addEventListener("click", randomFillAll);
+    $("randomBtn").addEventListener("click", randomFillAll);
     $("sendBtn").addEventListener("click", sendResult);
 
     Object.entries(posEls).forEach(([idx, el]) => {
@@ -1691,10 +1692,10 @@ function useFiveAndBack() {
 
 // ===== 把「隨機」按鈕改成開啟新面板 =====
 // 若你的按鈕 id 不是 btnRandom，請把選擇器換成你實際的
-const randomBtn = document.getElementById('randomBtn') 
+const chessMatrixBtn = document.getElementById('chessMatrixBtn') 
                 || document.querySelector('[data-action="random"]') 
                 || document.querySelector('.btn-random');
-randomBtn?.addEventListener('click', (e)=>{ e.preventDefault(); openRandomGrid(); });
+chessMatrixBtn?.addEventListener('click', (e)=>{ e.preventDefault(); openRandomGrid(); });
 
 // ✅ 事件委派：即使按鈕是之後才顯示，也能接到點擊
 document.addEventListener('click', function (e) {
