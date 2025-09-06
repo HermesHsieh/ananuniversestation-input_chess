@@ -549,11 +549,28 @@ flex-direction: column;
   font-weight: 700;
   text-align: center;
   margin-bottom: 8px;
-  width: 97%;
+  width: 100%;
   border: 1px solid var(--border);
   border-radius: 8px;
-  padding: 6px 8px;
+  padding: 6px 32px 6px 8px; /* 預留右邊空間給 icon */
+  box-sizing: border-box;
+}
 
+.card-title-wrapper {
+  position: relative;
+  display: inline-block;
+  width: 100%;
+}
+
+.clear-icon {
+  position: absolute;
+  right: 4px;
+  top: 50%;
+  transform: translateY(-63%);
+  font-size: 42px;
+  color: #aaa;
+  cursor: pointer;
+  display: none; /* 預設隱藏 */
 }
 
   </style>
@@ -575,7 +592,10 @@ flex-direction: column;
       <div id="status" class="status">初始化中…</div>
 
       <div class="card">
+		<div class="card-title-wrapper">
+		  <span class="clear-icon" id="clearTitleBtn">&times;</span>
           <input id="cardTitleInput" class="card-title-input" type="text" placeholder="輸入問題名稱" />
+		</div>
 
         <!-- 九宮格（上：4 / 中：2 1 3 / 下：5） -->
         <div class="grid" aria-label="十字九宮格">
@@ -1382,11 +1402,24 @@ flex-direction: column;
     $("randomBtn").addEventListener("click", randomFillAll);
     $("sendBtn").addEventListener("click", sendResult);
 	const cardTitleInput = document.getElementById("cardTitleInput");
+	const clearTitleBtn = document.getElementById("clearTitleBtn");
 	
 	// 如果還要存取這個標題，可以直接讀 value
 	function getCardTitle() {
 	  return cardTitleInput.value.trim();
 	}
+	
+	// 輸入時，判斷是否顯示清除 icon
+	cardTitleInput.addEventListener("input", () => {
+	  clearTitleBtn.style.display = cardTitleInput.value ? "block" : "none";
+	});
+
+	// 點擊清除 icon
+	clearTitleBtn.addEventListener("click", () => {
+	  cardTitleInput.value = "";
+	  clearTitleBtn.style.display = "none";
+	  cardTitleInput.focus(); // 清除後讓輸入框重新 focus
+	});
 
     Object.entries(posEls).forEach(([idx, el]) => {
       el.addEventListener("click", () => setSelected(Number(idx)));
@@ -1470,6 +1503,7 @@ flex-direction: column;
         statusEl.textContent = `LIFF 初始化失敗：${err?.message || "unknown"}`;
       }
     })();
+
 
     // ====== 初始狀態與版本顯示 ======
     document.getElementById("ver").textContent = LINE_ID + " | " + APP_VERSION;
