@@ -543,6 +543,19 @@ flex-direction: column;
   cursor: not-allowed;
   filter: grayscale(30%);
 }
+
+.card-title-input {
+  font-size: 16px;
+  font-weight: 700;
+  text-align: center;
+  margin-bottom: 8px;
+  width: 97%;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 6px 8px;
+
+}
+
   </style>
 </head>
 
@@ -562,8 +575,7 @@ flex-direction: column;
       <div id="status" class="status">初始化中…</div>
 
       <div class="card">
-        <div id="cardTitle" class="card-title"></div>
-          <button class="ghost" id="askBtn">輸入問題名稱</button>
+          <input id="cardTitleInput" class="card-title-input" type="text" placeholder="請輸入標題..." />
 
         <!-- 九宮格（上：4 / 中：2 1 3 / 下：5） -->
         <div class="grid" aria-label="十字九宮格">
@@ -845,7 +857,6 @@ flex-direction: column;
     const $ = (id) => document.getElementById(id);
     const posEls = { 1: $("pos1"), 2: $("pos2"), 3: $("pos3"), 4: $("pos4"), 5: $("pos5") };
     const statusEl = $("status");
-    const titleEl = $("cardTitle");
 
     // 目前 5 格內容：{ type, color } 或 null
     const picks = { 1: null, 2: null, 3: null, 4: null, 5: null };
@@ -959,11 +970,6 @@ flex-direction: column;
       location.replace(base + "?t=" + Date.now()); // 破快取
     }
 
-    function promptQuestion() {
-      const t = prompt("請輸入你的卜卦問題：", titleEl.textContent || "");
-      if (t && t.trim()) titleEl.textContent = t.trim();
-    }
-
     // ====== 隨機 5 顆（遵守每種上限） ======
     function randomFillAll() {
       // 先清空五格＆重置牌堆（保留「隨機」模式）
@@ -1036,7 +1042,7 @@ flex-direction: column;
       const summary = [1, 2, 3, 4, 5].map(i => `${i}:${picks[i].type}`).join("  ");
       const fiveStr = [1, 2, 3, 4, 5].map(i => picks[i].type).join(""); // 五字
       const fiveParam = encodeURIComponent(fiveStr);
-      const titleText = (titleEl.textContent || "").trim();
+      const titleText = getCardTitle();
       const titleParam = encodeURIComponent(titleText);
       const modeTag = (drawMode === "隨機" ? "隨機" : "手動"); // 要顯示的文字
       const modeParam = encodeURIComponent(modeTag);
@@ -1372,10 +1378,15 @@ flex-direction: column;
     }
 
     // ====== 綁定 UI ======
-    $("askBtn").addEventListener("click", promptQuestion);
     $("clearBtn").addEventListener("click", clearAll);
     $("randomBtn").addEventListener("click", randomFillAll);
     $("sendBtn").addEventListener("click", sendResult);
+	const cardTitleInput = document.getElementById("cardTitleInput");
+	
+	// 如果還要存取這個標題，可以直接讀 value
+	function getCardTitle() {
+	  return cardTitleInput.value.trim();
+	}
 
     Object.entries(posEls).forEach(([idx, el]) => {
       el.addEventListener("click", () => setSelected(Number(idx)));
@@ -1506,7 +1517,7 @@ flex-direction: column;
 
       // 先帶入：?n=（舊參數名稱）或 ?title=
       inputTitle.textContent = qs.get('n') || qs.get('title')
-        || (document.getElementById('cardTitle')?.textContent?.trim() || '')
+        || (getCardTitle()?.textContent?.trim() || '')
         || '';
 
       // 接上現有分數邏輯：
