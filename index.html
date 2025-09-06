@@ -503,7 +503,7 @@
 }
 .dark-cell{
 flex-direction: column;
-  width:72px; height:72px; border-radius:50%;
+  width:68px; height:68px; border-radius:50%;
   border:4px solid #9ca3af; background:#fff;
   display:flex; align-items:center; justify-content:center;
   font-size:36px; line-height:1; user-select:none; cursor:pointer;
@@ -531,12 +531,18 @@ flex-direction: column;
 
 /* 序號（小一點、淡一點），置於棋字下方一點 */
 .dark-cell .flip-order {
-  font-size: 16px;
+  font-size: 14px;
   line-height: 1;
   margin-top: 4px;              /* ⬅「下面一點」 */
   color: #666;
 }
-
+/* 使用這 5 顆：未選滿時的視覺狀態 */
+#btnUseSelected[disabled],
+#btnUseSelected.is-disabled {
+  opacity: .5;
+  cursor: not-allowed;
+  filter: grayscale(30%);
+}
   </style>
 </head>
 
@@ -585,7 +591,7 @@ flex-direction: column;
         </div>
 
         <div class="controls">
-          <button class="btn btn-secondary" id="randomBtn">一鍵隨機</button>
+          <button class="btn btn-secondary" id="randomBtn">隨機</button>
           <button class="btn btn-primary" id="sendBtn">送出</button>
           <button class="btn btn-secondary" id="clearBtn">清除</button>
         </div>
@@ -1621,7 +1627,7 @@ function shuffleDeck() {
 // ===== 入口：開啟 4x8 棋盤流程 =====
 function openRandomGrid(){
   flipSelections = [];
-  updateFlipCount(0);
+  setUseButtonState(0);        // ← 新增
   shuffledPieces = shuffleDeck();     // ← 這次面板要用的隨機結果
   
   // 顯示/隱藏
@@ -1651,7 +1657,8 @@ function renderDarkGrid(){
     }
   }
   // 控制按鈕初始狀態
-  document.getElementById('btnUseSelected')?.setAttribute('disabled','');
+  // document.getElementById('btnUseSelected')?.setAttribute('disabled','');
+  setUseButtonState(0);
 }
 
 // ===== 點格子翻子（最多 5 顆）=====
@@ -1679,20 +1686,13 @@ function onCellClick(e){
   });
 
   const n = flipSelections.length;
-  updateFlipCount(n);
+  setUseButtonState(n);
 
   // 滿 5 顆：鎖住其他格子 + 啟用「使用這 5 顆」
   if(n >= 5){
     gridEl()?.querySelectorAll('.dark-cell:not(.flipped)')
       .forEach(node => node.classList.add('disabled'));
-    document.getElementById('btnUseSelected')?.removeAttribute('disabled');
   }
-}
-
-// ===== 更新顯示「已翻 N/5」 =====
-function updateFlipCount(n){ 
-  const c = document.getElementById('flipCount');
-  if(c) c.textContent = String(n);
 }
 
 // ===== 取消：回主畫面、清空狀態 =====
@@ -1700,6 +1700,7 @@ function cancelRandomGrid(){
   gridView()?.classList.add('hidden');
   mainView()?.classList.remove('hidden');
   flipSelections = [];
+  setUseButtonState(0);
 }
 
 // ✅ 使用這 5 顆：餵回主畫面的 picks[1..5]，並回主畫面
@@ -1759,6 +1760,25 @@ document.addEventListener('click', function (e) {
   }
 });
 
+// 依目前已翻數量，更新「使用這 5 顆」按鈕狀態與文字
+function setUseButtonState(count) {
+  const btn = document.getElementById('btnUseSelected');
+  if (!btn) return;
+  const enable = count >= 5;
+
+  // 實際可點與屬性
+  btn.disabled = !enable;
+  if (enable) {
+    btn.removeAttribute('disabled');
+    btn.classList.remove('is-disabled');
+    btn.textContent = '確認';
+  } else {
+    btn.setAttribute('disabled', '');
+    btn.classList.add('is-disabled');
+    // 顯示目前已翻幾顆（可改成不要顯示）
+    btn.textContent = `已翻 ${count}／5 顆`;
+  }
+}
 
 </script>
 
@@ -1779,19 +1799,14 @@ document.addEventListener('click', function (e) {
     <div class="title">請翻 5 顆棋子</div>
     <div class="bar-actions"></div>
   </div>
-
-  <div class="status">
-    已翻 <span id="flipCount">0</span> / 5
-  </div>
-
-  <div class="card">
-    <div class="card-title">4 × 8 棋盤</div>
-    <div id="darkGrid" class="dark-grid"></div>
-  </div>
-
-  <div class="controls" style="margin-top:12px;">
+  
+  <div class="controls" style="margin-top:8px;">
     <button class="btn btn-secondary" id="btnCancelGrid">取消</button>
-    <button class="btn btn-primary" id="btnUseSelected" disabled>使用這 5 顆</button>
+    <button class="btn btn-primary" id="btnUseSelected" disabled>確認</button>
+  </div>
+  
+  <div class="card">
+    <div id="darkGrid" class="dark-grid"></div>
   </div>
 </div>
 
