@@ -573,6 +573,16 @@ flex-direction: column;
   display: none; /* 預設隱藏 */
 }
 
+.char-counter {
+  font-size: 12px;
+  color: #666;
+  text-align: right;
+  margin-top: 2px;
+}
+.char-counter.limit-reached {
+  color: #d32f2f; /* 超過時變紅色 */
+}
+
   </style>
 </head>
 
@@ -596,6 +606,7 @@ flex-direction: column;
 		  <span class="clear-icon" id="clearTitleBtn">&times;</span>
           <input id="cardTitleInput" class="card-title-input" type="text" placeholder="輸入問題名稱" />
 		</div>
+		<div class="char-counter" id="titleCharCounter">0 / 0</div>
 
         <!-- 九宮格（上：4 / 中：2 1 3 / 下：5） -->
         <div class="grid" aria-label="十字九宮格">
@@ -1396,6 +1407,9 @@ flex-direction: column;
         logDiv.scrollTop = logDiv.scrollHeight;  // 自動捲到底部
       }
     }
+	
+	
+	const MAX_TITLE_LENGTH = 50; // ✅ 這裡控制最大字數
 
     // ====== 綁定 UI ======
     $("clearBtn").addEventListener("click", clearAll);
@@ -1403,22 +1417,48 @@ flex-direction: column;
     $("sendBtn").addEventListener("click", sendResult);
 	const cardTitleInput = document.getElementById("cardTitleInput");
 	const clearTitleBtn = document.getElementById("clearTitleBtn");
+	const titleCharCounter = document.getElementById("titleCharCounter");
 	
 	// 如果還要存取這個標題，可以直接讀 value
 	function getCardTitle() {
 	  return cardTitleInput.value.trim();
 	}
 	
-	// 輸入時，判斷是否顯示清除 icon
+	// 初始化字數提示
+	titleCharCounter.textContent = `0 / ${MAX_TITLE_LENGTH}`;
+	
+	cardTitleInput.setAttribute("maxlength", MAX_TITLE_LENGTH);
+	
 	cardTitleInput.addEventListener("input", () => {
-	  clearTitleBtn.style.display = cardTitleInput.value ? "block" : "none";
+	  // 移除換行符號（防止貼上多行）
+	  cardTitleInput.value = cardTitleInput.value.replace(/[\r\n]+/g, "");
+
+	  const length = cardTitleInput.value.length;
+
+	  // 顯示清除按鈕
+	  clearTitleBtn.style.display = length ? "block" : "none";
+
+	  // 更新字數
+	  titleCharCounter.textContent = `${length} / ${MAX_TITLE_LENGTH}`;
+	  if (length >= MAX_TITLE_LENGTH) {
+		titleCharCounter.classList.add("limit-reached");
+	  } else {
+		titleCharCounter.classList.remove("limit-reached");
+	  }
+
+	  // 保險：字數超過上限，自動截斷
+	  if (length > MAX_TITLE_LENGTH) {
+		cardTitleInput.value = cardTitleInput.value.slice(0, MAX_TITLE_LENGTH);
+	  }
 	});
 
 	// 點擊清除 icon
 	clearTitleBtn.addEventListener("click", () => {
 	  cardTitleInput.value = "";
 	  clearTitleBtn.style.display = "none";
-	  cardTitleInput.focus(); // 清除後讓輸入框重新 focus
+	  titleCharCounter.textContent = `0 / ${MAX_TITLE_LENGTH}`;
+	  titleCharCounter.classList.remove("limit-reached");
+	  cardTitleInput.focus();
 	});
 
     Object.entries(posEls).forEach(([idx, el]) => {
@@ -1503,7 +1543,6 @@ flex-direction: column;
         statusEl.textContent = `LIFF 初始化失敗：${err?.message || "unknown"}`;
       }
     })();
-
 
     // ====== 初始狀態與版本顯示 ======
     document.getElementById("ver").textContent = LINE_ID + " | " + APP_VERSION;
