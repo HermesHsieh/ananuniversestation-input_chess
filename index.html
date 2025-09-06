@@ -748,7 +748,7 @@ flex-direction: column;
     /** 2007906926-NZW6EQ7P Production **/
     /** 2007931033-4D50LqwM Dev **/
     const LIFF_ID = "2007931033-4D50LqwM";
-    const APP_VERSION = "v1.0.3-43";
+    const APP_VERSION = "v1.0.3-44";
     const LINE_ID = "@968noswo"; // 你的官方帳號 ID（@ 開頭）
 
     /** ******************************
@@ -1590,8 +1590,7 @@ flex-direction: column;
 
       // 先帶入：?n=（舊參數名稱）或 ?title=
       inputTitle.textContent = qs.get('n') || qs.get('title')
-        || (getCardTitle()?.textContent?.trim() || '')
-        || '';
+        || getCardTitle() || '';
 
       // 接上現有分數邏輯：
       // 1) 若網址給了 bs/ps（base / penalty），照既有規則推 finalScoreText
