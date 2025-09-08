@@ -787,7 +787,7 @@
     /** 2007906926-NZW6EQ7P Production **/
     /** 2007931033-4D50LqwM Dev **/
     const LIFF_ID = "2007931033-4D50LqwM";
-    const APP_VERSION = "v1.0.3-44";
+    const APP_VERSION = "v1.0.3-45";
     const LINE_ID = "@968noswo"; // 你的官方帳號 ID（@ 開頭）
 
     /** ******************************
@@ -1574,6 +1574,9 @@
         printLog("用戶名稱：" + profile.displayName);
         statusEl.textContent = `Hello, ${profile.displayName} 👋`;
 
+        const idToken = liff.getIDToken();
+        printLog("idToken：" + idToken);
+
         // 取得網址參數
         const urlParams = new URLSearchParams(window.location.search);
         gUrlParams = urlParams; // 儲存起來給其他函式用
@@ -1587,7 +1590,7 @@
     document.getElementById("ver").textContent = LINE_ID + " | " + APP_VERSION;
 
     // 隱藏日誌輸出區域
-    document.getElementById("logOutput").classList.add("hidden");
+    // document.getElementById("logOutput").classList.add("hidden");
 
     initElderMode();
     // 初次渲染
