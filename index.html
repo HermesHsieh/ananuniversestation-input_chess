@@ -325,7 +325,6 @@
       order: 5;
     }
 
-
     /* ===== 放大模式：棋子選擇區改為 2×7 網格，且整體可左右滑動 ===== */
     body.mode-elder .picker-wrap {
       overflow-x: auto;
@@ -491,98 +490,138 @@
       z-index: 0;
       /* 在內容下方 */
     }
-	
-	/* 4x8 暗棋面板樣式 */
-.dark-grid{
-  display:grid;
-  grid-template-columns:repeat(4, minmax(64px,1fr));
-  gap:12px;
-  justify-items:center;
-  align-items:center;
-  padding:8px 4px;
-}
-.dark-cell{
-flex-direction: column;
-  width:60px; height:60px; border-radius:50%;
-  border:4px solid #9ca3af; background:#fff;
-  display:flex; align-items:center; justify-content:center;
-  font-size:30px; line-height:1; user-select:none; cursor:pointer;
-  position:relative; box-shadow:0 1px 2px rgba(0,0,0,.06) inset;
-}
-.dark-cell.face-down::after{
-  content:""; position:absolute; inset:10px; border-radius:50%;
-  border:2px dashed #c7ced6; background:#f3f4f6;
-}
-.dark-cell.flipped{ cursor:default; }
-.dark-cell.red.flipped  { color:#d32f2f; border-color:#d32f2f; }
-.dark-cell.black.flipped{ color:#111111; border-color:#111111; }
-.dark-cell.disabled{ pointer-events:none; opacity:.6; }
 
-/* 可依需求微調尺寸 */
-@media (max-width: 380px){
-  .dark-cell{ width:64px; height:64px; font-size:24px; }
-}
+    /* 4x8 暗棋面板樣式 */
+    .dark-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(64px, 1fr));
+      gap: 12px;
+      justify-items: center;
+      align-items: center;
+      padding: 8px 4px;
+    }
 
-/* 棋字本體 */
-.dark-cell .piece-text {
-  font-size: 1em;           /* 沿用 .dark-cell 的字體大小（36px / 或媒體查詢後的 24px） */
-  line-height: 1;
-}
+    .dark-cell {
+      flex-direction: column;
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      border: 4px solid #9ca3af;
+      background: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 30px;
+      line-height: 1;
+      user-select: none;
+      cursor: pointer;
+      position: relative;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, .06) inset;
+    }
 
-/* 序號（小一點、淡一點），置於棋字下方一點 */
-.dark-cell .flip-order {
-  font-size: 14px;
-  line-height: 1;
-  margin-top: 4px;              /* ⬅「下面一點」 */
-  color: #666;
-}
-/* 使用這 5 顆：未選滿時的視覺狀態 */
-#btnUseSelected[disabled],
-#btnUseSelected.is-disabled {
-  opacity: .5;
-  cursor: not-allowed;
-  filter: grayscale(30%);
-}
+    .dark-cell.face-down::after {
+      content: "";
+      position: absolute;
+      inset: 10px;
+      border-radius: 50%;
+      border: 2px dashed #c7ced6;
+      background: #f3f4f6;
+    }
 
-.card-title-input {
-  font-size: 16px;
-  font-weight: 700;
-  text-align: center;
-  margin-bottom: 8px;
-  width: 100%;
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  padding: 6px 32px 6px 32px; /* 預留右邊空間給 icon */
-  box-sizing: border-box;
-}
+    .dark-cell.flipped {
+      cursor: default;
+    }
 
-.card-title-wrapper {
-  position: relative;
-  display: inline-block;
-  width: 100%;
-}
+    .dark-cell.red.flipped {
+      color: #d32f2f;
+      border-color: #d32f2f;
+    }
 
-.clear-icon {
-  position: absolute;
-  right: 4px;
-  top: 50%;
-  transform: translateY(-63%);
-  font-size: 42px;
-  color: #aaa;
-  cursor: pointer;
-  display: none; /* 預設隱藏 */
-}
+    .dark-cell.black.flipped {
+      color: #111111;
+      border-color: #111111;
+    }
 
-.char-counter {
-  font-size: 12px;
-  color: #666;
-  text-align: right;
-  margin-top: 2px;
-}
-.char-counter.limit-reached {
-  color: #d32f2f; /* 超過時變紅色 */
-}
+    .dark-cell.disabled {
+      pointer-events: none;
+      opacity: .6;
+    }
 
+    /* 可依需求微調尺寸 */
+    @media (max-width: 380px) {
+      .dark-cell {
+        width: 64px;
+        height: 64px;
+        font-size: 24px;
+      }
+    }
+
+    /* 棋字本體 */
+    .dark-cell .piece-text {
+      font-size: 1em;
+      /* 沿用 .dark-cell 的字體大小（36px / 或媒體查詢後的 24px） */
+      line-height: 1;
+    }
+
+    /* 序號（小一點、淡一點），置於棋字下方一點 */
+    .dark-cell .flip-order {
+      font-size: 14px;
+      line-height: 1;
+      margin-top: 4px;
+      /* ⬅「下面一點」 */
+      color: #666;
+    }
+
+    /* 使用這 5 顆：未選滿時的視覺狀態 */
+    #btnUseSelected[disabled],
+    #btnUseSelected.is-disabled {
+      opacity: .5;
+      cursor: not-allowed;
+      filter: grayscale(30%);
+    }
+
+    .card-title-input {
+      font-size: 16px;
+      font-weight: 700;
+      text-align: center;
+      margin-bottom: 8px;
+      width: 100%;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 6px 32px 6px 32px;
+      /* 預留右邊空間給 icon */
+      box-sizing: border-box;
+    }
+
+    .card-title-wrapper {
+      position: relative;
+      display: inline-block;
+      width: 100%;
+    }
+
+    .clear-icon {
+      position: absolute;
+      right: 4px;
+      top: 50%;
+      transform: translateY(-63%);
+      font-size: 42px;
+      color: #aaa;
+      cursor: pointer;
+      display: none;
+      /* 預設隱藏 */
+    }
+
+    .char-counter {
+      font-size: 12px;
+      color: #666;
+      text-align: right;
+      margin-top: 2px;
+    }
+
+    .char-counter.limit-reached {
+      color: #d32f2f;
+      /* 超過時變紅色 */
+    }
   </style>
 </head>
 
@@ -594,7 +633,7 @@ flex-direction: column;
       <div class="topbar">
         <div class="title">單卦</div>
         <div class="bar-actions">
-		  <button class="btn btn-secondary" id="chessMatrixBtn">線上抽卦</button>
+          <button class="btn btn-secondary" id="chessMatrixBtn">線上抽卦</button>
           <button class="mode-toggle" id="elderToggleBtn">放大模式</button>
         </div>
       </div>
@@ -602,11 +641,11 @@ flex-direction: column;
       <div id="status" class="status">初始化中…</div>
 
       <div class="card">
-		<div class="card-title-wrapper">
-		  <span class="clear-icon" id="clearTitleBtn">&times;</span>
+        <div class="card-title-wrapper">
+          <span class="clear-icon" id="clearTitleBtn">&times;</span>
           <input id="cardTitleInput" class="card-title-input" type="text" placeholder="輸入問題名稱" />
-		</div>
-		<div class="char-counter" id="titleCharCounter">0 / 0</div>
+        </div>
+        <div class="char-counter" id="titleCharCounter">0 / 0</div>
 
         <!-- 九宮格（上：4 / 中：2 1 3 / 下：5） -->
         <div class="grid" aria-label="十字九宮格">
@@ -1407,59 +1446,59 @@ flex-direction: column;
         logDiv.scrollTop = logDiv.scrollHeight;  // 自動捲到底部
       }
     }
-	
-	
-	const MAX_TITLE_LENGTH = 50; // ✅ 這裡控制最大字數
+
+
+    const MAX_TITLE_LENGTH = 50; // ✅ 這裡控制最大字數
 
     // ====== 綁定 UI ======
     $("clearBtn").addEventListener("click", clearAll);
     $("randomBtn").addEventListener("click", randomFillAll);
     $("sendBtn").addEventListener("click", sendResult);
-	const cardTitleInput = document.getElementById("cardTitleInput");
-	const clearTitleBtn = document.getElementById("clearTitleBtn");
-	const titleCharCounter = document.getElementById("titleCharCounter");
-	
-	// 如果還要存取這個標題，可以直接讀 value
-	function getCardTitle() {
-	  return cardTitleInput.value.trim();
-	}
-	
-	// 初始化字數提示
-	titleCharCounter.textContent = `0 / ${MAX_TITLE_LENGTH}`;
-	
-	cardTitleInput.setAttribute("maxlength", MAX_TITLE_LENGTH);
-	
-	cardTitleInput.addEventListener("input", () => {
-	  // 移除換行符號（防止貼上多行）
-	  cardTitleInput.value = cardTitleInput.value.replace(/[\r\n]+/g, "");
+    const cardTitleInput = document.getElementById("cardTitleInput");
+    const clearTitleBtn = document.getElementById("clearTitleBtn");
+    const titleCharCounter = document.getElementById("titleCharCounter");
 
-	  const length = cardTitleInput.value.length;
+    // 如果還要存取這個標題，可以直接讀 value
+    function getCardTitle() {
+      return cardTitleInput.value.trim();
+    }
 
-	  // 顯示清除按鈕
-	  clearTitleBtn.style.display = length ? "block" : "none";
+    // 初始化字數提示
+    titleCharCounter.textContent = `0 / ${MAX_TITLE_LENGTH}`;
 
-	  // 更新字數
-	  titleCharCounter.textContent = `${length} / ${MAX_TITLE_LENGTH}`;
-	  if (length >= MAX_TITLE_LENGTH) {
-		titleCharCounter.classList.add("limit-reached");
-	  } else {
-		titleCharCounter.classList.remove("limit-reached");
-	  }
+    cardTitleInput.setAttribute("maxlength", MAX_TITLE_LENGTH);
 
-	  // 保險：字數超過上限，自動截斷
-	  if (length > MAX_TITLE_LENGTH) {
-		cardTitleInput.value = cardTitleInput.value.slice(0, MAX_TITLE_LENGTH);
-	  }
-	});
+    cardTitleInput.addEventListener("input", () => {
+      // 移除換行符號（防止貼上多行）
+      cardTitleInput.value = cardTitleInput.value.replace(/[\r\n]+/g, "");
 
-	// 點擊清除 icon
-	clearTitleBtn.addEventListener("click", () => {
-	  cardTitleInput.value = "";
-	  clearTitleBtn.style.display = "none";
-	  titleCharCounter.textContent = `0 / ${MAX_TITLE_LENGTH}`;
-	  titleCharCounter.classList.remove("limit-reached");
-	  cardTitleInput.focus();
-	});
+      const length = cardTitleInput.value.length;
+
+      // 顯示清除按鈕
+      clearTitleBtn.style.display = length ? "block" : "none";
+
+      // 更新字數
+      titleCharCounter.textContent = `${length} / ${MAX_TITLE_LENGTH}`;
+      if (length >= MAX_TITLE_LENGTH) {
+        titleCharCounter.classList.add("limit-reached");
+      } else {
+        titleCharCounter.classList.remove("limit-reached");
+      }
+
+      // 保險：字數超過上限，自動截斷
+      if (length > MAX_TITLE_LENGTH) {
+        cardTitleInput.value = cardTitleInput.value.slice(0, MAX_TITLE_LENGTH);
+      }
+    });
+
+    // 點擊清除 icon
+    clearTitleBtn.addEventListener("click", () => {
+      cardTitleInput.value = "";
+      clearTitleBtn.style.display = "none";
+      titleCharCounter.textContent = `0 / ${MAX_TITLE_LENGTH}`;
+      titleCharCounter.classList.remove("limit-reached");
+      cardTitleInput.focus();
+    });
 
     Object.entries(posEls).forEach(([idx, el]) => {
       el.addEventListener("click", () => setSelected(Number(idx)));
@@ -1506,7 +1545,7 @@ flex-direction: column;
       }
       return true;
     }
-	
+
     // ====== 初始化 LIFF ======
     (async () => {
       try {
@@ -1669,201 +1708,201 @@ flex-direction: column;
       });
     })();
 
-// ===== 暗棋 32 子（固定矩陣；可自行調整順序）=====
-// 8 rows × 4 columns，每格 { t: 棋子字, color: 'red'|'black' }
-const DARK_CHESS_32 = [
-  [ {t:"士",c:"black"}, {t:"象",c:"black"}, {t:"馬",c:"black"}, {t:"車",c:"black"} ],
-  [ {t:"包",c:"black"}, {t:"卒",c:"black"}, {t:"卒",c:"black"}, {t:"卒",c:"black"} ],
-  [ {t:"卒",c:"black"}, {t:"卒",c:"black"}, {t:"包",c:"black"}, {t:"將",c:"black"} ],
-  [ {t:"象",c:"black"}, {t:"士",c:"black"}, {t:"車",c:"black"}, {t:"馬",c:"black"} ],
+    // ===== 暗棋 32 子（固定矩陣；可自行調整順序）=====
+    // 8 rows × 4 columns，每格 { t: 棋子字, color: 'red'|'black' }
+    const DARK_CHESS_32 = [
+      [{ t: "士", c: "black" }, { t: "象", c: "black" }, { t: "馬", c: "black" }, { t: "車", c: "black" }],
+      [{ t: "包", c: "black" }, { t: "卒", c: "black" }, { t: "卒", c: "black" }, { t: "卒", c: "black" }],
+      [{ t: "卒", c: "black" }, { t: "卒", c: "black" }, { t: "包", c: "black" }, { t: "將", c: "black" }],
+      [{ t: "象", c: "black" }, { t: "士", c: "black" }, { t: "車", c: "black" }, { t: "馬", c: "black" }],
 
-  [ {t:"仕",c:"red"},   {t:"相",c:"red"},   {t:"傌",c:"red"},   {t:"俥",c:"red"} ],
-  [ {t:"炮",c:"red"},   {t:"兵",c:"red"},   {t:"兵",c:"red"},   {t:"兵",c:"red"} ],
-  [ {t:"兵",c:"red"},   {t:"兵",c:"red"},   {t:"炮",c:"red"},   {t:"帥",c:"red"} ],
-  [ {t:"相",c:"red"},   {t:"仕",c:"red"},   {t:"俥",c:"red"},   {t:"傌",c:"red"} ],
-];
+      [{ t: "仕", c: "red" }, { t: "相", c: "red" }, { t: "傌", c: "red" }, { t: "俥", c: "red" }],
+      [{ t: "炮", c: "red" }, { t: "兵", c: "red" }, { t: "兵", c: "red" }, { t: "兵", c: "red" }],
+      [{ t: "兵", c: "red" }, { t: "兵", c: "red" }, { t: "炮", c: "red" }, { t: "帥", c: "red" }],
+      [{ t: "相", c: "red" }, { t: "仕", c: "red" }, { t: "俥", c: "red" }, { t: "傌", c: "red" }],
+    ];
 
-// ===== 狀態 =====
-let flipSelections = []; // 使用者已翻的 5 顆（照順序）
-const gridEl = () => document.getElementById('darkGrid');
-const gridView = () => document.getElementById('randomGridView');
-const mainView = () => document.getElementById('mainContent'); // 你的主畫面容器 id
+    // ===== 狀態 =====
+    let flipSelections = []; // 使用者已翻的 5 顆（照順序）
+    const gridEl = () => document.getElementById('darkGrid');
+    const gridView = () => document.getElementById('randomGridView');
+    const mainView = () => document.getElementById('mainContent'); // 你的主畫面容器 id
 
-// 目前棋盤對應的 32 顆（本次面板用的隨機結果）
-let shuffledPieces = [];
+    // 目前棋盤對應的 32 顆（本次面板用的隨機結果）
+    let shuffledPieces = [];
 
-// Fisher–Yates 洗牌：把 DARK_CHESS_32 攤平後打亂
-function shuffleDeck() {
-  const arr = [];
-  for (let r = 0; r < 8; r++) {
-    for (let c = 0; c < 4; c++) {
-      arr.push(DARK_CHESS_32[r][c]); // { t, c }
+    // Fisher–Yates 洗牌：把 DARK_CHESS_32 攤平後打亂
+    function shuffleDeck() {
+      const arr = [];
+      for (let r = 0; r < 8; r++) {
+        for (let c = 0; c < 4; c++) {
+          arr.push(DARK_CHESS_32[r][c]); // { t, c }
+        }
+      }
+      for (let i = arr.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+      }
+      return arr;
     }
-  }
-  for (let i = arr.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [arr[i], arr[j]] = [arr[j], arr[i]];
-  }
-  return arr;
-}
 
-// ===== 入口：開啟 4x8 棋盤流程 =====
-function openRandomGrid(){
-  flipSelections = [];
-  setUseButtonState(0);        // ← 新增
-  shuffledPieces = shuffleDeck();     // ← 這次面板要用的隨機結果
-  
-  // 顯示/隱藏
-  mainView()?.classList.add('hidden');
-  gridView()?.classList.remove('hidden');
-  // 渲染棋盤
-  renderDarkGrid();
-}
+    // ===== 入口：開啟 4x8 棋盤流程 =====
+    function openRandomGrid() {
+      flipSelections = [];
+      setUseButtonState(0);        // ← 新增
+      shuffledPieces = shuffleDeck();     // ← 這次面板要用的隨機結果
 
-// ===== 渲染 4x8 棋盤（全部朝下） =====
-function renderDarkGrid(){
-  const el = gridEl();
-  if(!el) return;
-  el.innerHTML = "";
-  for(let r=0; r<8; r++){
-    for(let c=0; c<4; c++){
-      const idx = r * 4 + c;
-      const p = shuffledPieces[idx] || DARK_CHESS_32[r][c]; // 保底
-      const cell = document.createElement('div');
-      cell.className = 'dark-cell face-down';
-      cell.dataset.r = r;
-      cell.dataset.c = c;
-      cell.dataset.t = p.t;
-      cell.dataset.color = p.c;
-      cell.addEventListener('click', onCellClick);
-      el.appendChild(cell);
+      // 顯示/隱藏
+      mainView()?.classList.add('hidden');
+      gridView()?.classList.remove('hidden');
+      // 渲染棋盤
+      renderDarkGrid();
     }
-  }
-  // 控制按鈕初始狀態
-  // document.getElementById('btnUseSelected')?.setAttribute('disabled','');
-  setUseButtonState(0);
-}
 
-// ===== 點格子翻子（最多 5 顆）=====
-function onCellClick(e){
-  const cell = e.currentTarget;
-  if(cell.classList.contains('flipped')) return;
-  if(flipSelections.length >= 5) return;
+    // ===== 渲染 4x8 棋盤（全部朝下） =====
+    function renderDarkGrid() {
+      const el = gridEl();
+      if (!el) return;
+      el.innerHTML = "";
+      for (let r = 0; r < 8; r++) {
+        for (let c = 0; c < 4; c++) {
+          const idx = r * 4 + c;
+          const p = shuffledPieces[idx] || DARK_CHESS_32[r][c]; // 保底
+          const cell = document.createElement('div');
+          cell.className = 'dark-cell face-down';
+          cell.dataset.r = r;
+          cell.dataset.c = c;
+          cell.dataset.t = p.t;
+          cell.dataset.color = p.c;
+          cell.addEventListener('click', onCellClick);
+          el.appendChild(cell);
+        }
+      }
+      // 控制按鈕初始狀態
+      // document.getElementById('btnUseSelected')?.setAttribute('disabled','');
+      setUseButtonState(0);
+    }
 
-  // 翻開
-  cell.classList.remove('face-down');
-  cell.classList.add('flipped', cell.dataset.color);
-  //cell.textContent = cell.dataset.t;
- const order = flipSelections.length + 1; // 這是第幾顆
- cell.innerHTML = `
+    // ===== 點格子翻子（最多 5 顆）=====
+    function onCellClick(e) {
+      const cell = e.currentTarget;
+      if (cell.classList.contains('flipped')) return;
+      if (flipSelections.length >= 5) return;
+
+      // 翻開
+      cell.classList.remove('face-down');
+      cell.classList.add('flipped', cell.dataset.color);
+      //cell.textContent = cell.dataset.t;
+      const order = flipSelections.length + 1; // 這是第幾顆
+      cell.innerHTML = `
    <div class="piece-text">${cell.dataset.t}</div>
    <div class="flip-order">${order}</div>
  `;
-  // 紀錄
-  flipSelections.push({
-    t: cell.dataset.t,
-    color: cell.dataset.color,
-    r: Number(cell.dataset.r),
-    c: Number(cell.dataset.c),
-	order          // ← 可留著備查（不影響後續）
-  });
+      // 紀錄
+      flipSelections.push({
+        t: cell.dataset.t,
+        color: cell.dataset.color,
+        r: Number(cell.dataset.r),
+        c: Number(cell.dataset.c),
+        order          // ← 可留著備查（不影響後續）
+      });
 
-  const n = flipSelections.length;
-  setUseButtonState(n);
+      const n = flipSelections.length;
+      setUseButtonState(n);
 
-  // 滿 5 顆：鎖住其他格子 + 啟用「使用這 5 顆」
-  if(n >= 5){
-    gridEl()?.querySelectorAll('.dark-cell:not(.flipped)')
-      .forEach(node => node.classList.add('disabled'));
-  }
-}
-
-// ===== 取消：回主畫面、清空狀態 =====
-function cancelRandomGrid(){
-  gridView()?.classList.add('hidden');
-  mainView()?.classList.remove('hidden');
-  flipSelections = [];
-  setUseButtonState(0);
-}
-
-// ✅ 使用這 5 顆：餵回主畫面的 picks[1..5]，並回主畫面
-function useFiveAndBack() {
-  if (flipSelections.length < 5) {
-    alert('請先翻滿 5 顆');
-    return;
-  }
-
-  // 你的頁面有頂層 const picks（不是 window.picks）
-  // 這裡優先寫入 picks；若不存在再退回 window.picks
-  const targetPicks =
-    (typeof picks !== 'undefined' && picks) ||
-    (window.picks ||= { 1: null, 2: null, 3: null, 4: null, 5: null });
-
-  // 依點擊順序塞進 1..5
-  for (let i = 0; i < 5; i++) {
-    const p = flipSelections[i]; // { t, color, r, c }
-    targetPicks[i + 1] = { type: p.t, color: p.color };
-  }
-
-  // 重新渲染主畫面
-  try { if (typeof render === 'function') render(); } catch (_) {}
-
-  // 回主畫面
-  cancelRandomGrid();
-}
-
-
-// ===== 把「隨機」按鈕改成開啟新面板 =====
-// 若你的按鈕 id 不是 btnRandom，請把選擇器換成你實際的
-const chessMatrixBtn = document.getElementById('chessMatrixBtn') 
-                || document.querySelector('[data-action="random"]') 
-                || document.querySelector('.btn-random');
-chessMatrixBtn?.addEventListener('click', (e)=>{ e.preventDefault(); openRandomGrid(); });
-
-// ✅ 事件委派：即使按鈕是之後才顯示，也能接到點擊
-document.addEventListener('click', function (e) {
-  const t = e.target;
-  if (!t) return;
-
-  // 取消
-  const cancelBtn = t.closest?.('#btnCancelGrid');
-  if (cancelBtn) {
-    e.preventDefault();
-    cancelRandomGrid();
-    return;
-  }
-
-  // 使用這 5 顆（需非 disabled）
-  const useBtn = t.closest?.('#btnUseSelected');
-  if (useBtn) {
-    e.preventDefault();
-    if (!useBtn.hasAttribute('disabled') && !useBtn.disabled) {
-      useFiveAndBack();
+      // 滿 5 顆：鎖住其他格子 + 啟用「使用這 5 顆」
+      if (n >= 5) {
+        gridEl()?.querySelectorAll('.dark-cell:not(.flipped)')
+          .forEach(node => node.classList.add('disabled'));
+      }
     }
-  }
-});
 
-// 依目前已翻數量，更新「使用這 5 顆」按鈕狀態與文字
-function setUseButtonState(count) {
-  const btn = document.getElementById('btnUseSelected');
-  if (!btn) return;
-  const enable = count >= 5;
+    // ===== 取消：回主畫面、清空狀態 =====
+    function cancelRandomGrid() {
+      gridView()?.classList.add('hidden');
+      mainView()?.classList.remove('hidden');
+      flipSelections = [];
+      setUseButtonState(0);
+    }
 
-  // 實際可點與屬性
-  btn.disabled = !enable;
-  if (enable) {
-    btn.removeAttribute('disabled');
-    btn.classList.remove('is-disabled');
-    btn.textContent = '確認';
-  } else {
-    btn.setAttribute('disabled', '');
-    btn.classList.add('is-disabled');
-    // 顯示目前已翻幾顆（可改成不要顯示）
-    btn.textContent = `已翻 ${count}／5 顆`;
-  }
-}
+    // ✅ 使用這 5 顆：餵回主畫面的 picks[1..5]，並回主畫面
+    function useFiveAndBack() {
+      if (flipSelections.length < 5) {
+        alert('請先翻滿 5 顆');
+        return;
+      }
 
-</script>
+      // 你的頁面有頂層 const picks（不是 window.picks）
+      // 這裡優先寫入 picks；若不存在再退回 window.picks
+      const targetPicks =
+        (typeof picks !== 'undefined' && picks) ||
+        (window.picks ||= { 1: null, 2: null, 3: null, 4: null, 5: null });
+
+      // 依點擊順序塞進 1..5
+      for (let i = 0; i < 5; i++) {
+        const p = flipSelections[i]; // { t, color, r, c }
+        targetPicks[i + 1] = { type: p.t, color: p.color };
+      }
+
+      // 重新渲染主畫面
+      try { if (typeof render === 'function') render(); } catch (_) { }
+
+      // 回主畫面
+      cancelRandomGrid();
+    }
+
+
+    // ===== 把「隨機」按鈕改成開啟新面板 =====
+    // 若你的按鈕 id 不是 btnRandom，請把選擇器換成你實際的
+    const chessMatrixBtn = document.getElementById('chessMatrixBtn')
+      || document.querySelector('[data-action="random"]')
+      || document.querySelector('.btn-random');
+    chessMatrixBtn?.addEventListener('click', (e) => { e.preventDefault(); openRandomGrid(); });
+
+    // ✅ 事件委派：即使按鈕是之後才顯示，也能接到點擊
+    document.addEventListener('click', function (e) {
+      const t = e.target;
+      if (!t) return;
+
+      // 取消
+      const cancelBtn = t.closest?.('#btnCancelGrid');
+      if (cancelBtn) {
+        e.preventDefault();
+        cancelRandomGrid();
+        return;
+      }
+
+      // 使用這 5 顆（需非 disabled）
+      const useBtn = t.closest?.('#btnUseSelected');
+      if (useBtn) {
+        e.preventDefault();
+        if (!useBtn.hasAttribute('disabled') && !useBtn.disabled) {
+          useFiveAndBack();
+        }
+      }
+    });
+
+    // 依目前已翻數量，更新「使用這 5 顆」按鈕狀態與文字
+    function setUseButtonState(count) {
+      const btn = document.getElementById('btnUseSelected');
+      if (!btn) return;
+      const enable = count >= 5;
+
+      // 實際可點與屬性
+      btn.disabled = !enable;
+      if (enable) {
+        btn.removeAttribute('disabled');
+        btn.classList.remove('is-disabled');
+        btn.textContent = '確認';
+      } else {
+        btn.setAttribute('disabled', '');
+        btn.classList.add('is-disabled');
+        // 顯示目前已翻幾顆（可改成不要顯示）
+        btn.textContent = `已翻 ${count}／5 顆`;
+      }
+    }
+
+  </script>
 
   <div id="onlyInApp" class="wrap hidden"
     style="position:fixed;inset:0;background:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:9999;text-align:center;padding:24px;">
@@ -1876,21 +1915,21 @@ function setUseButtonState(count) {
     </div>
   </div>
 
-<!-- 隨機翻子面板：4x8 棋盤（預設隱藏） -->
-<div id="randomGridView" class="wrap hidden" aria-label="隨機翻 5 顆">
-  <div class="topbar">
-    <div class="bar-actions"></div>
+  <!-- 隨機翻子面板：4x8 棋盤（預設隱藏） -->
+  <div id="randomGridView" class="wrap hidden" aria-label="隨機翻 5 顆">
+    <div class="topbar">
+      <div class="bar-actions"></div>
+    </div>
+
+    <div class="controls" style="margin-top:8px;">
+      <button class="btn btn-secondary" id="btnCancelGrid">取消</button>
+      <button class="btn btn-primary" id="btnUseSelected" disabled>確認</button>
+    </div>
+
+    <div class="card">
+      <div id="darkGrid" class="dark-grid"></div>
+    </div>
   </div>
-  
-  <div class="controls" style="margin-top:8px;">
-    <button class="btn btn-secondary" id="btnCancelGrid">取消</button>
-    <button class="btn btn-primary" id="btnUseSelected" disabled>確認</button>
-  </div>
-  
-  <div class="card">
-    <div id="darkGrid" class="dark-grid"></div>
-  </div>
-</div>
 
 </body>
 
