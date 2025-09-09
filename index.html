@@ -812,7 +812,7 @@
     /** 2007906926-NZW6EQ7P Production **/
     /** 2007931033-4D50LqwM Dev **/
     const LIFF_ID = "2007931033-4D50LqwM";
-    const APP_VERSION = "v1.0.3-48";
+    const APP_VERSION = "v1.0.3-49";
     const LINE_ID = "@968noswo"; // 你的官方帳號 ID（@ 開頭）
 
     /** ******************************
@@ -1619,30 +1619,32 @@
         const idToken = liff.getIDToken();
         printLog("idToken：" + idToken);
         if (idToken) {
-          fetch('https://script.google.com/macros/s/AKfycbzv9VtVgoTKXpA29U6XX40pA5ucnFCPk_g16Soe05CPjr4GhxuD5kYFx2XKD2m6aOZZ/exec', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ idToken: idToken }),
-          })
-            .then(response => 
-            printLog("驗證回應狀態：" + response.status) ||
-            response.text()
-          )
-            .then(html => {
-              printLog("驗證成功");
-              // printLog("回傳內容：" + html);
-              statusEl.textContent += " (驗證成功)";
-              const _mainContent = document.getElementById('mainContent')
-              if (!_mainContent) {
-                _mainContent.classList.remove('hidden');
-                return;
-              }
-            })
-            .catch(() => {
-              printLog("驗證失敗或無權限訪問");
-              // alert('驗證失敗或無權限訪問');
-              // liff.closeWindow();
-            });
+          const _mainContent = document.getElementById('mainContent')
+          if (!_mainContent) {
+            _mainContent.classList.remove('hidden');
+            return;
+          }
+          // fetch('https://script.google.com/macros/s/AKfycbzv9VtVgoTKXpA29U6XX40pA5ucnFCPk_g16Soe05CPjr4GhxuD5kYFx2XKD2m6aOZZ/exec', {
+          //   method: 'POST',
+          //   headers: { 'Content-Type': 'application/json' },
+          //   body: JSON.stringify({ idToken: idToken }),
+          // }).then(response =>
+          //   printLog("驗證回應狀態：" + response.status) ||
+          //   response.text()
+          // ).then(html => {
+          //   printLog("驗證成功");
+          //   // printLog("回傳內容：" + html);
+          //   statusEl.textContent += " (驗證成功)";
+          //   const _mainContent = document.getElementById('mainContent')
+          //   if (!_mainContent) {
+          //     _mainContent.classList.remove('hidden');
+          //     return;
+          //   }
+          // }).catch(() => {
+          //   printLog("驗證失敗或無權限訪問");
+          //   // alert('驗證失敗或無權限訪問');
+          //   // liff.closeWindow();
+          // });
         }
       } catch (err) {
         printLog("初始化錯誤: " + (err?.message || err));
