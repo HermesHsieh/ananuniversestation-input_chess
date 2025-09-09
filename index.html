@@ -719,9 +719,6 @@
       </div>
     </div>
   </div>
-  <div id="logOutput"
-    style="white-space: pre-wrap; background:#f0f0f0; padding:10px; border:1px solid #ccc; height:150px; overflow-y:auto;">
-  </div>
   <!-- 🔄 分享模式佈局（預設隱藏；?action=share 或 ?a=share 時顯示） -->
   <div id="shareContent" class="wrap hidden" aria-label="分享設定區">
     <div class="topbar">
@@ -804,6 +801,10 @@
       <div id="darkGrid" class="dark-grid"></div>
     </div>
   </div>
+  
+  <div id="logOutput"
+    style="white-space: pre-wrap; background:#f0f0f0; padding:10px; border:1px solid #ccc; height:150px; overflow-y:auto;">
+  </div>
 
   <script>
     /** ******************************
@@ -812,7 +813,7 @@
     /** 2007906926-NZW6EQ7P Production **/
     /** 2007931033-4D50LqwM Dev **/
     const LIFF_ID = "2007931033-4D50LqwM";
-    const APP_VERSION = "v1.0.3-50";
+    const APP_VERSION = "v1.0.3-51";
     const LINE_ID = "@968noswo"; // 你的官方帳號 ID（@ 開頭）
 
     /** ******************************
@@ -1652,122 +1653,6 @@
       }
     })();
 
-
-    // ===== 分享模式：參數解析與 UI 切換 =====
-    (function setupShareModePanel() {
-      const qs = new URLSearchParams(location.search);
-      const action = qs.get('a');      // 既有參數：a=share
-      const parameter = qs.get('p'); //  取得 parameter 參數 5cg
-      const chessText = qs.get('c'); // 新參數：c=XXXXX 五字
-      const isShareMode = (action === 'share');
-
-      // 兩個容器：主畫面 & 分享畫面
-      const mainEl = document.getElementById('mainContent');
-      const shareEl = document.getElementById('shareContent');
-      const refreshEl = document.getElementById('refreshIndicator');
-
-      if (!isShareMode || !shareEl) {
-        mainEl.classList.remove('hidden');
-        return;
-      }
-
-      // 隱藏原本所有畫面元件，只顯示分享面板
-      if (mainEl) mainEl.classList.add('hidden');
-      if (refreshEl) refreshEl.classList.add('hidden');
-      shareEl.classList.remove('hidden');
-
-      // ✅ 顯示唯讀棋盤內容
-      renderShareBoardFromPicks(chessText);
-
-      // ==== 預設值：從網址或目前狀態帶入 ====
-      const chkTitle = document.getElementById('chkTitle');
-      const chkScore = document.getElementById('chkScore');
-      const inputTitle = document.getElementById('shareTitleText');
-      const inputScore = document.getElementById('shareScoreText');
-      const btnShare = document.getElementById('btnShare');
-      const btnCancel = document.getElementById('btnCancel');
-
-      // 先帶入：?n=（舊參數名稱）或 ?title=
-      inputTitle.textContent = qs.get('n') || qs.get('title')
-        || getCardTitle() || '';
-
-      // 接上現有分數邏輯：
-      // 1) 若網址給了 bs/ps（base / penalty），照既有規則推 finalScoreText
-      // 2) 否則讀全域 window.latestHealingScore / window.healingScore
-      // 3) 都沒有則留空（可手動輸入）
-      (function fillScoreFromState() {
-        const bs = qs.get('bs'), ps = qs.get('ps');
-        if (bs !== null && ps !== null) {
-          const base = Number(bs), pen = Number(ps);
-          if (!isNaN(base) && !isNaN(pen)) {
-            if (base < 60) {
-              inputScore.textContent = '需調整';
-            } else {
-              inputScore.textContent = String(base - pen) + '分';
-            }
-            return;
-          }
-        }
-        if (typeof window.latestHealingScore !== 'undefined' && window.latestHealingScore !== null) {
-          inputScore.textContent = String(window.latestHealingScore);
-          return;
-        }
-        if (typeof window.healingScore !== 'undefined' && window.healingScore !== null) {
-          inputScore.textContent = String(window.healingScore);
-          return;
-        }
-      })();
-
-      if (qs.has('showTitle')) chkTitle.checked = qs.get('showTitle') !== '0';
-      if (qs.has('showScore')) chkScore.checked = qs.get('showScore') !== '0';
-
-      let __liffReady = false;
-      async function ensureLiff() {
-        if (__liffReady) return;
-        if (!window.liff) throw new Error('LIFF SDK 未載入');
-        try { await liff.init({ liffId: LIFF_ID }); } catch (e) { }
-        __liffReady = true;
-      }
-
-      async function doShare() {
-        const flex = buildFlexMessage(gUrlParams, chkTitle.checked, chkScore.checked);
-        if (!flex) return;
-        try {
-          if (liff.isApiAvailable('shareTargetPicker')) {
-            await liff.shareTargetPicker([flex]);
-            alert("分享成功，可於聊天視窗中查看");
-            liff.closeWindow();
-          } else {
-            alert("請在 LINE 內開啟此 LIFF 頁面再送出。");
-          }
-        } catch (e) {
-          const msg = (e?.message || e || '').toString();
-          if ((msg.includes('scope') || msg.includes('not in LIFF app scope')) && liff.isApiAvailable('shareTargetPicker')) {
-            await liff.shareTargetPicker([flex]);
-            alert("尚未授權 chat_message.write，已改用分享送出");
-          } else {
-            alert("sendMessages 失敗：" + msg);
-          }
-        }
-      }
-
-      btnShare?.addEventListener('click', doShare);
-      btnCancel?.addEventListener('click', () => {
-        try {
-          if (window.liff && typeof liff.closeWindow === 'function') {
-            liff.closeWindow(); // 在 LINE App 內直接關閉
-            return;
-          }
-        } catch (_) { }
-        // 後備方案：非 LINE App 或 closeWindow 失敗
-        window.close();
-        if (!document.hidden) { // 多數瀏覽器不允許 window.close() 關閉非 script-opened 視窗
-          if (history.length > 1) history.back();
-          else location.href = 'about:blank';
-        }
-      });
-    })();
-
     // ===== 暗棋 32 子（固定矩陣；可自行調整順序）=====
     // 8 rows × 4 columns，每格 { t: 棋子字, color: 'red'|'black' }
     const DARK_CHESS_32 = [
@@ -1974,8 +1859,125 @@
     document.getElementById("randomGridView").classList.add("hidden");
 
     initElderMode();
+
     // 初次渲染
     render();
+
+    
+    // ===== 分享模式：參數解析與 UI 切換 =====
+    (function setupShareModePanel() {
+      const qs = new URLSearchParams(location.search);
+      const action = qs.get('a');      // 既有參數：a=share
+      const parameter = qs.get('p'); //  取得 parameter 參數 5cg
+      const chessText = qs.get('c'); // 新參數：c=XXXXX 五字
+      const isShareMode = (action === 'share');
+
+      // 兩個容器：主畫面 & 分享畫面
+      const mainEl = document.getElementById('mainContent');
+      const shareEl = document.getElementById('shareContent');
+      const refreshEl = document.getElementById('refreshIndicator');
+
+      if (!isShareMode || !shareEl) {
+        mainEl.classList.remove('hidden');
+        return;
+      }
+
+      // 隱藏原本所有畫面元件，只顯示分享面板
+      if (mainEl) mainEl.classList.add('hidden');
+      if (refreshEl) refreshEl.classList.add('hidden');
+      shareEl.classList.remove('hidden');
+
+      // ✅ 顯示唯讀棋盤內容
+      renderShareBoardFromPicks(chessText);
+
+      // ==== 預設值：從網址或目前狀態帶入 ====
+      const chkTitle = document.getElementById('chkTitle');
+      const chkScore = document.getElementById('chkScore');
+      const inputTitle = document.getElementById('shareTitleText');
+      const inputScore = document.getElementById('shareScoreText');
+      const btnShare = document.getElementById('btnShare');
+      const btnCancel = document.getElementById('btnCancel');
+
+      // 先帶入：?n=（舊參數名稱）或 ?title=
+      inputTitle.textContent = qs.get('n') || qs.get('title')
+        || getCardTitle() || '';
+
+      // 接上現有分數邏輯：
+      // 1) 若網址給了 bs/ps（base / penalty），照既有規則推 finalScoreText
+      // 2) 否則讀全域 window.latestHealingScore / window.healingScore
+      // 3) 都沒有則留空（可手動輸入）
+      (function fillScoreFromState() {
+        const bs = qs.get('bs'), ps = qs.get('ps');
+        if (bs !== null && ps !== null) {
+          const base = Number(bs), pen = Number(ps);
+          if (!isNaN(base) && !isNaN(pen)) {
+            if (base < 60) {
+              inputScore.textContent = '需調整';
+            } else {
+              inputScore.textContent = String(base - pen) + '分';
+            }
+            return;
+          }
+        }
+        if (typeof window.latestHealingScore !== 'undefined' && window.latestHealingScore !== null) {
+          inputScore.textContent = String(window.latestHealingScore);
+          return;
+        }
+        if (typeof window.healingScore !== 'undefined' && window.healingScore !== null) {
+          inputScore.textContent = String(window.healingScore);
+          return;
+        }
+      })();
+
+      if (qs.has('showTitle')) chkTitle.checked = qs.get('showTitle') !== '0';
+      if (qs.has('showScore')) chkScore.checked = qs.get('showScore') !== '0';
+
+      let __liffReady = false;
+      async function ensureLiff() {
+        if (__liffReady) return;
+        if (!window.liff) throw new Error('LIFF SDK 未載入');
+        try { await liff.init({ liffId: LIFF_ID }); } catch (e) { }
+        __liffReady = true;
+      }
+
+      async function doShare() {
+        const flex = buildFlexMessage(gUrlParams, chkTitle.checked, chkScore.checked);
+        if (!flex) return;
+        try {
+          if (liff.isApiAvailable('shareTargetPicker')) {
+            await liff.shareTargetPicker([flex]);
+            alert("分享成功，可於聊天視窗中查看");
+            liff.closeWindow();
+          } else {
+            alert("請在 LINE 內開啟此 LIFF 頁面再送出。");
+          }
+        } catch (e) {
+          const msg = (e?.message || e || '').toString();
+          if ((msg.includes('scope') || msg.includes('not in LIFF app scope')) && liff.isApiAvailable('shareTargetPicker')) {
+            await liff.shareTargetPicker([flex]);
+            alert("尚未授權 chat_message.write，已改用分享送出");
+          } else {
+            alert("sendMessages 失敗：" + msg);
+          }
+        }
+      }
+
+      btnShare?.addEventListener('click', doShare);
+      btnCancel?.addEventListener('click', () => {
+        try {
+          if (window.liff && typeof liff.closeWindow === 'function') {
+            liff.closeWindow(); // 在 LINE App 內直接關閉
+            return;
+          }
+        } catch (_) { }
+        // 後備方案：非 LINE App 或 closeWindow 失敗
+        window.close();
+        if (!document.hidden) { // 多數瀏覽器不允許 window.close() 關閉非 script-opened 視窗
+          if (history.length > 1) history.back();
+          else location.href = 'about:blank';
+        }
+      });
+    })();
 
   </script>
 
