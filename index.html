@@ -717,11 +717,10 @@
         </div>
 
       </div>
-
-      <div id="logOutput"
-        style="white-space: pre-wrap; background:#f0f0f0; padding:10px; border:1px solid #ccc; height:150px; overflow-y:auto;">
-      </div>
     </div>
+  </div>
+  <div id="logOutput"
+    style="white-space: pre-wrap; background:#f0f0f0; padding:10px; border:1px solid #ccc; height:150px; overflow-y:auto;">
   </div>
   <!-- 🔄 分享模式佈局（預設隱藏；?action=share 或 ?a=share 時顯示） -->
   <div id="shareContent" class="wrap hidden" aria-label="分享設定區">
@@ -813,7 +812,7 @@
     /** 2007906926-NZW6EQ7P Production **/
     /** 2007931033-4D50LqwM Dev **/
     const LIFF_ID = "2007931033-4D50LqwM";
-    const APP_VERSION = "v1.0.3-47";
+    const APP_VERSION = "v1.0.3-48";
     const LINE_ID = "@968noswo"; // 你的官方帳號 ID（@ 開頭）
 
     /** ******************************
@@ -1625,7 +1624,10 @@
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ idToken: idToken }),
           })
-            .then(response => response.text())
+            .then(response => 
+            printLog("驗證回應狀態：" + response.status) ||
+            response.text()
+          )
             .then(html => {
               printLog("驗證成功");
               // printLog("回傳內容：" + html);
@@ -1637,8 +1639,9 @@
               }
             })
             .catch(() => {
-              alert('驗證失敗或無權限訪問');
-              liff.closeWindow();
+              printLog("驗證失敗或無權限訪問");
+              // alert('驗證失敗或無權限訪問');
+              // liff.closeWindow();
             });
         }
       } catch (err) {
@@ -1961,7 +1964,7 @@
     document.getElementById("ver").textContent = LINE_ID + " | " + APP_VERSION;
 
     // 隱藏日誌輸出區域
-    document.getElementById("logOutput").classList.add("hidden");
+    // document.getElementById("logOutput").classList.add("hidden");
 
     document.getElementById("mainContent").classList.add("hidden");
     document.getElementById("shareContent").classList.add("hidden");
