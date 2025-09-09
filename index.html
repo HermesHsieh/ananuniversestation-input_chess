@@ -812,7 +812,7 @@
     /** 2007906926-NZW6EQ7P Production **/
     /** 2007931033-4D50LqwM Dev **/
     const LIFF_ID = "2007931033-4D50LqwM";
-    const APP_VERSION = "v1.0.3-49";
+    const APP_VERSION = "v1.0.3-50";
     const LINE_ID = "@968noswo"; // 你的官方帳號 ID（@ 開頭）
 
     /** ******************************
@@ -1620,7 +1620,7 @@
         printLog("idToken：" + idToken);
         if (idToken) {
           const _mainContent = document.getElementById('mainContent')
-          if (!_mainContent) {
+          if (_mainContent) {
             _mainContent.classList.remove('hidden');
             return;
           }
