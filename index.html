@@ -777,7 +777,33 @@
       <button class="btn btn-secondary" id="btnCancel">取消</button>
     </div>
   </div>
+  </div>
 
+  <div id="onlyInApp" class="wrap hidden"
+    style="position:fixed;inset:0;background:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:9999;text-align:center;padding:24px;">
+    <div class="card" style="max-width:520px;">
+      <div class="card-title">請在「手機 LINE」中開啟</div>
+      <p class="status">本服務僅支援在 LINE App 內開啟。點擊下方按鈕回到 LINE。</p>
+      <div style="margin-top:12px">
+        <a id="openInLine" class="btn btn-primary" href="#">在 LINE 開啟</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- 隨機翻子面板：4x8 棋盤（預設隱藏） -->
+  <div id="randomGridView" class="wrap hidden" aria-label="隨機翻 5 顆">
+    <div class="topbar">
+      <div class="bar-actions"></div>
+    </div>
+
+    <div class="controls" style="margin-top:8px;">
+      <button class="btn btn-secondary" id="btnCancelGrid">取消</button>
+      <button class="btn btn-primary" id="btnUseSelected" disabled>確認</button>
+    </div>
+
+    <div class="card">
+      <div id="darkGrid" class="dark-grid"></div>
+    </div>
   </div>
 
   <script>
@@ -787,7 +813,7 @@
     /** 2007906926-NZW6EQ7P Production **/
     /** 2007931033-4D50LqwM Dev **/
     const LIFF_ID = "2007931033-4D50LqwM";
-    const APP_VERSION = "v1.0.3-46";
+    const APP_VERSION = "v1.0.3-47";
     const LINE_ID = "@968noswo"; // 你的官方帳號 ID（@ 開頭）
 
     /** ******************************
@@ -1569,6 +1595,23 @@
           return;
         }
 
+        // utou：一對一聊天室
+        // group：多人群組聊天室
+        // room：多人房間聊天室
+        // external：外部瀏覽器環境（非LINE App內）
+        // none：不屬於以上類型（如LINE錢包等）
+
+        const context = liff.getContext();
+        if (context.type !== 'utou') {
+          alert('請在LINE聊天室中打開此頁面');
+          // 可以選擇導向空白頁或關閉LIFF頁面
+          return liff.closeWindow();
+        }
+
+        // 取得網址參數
+        const urlParams = new URLSearchParams(window.location.search);
+        gUrlParams = urlParams; // 儲存起來給其他函式用
+
         // 登入成功，取得使用者資訊
         const profile = await liff.getProfile();
         printLog("用戶名稱：" + profile.displayName);
@@ -1584,31 +1627,26 @@
           })
             .then(response => response.text())
             .then(html => {
-              document.getElementById('container').innerHTML = html;
+              printLog("驗證成功");
+              // printLog("回傳內容：" + html);
+              statusEl.textContent += " (驗證成功)";
+              const _mainContent = document.getElementById('mainContent')
+              if (!_mainContent) {
+                _mainContent.classList.remove('hidden');
+                return;
+              }
             })
             .catch(() => {
               alert('驗證失敗或無權限訪問');
+              liff.closeWindow();
             });
         }
-
-        // 取得網址參數
-        const urlParams = new URLSearchParams(window.location.search);
-        gUrlParams = urlParams; // 儲存起來給其他函式用
       } catch (err) {
         printLog("初始化錯誤: " + (err?.message || err));
         statusEl.textContent = `LIFF 初始化失敗：${err?.message || "unknown"}`;
       }
     })();
 
-    // ====== 初始狀態與版本顯示 ======
-    document.getElementById("ver").textContent = LINE_ID + " | " + APP_VERSION;
-
-    // 隱藏日誌輸出區域
-    // document.getElementById("logOutput").classList.add("hidden");
-
-    initElderMode();
-    // 初次渲染
-    render();
 
     // ===== 分享模式：參數解析與 UI 切換 =====
     (function setupShareModePanel() {
@@ -1919,34 +1957,22 @@
       }
     }
 
+    // ====== 初始狀態與版本顯示 ======
+    document.getElementById("ver").textContent = LINE_ID + " | " + APP_VERSION;
+
+    // 隱藏日誌輸出區域
+    document.getElementById("logOutput").classList.add("hidden");
+
+    document.getElementById("mainContent").classList.add("hidden");
+    document.getElementById("shareContent").classList.add("hidden");
+    document.getElementById("onlyInApp").classList.add("hidden");
+    document.getElementById("randomGridView").classList.add("hidden");
+
+    initElderMode();
+    // 初次渲染
+    render();
+
   </script>
-
-  <div id="onlyInApp" class="wrap hidden"
-    style="position:fixed;inset:0;background:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:9999;text-align:center;padding:24px;">
-    <div class="card" style="max-width:520px;">
-      <div class="card-title">請在「手機 LINE」中開啟</div>
-      <p class="status">本服務僅支援在 LINE App 內開啟。點擊下方按鈕回到 LINE。</p>
-      <div style="margin-top:12px">
-        <a id="openInLine" class="btn btn-primary" href="#">在 LINE 開啟</a>
-      </div>
-    </div>
-  </div>
-
-  <!-- 隨機翻子面板：4x8 棋盤（預設隱藏） -->
-  <div id="randomGridView" class="wrap hidden" aria-label="隨機翻 5 顆">
-    <div class="topbar">
-      <div class="bar-actions"></div>
-    </div>
-
-    <div class="controls" style="margin-top:8px;">
-      <button class="btn btn-secondary" id="btnCancelGrid">取消</button>
-      <button class="btn btn-primary" id="btnUseSelected" disabled>確認</button>
-    </div>
-
-    <div class="card">
-      <div id="darkGrid" class="dark-grid"></div>
-    </div>
-  </div>
 
 </body>
 
