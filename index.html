@@ -813,7 +813,7 @@
     /** 2007906926-NZW6EQ7P Production **/
     /** 2007931033-4D50LqwM Dev **/
     const LIFF_ID = "2007931033-4D50LqwM";
-    const APP_VERSION = "v1.0.3-58";
+    const APP_VERSION = "v1.0.3-59";
     const LINE_ID = "@968noswo"; // 你的官方帳號 ID（@ 開頭）
 
     /** ******************************
@@ -905,8 +905,10 @@
     let isPulling = false;
     const refreshThreshold = 120; // 下拉多少距離觸發刷新
     const refreshElement = document.getElementById('refreshIndicator');
+    let pullToRefreshDisabled = false; // 分享頁面可關閉下拉刷新
 
     window.addEventListener('touchstart', (e) => {
+      if (pullToRefreshDisabled) return;
       if (window.scrollY === 0) {
         startY = e.touches[0].clientY;
         isPulling = true;
@@ -914,6 +916,7 @@
     });
 
     window.addEventListener('touchmove', (e) => {
+      if (pullToRefreshDisabled) return;
       if (!isPulling) return;
       let currentY = e.touches[0].clientY;
       let diff = currentY - startY;
@@ -928,6 +931,7 @@
     });
 
     window.addEventListener('touchend', (e) => {
+      if (pullToRefreshDisabled) return;
       if (!isPulling) return;
       let endY = e.changedTouches[0].clientY;
       let diff = endY - startY;
@@ -1865,6 +1869,14 @@
       if (mainEl) mainEl.classList.add('hidden');
       if (refreshEl) refreshEl.classList.add('hidden');
       shareEl.classList.remove('hidden');
+
+      // 關閉下拉刷新（分享頁面不需要）
+      pullToRefreshDisabled = true;
+      isPulling = false;
+      if (refreshEl) {
+        refreshEl.style.height = '0px';
+        refreshEl.textContent = '下拉刷新';
+      }
 
       // ✅ 顯示唯讀棋盤內容
       renderShareBoardFromPicks(chessText);
