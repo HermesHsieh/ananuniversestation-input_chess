@@ -813,7 +813,7 @@
     /** 2007906926-NZW6EQ7P Production **/
     /** 2007931033-4D50LqwM Dev **/
     const LIFF_ID = "2007931033-4D50LqwM";
-    const APP_VERSION = "v1.0.3-53";
+    const APP_VERSION = "v1.0.3-54";
     const LINE_ID = "@968noswo"; // 你的官方帳號 ID（@ 開頭）
 
     /** ******************************
@@ -1241,7 +1241,7 @@
       const fiveParam = encodeURIComponent(fiveStr);
       const titleText = (titleName || "象棋卜卦-單掛").trim();
       const titleParam = encodeURIComponent(titleText);
-      const modeHint = (auto === "1" ? "*隨機抽卦結果僅供參考*" : ((auto === "2" ? "*線上抽卦結果僅供參考*" : "")));
+      const modeHint = (auto === "1" ? "*隨機抽卦結果僅供參考*" : (auto === "2" ? "*線上抽卦結果僅供參考*" : ""));
       const modeHintParam = encodeURIComponent(modeHint);
 
       // ★ 圓圈尺寸（可調）：建議 72~90px
@@ -1348,9 +1348,13 @@
             ]
           }]
         },
-        { type: "text", text: summary, size: "sm", color: "#6b7280", wrap: true },
-        { type: "text", text: modeHint, size: "sm", color: "#6b7280", wrap: true }
+        { type: "text", text: summary, size: "sm", color: "#6b7280", wrap: true }
       );
+
+      // 若是手動輸入 => modeHint 空字串 => 不顯示
+      if (modeHint !== "") {
+        contents.push({ type: "text", text: modeHint, size: "sm", color: "#6b7280", wrap: true });
+      }
 
       // 3) 分數列
       if (showScore) {
