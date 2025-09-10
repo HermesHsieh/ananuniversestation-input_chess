@@ -628,7 +628,7 @@
 <body>
   <div id="refreshIndicator">下拉刷新</div>
 
-  <div id="mainContent">
+  <div id="mainContent" class="wrap hidden">
     <div class="wrap">
       <div class="topbar">
         <div class="title">單卦</div>
@@ -813,7 +813,7 @@
     /** 2007906926-NZW6EQ7P Production **/
     /** 2007931033-4D50LqwM Dev **/
     const LIFF_ID = "2007931033-4D50LqwM";
-    const APP_VERSION = "v1.0.3-54";
+    const APP_VERSION = "v1.0.3-55";
     const LINE_ID = "@968noswo"; // 你的官方帳號 ID（@ 開頭）
 
     /** ******************************
@@ -903,7 +903,7 @@
     // 下拉刷新初始化
     let startY = 0;
     let isPulling = false;
-    const refreshThreshold = 60; // 下拉多少距離觸發刷新
+    const refreshThreshold = 120; // 下拉多少距離觸發刷新
     const refreshElement = document.getElementById('refreshIndicator');
 
     window.addEventListener('touchstart', (e) => {
