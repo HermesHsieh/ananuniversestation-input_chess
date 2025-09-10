@@ -813,7 +813,7 @@
     /** 2007906926-NZW6EQ7P Production **/
     /** 2007931033-4D50LqwM Dev **/
     const LIFF_ID = "2007931033-4D50LqwM";
-    const APP_VERSION = "v1.0.3-56";
+    const APP_VERSION = "v1.0.3-57";
     const LINE_ID = "@968noswo"; // 你的官方帳號 ID（@ 開頭）
 
     /** ******************************
@@ -915,7 +915,7 @@
 
     window.addEventListener('touchmove', (e) => {
       if (!isPulling) return;
-      let currentY = e.touches.clientY;
+      let currentY = e.touches[0].clientY;
       let diff = currentY - startY;
       if (diff > 0) {
         refreshElement.style.height = diff + 'px';
@@ -945,7 +945,12 @@
 
     function doRefresh() {
       return new Promise((resolve) => {
-        hardReload()
+        try {
+          hardReload(); // 多數環境會直接跳轉
+        } finally {
+          // 保底：若未跳轉，避免指示條永遠停在「正在刷新...」
+          setTimeout(resolve, 3000);
+        }
       });
     }
 
@@ -1148,7 +1153,7 @@
 
       return {
         type: 'image',
-        originalContentUrl: `https://i.imgur.com/MwS42AE.png?p=5cg&c=${fiveStr}&n=${titleText}&at=${auto}&bg=${isBigMode}&v=${APP_VERSION}`,
+        originalContentUrl: `https://i.imgur.com/MwS42AE.png?p=5cg&c=${fiveParam}&n=${titleParam}&at=${auto}&bg=${isBigMode}&v=${encodeURIComponent(APP_VERSION)}`,
         previewImageUrl: `https://i.imgur.com/MwS42AE.png`
       };
     }
@@ -1163,8 +1168,8 @@
       const cVersion = urlParams.get('v'); // 取得 version 參數
       const createTime = urlParams.get('tm'); // 取得 create time 參數
       const auto = urlParams.get('at'); // 取得 是否為 auto 參數
-      const baseScore = urlParams.get('bs'); // 取得 base score 參數
-      const penaltyScroe = urlParams.get('ps'); // 取得 penalty score 參數
+      const baseScore = urlParams.get('bs'); // 取得 base score 參數（字串）
+      const penaltyScroe = urlParams.get('ps'); // 取得 penalty score 參數（字串，沿用原名）
       const mFace = urlParams.get('f'); // 取得 emoji face
 
       if (parameter === null) {
@@ -1198,14 +1203,20 @@
       let finalScoreDetail = ""
       let mEmoji = ''
       // 基本分數 小於 60 分為 需調整
-      if (baseScore < 60) {
+      const base = Number(baseScore);
+      const pen = Number(penaltyScroe);
+      if (Number.isNaN(base) || Number.isNaN(pen)) {
+        document.body.insertAdjacentHTML('beforeend', '<p>baseScore/penaltyScroe 必須為數字</p>');
+        return null;
+      }
+      if (base < 60) {
         mEmoji = '😞'
         finalScoreText = "需調整";
         finalScoreDetail = ""
       } else {
-        finalScore = baseScore - penaltyScroe; // 計算 final score
-        if (penaltyScroe > 0) {
-          finalScoreDetail = `${baseScore}-${penaltyScroe}`; // final score 詳細計算
+        finalScore = base - pen; // 計算 final score
+        if (pen > 0) {
+          finalScoreDetail = `${base}-${pen}`; // final score 詳細計算
         }
         finalScoreText = `${finalScore}分`;
       }
@@ -1620,37 +1631,6 @@
         const profile = await liff.getProfile();
         printLog("用戶名稱：" + profile.displayName);
         statusEl.textContent = `Hello, ${profile.displayName} 👋`;
-
-        const idToken = liff.getIDToken();
-        printLog("idToken：" + idToken);
-        if (idToken) {
-          // const _mainContent = document.getElementById('mainContent')
-          // if (_mainContent) {
-          //   _mainContent.classList.remove('hidden');
-          //   return;
-          // }
-          // fetch('https://script.google.com/macros/s/AKfycbzv9VtVgoTKXpA29U6XX40pA5ucnFCPk_g16Soe05CPjr4GhxuD5kYFx2XKD2m6aOZZ/exec', {
-          //   method: 'POST',
-          //   headers: { 'Content-Type': 'application/json' },
-          //   body: JSON.stringify({ idToken: idToken }),
-          // }).then(response =>
-          //   printLog("驗證回應狀態：" + response.status) ||
-          //   response.text()
-          // ).then(html => {
-          //   printLog("驗證成功");
-          //   // printLog("回傳內容：" + html);
-          //   statusEl.textContent += " (驗證成功)";
-          //   const _mainContent = document.getElementById('mainContent')
-          //   if (!_mainContent) {
-          //     _mainContent.classList.remove('hidden');
-          //     return;
-          //   }
-          // }).catch(() => {
-          //   printLog("驗證失敗或無權限訪問");
-          //   // alert('驗證失敗或無權限訪問');
-          //   // liff.closeWindow();
-          // });
-        }
       } catch (err) {
         printLog("初始化錯誤: " + (err?.message || err));
         statusEl.textContent = `LIFF 初始化失敗：${err?.message || "unknown"}`;
@@ -1977,9 +1957,6 @@
         }
       });
     })();
-
   </script>
-
 </body>
-
 </html>
