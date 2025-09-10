@@ -813,7 +813,7 @@
     /** 2007906926-NZW6EQ7P Production **/
     /** 2007931033-4D50LqwM Dev **/
     const LIFF_ID = "2007931033-4D50LqwM";
-    const APP_VERSION = "v1.0.3-61";
+    const APP_VERSION = "v1.0.3-62";
     const LINE_ID = "@968noswo"; // 你的官方帳號 ID（@ 開頭）
 
     /** ******************************
@@ -918,7 +918,7 @@
     window.addEventListener('touchmove', (e) => {
       if (pullToRefreshDisabled) return;
       if (!isPulling) return;
-      let currentY = e.touches[0].clientY;
+      let currentY = e.touches.clientY;
       let diff = currentY - startY;
       if (diff > 0) {
         refreshElement.style.height = diff + 'px';
