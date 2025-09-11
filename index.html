@@ -813,7 +813,7 @@
     /** 2007906926-NZW6EQ7P Production **/
     /** 2007931033-4D50LqwM Dev **/
     const LIFF_ID = "2007931033-4D50LqwM";
-    const APP_VERSION = "v1.0.3-63";
+    const APP_VERSION = "v1.0.3-64";
     const LINE_ID = "@968noswo"; // 你的官方帳號 ID（@ 開頭）
 
     /** ******************************
@@ -1594,10 +1594,9 @@
     // ====== 初始化 LIFF ======
     (async () => {
       try {
-        statusEl.textContent = "頁面初始化中…";
+        document.getElementById('mainContent').classList.add('hidden');
 
-        // 顯示/隱藏
-        mainView()?.classList.add('hidden');
+        statusEl.textContent = "頁面初始化中…";
 
         // ★ 先做「只能在手機 LINE」的環境檢查
         const ok = await guardMobileLineOnly(LIFF_ID);
