@@ -813,7 +813,7 @@
     /** 2007906926-NZW6EQ7P Production **/
     /** 2007931033-4D50LqwM Dev **/
     const LIFF_ID = "2007931033-4D50LqwM";
-    const APP_VERSION = "v1.0.3-65";
+    const APP_VERSION = "v1.0.4";
     const LINE_ID = "@968noswo"; // 你的官方帳號 ID（@ 開頭）
 
     /** ******************************
@@ -1151,7 +1151,7 @@
       const titleParam = encodeURIComponent(titleText);
       const modeTag = (drawMode === "隨機" ? "隨機" : "手動"); // 要顯示的文字
       const modeParam = encodeURIComponent(modeTag);
-      const modeHint = (drawMode === "隨機" ? "*隨機抽卦結果僅供參考*" : (drawMode === "線上抽卦" ? "*線上抽卦結果僅供參考*" : ""));
+      const modeHint = (drawMode === "隨機" ? "*隨機抽卦結果僅供參考*" : (drawMode === "線上" ? "*線上抽卦結果僅供參考*" : ""));
       const auto = (drawMode === "隨機") ? 1 : (drawMode === "手動") ? 0 : 2;
       const isBigMode = getSwitchModeName() === "放大模式" ? 1 : 0;
 
@@ -1776,7 +1776,7 @@
         targetPicks[i + 1] = { type: p.t, color: p.color };
       }
 
-      setDrawMode("線上抽卦");
+      setDrawMode("線上");
 
       // 重新渲染主畫面
       try { if (typeof render === 'function') render(); } catch (_) { }
