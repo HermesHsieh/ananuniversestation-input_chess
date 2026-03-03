@@ -13,6 +13,7 @@
             --text-dark: #333333;
             --white: #ffffff;
             --nav-bg: rgba(255, 255, 255, 0.9);
+			--blue-accent: #2b6cb0;
         }
 
         /* 基礎樣式重置 */
@@ -102,6 +103,14 @@
             transition: transform 0.2s;
         }
         .btn-line:active { transform: scale(0.98); }
+		
+		/* 會員方案樣式 */
+        .pricing-section { background-color: #ebf4ff; padding: 60px 0; }
+        .price-card { background: white; padding: 25px; border-radius: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); margin-bottom: 30px; }
+        .price-table { width: 100%; border-collapse: collapse; margin: 15px 0; font-size: 1.1rem; }
+        .price-table th { background: #f8fafc; border-bottom: 2px solid #e2e8f0; padding: 12px; text-align: left; }
+        .price-table td { padding: 12px; border-bottom: 1px solid #edf2f7; }
+        .rule-box { background: #fff9f0; border: 1px solid #ffe8cc; padding: 20px; border-radius: 12px; }
 
         /* 常見問題區 (FAQ) */
         .faq-section { background-color: #f0f4f8; padding: 60px 0; border-radius: 30px 30px 0 0; }
@@ -144,7 +153,7 @@
 <header class="hero">
     <div class="container">
         <div class="feature-tag">
-            <i class="fas fa-calculator" style="margin-right: 8px;"></i>象卦結果自動算分
+            <i class="fas fa-calculator" style="margin-right: 8px;"></i>象卦AI算分
         </div>
         <h1>不再為複雜規則<br>算分燒腦<br>讓❤️專注於療癒</h1>
         <p>由蔡老師象棋課內容為基礎，具有嚴謹的象卦規則與邏輯計算。<br>迅速計算三秒內呈現。</p>
@@ -160,7 +169,7 @@
             </div>
         </div>
 
-        <a href="https://line.me/R/ti/p/@968noswo" class="btn-line"><i class="fab fa-line" style="margin-right: 8px;"></i> 立即加入 LINE 好友</a>
+        <a href="https://line.me/R/ti/p/@968noswo" class="btn-line"><i class="fab fa-line" style="margin-right: 8px;"></i> 加入好友</a>
         <p class="small-text">※ 每日享有免費額度，每日凌晨 4 點重置</p>
     </div>
 </header>
@@ -196,6 +205,54 @@
     </section>
 </main>
 
+<section class="pricing-section">
+    <div class="container">
+        <h2 style="text-align: center; border: none; padding: 0; color: var(--blue-accent); font-size: 2rem; margin-bottom: 40px;">VIP會員方案</h2>
+        
+        <div class="price-card">
+            <h3 style="color: var(--warm-gold); margin-top: 0;"><i class="fas fa-crown"></i> 會員方案 - 每日額度型</h3>
+            <p style="font-size: 1rem; color: #666;">在原有每日免費額度外，額外增加固定次數。適合深度使用者。</p>
+            <div style="overflow-x: auto;">
+                <table class="price-table">
+                    <thead><tr><th>天數</th><th>費用 (TWD)</th><th>每日增加額度</th></tr></thead>
+                    <tbody>
+                        <tr><td>30 天</td><td>$300</td><td style="color:var(--blue-accent); font-weight:bold;">+2 次 / 日</td></tr>
+                        <tr><td>90 天</td><td>$800</td><td style="color:var(--blue-accent); font-weight:bold;">+4 次 / 日</td></tr>
+                        <tr><td>180 天</td><td>$1,265</td><td style="color:var(--blue-accent); font-weight:bold;">+6 次 / 日</td></tr>
+                        <tr><td>365 天</td><td>$2,190</td><td style="color:var(--blue-accent); font-weight:bold;">+10 次 / 日</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="price-card">
+            <h3 style="color: var(--primary-green); margin-top: 0;"><i class="fas fa-box-open"></i> 會員方案 - 總量型</h3>
+            <p style="font-size: 1rem; color: #666;">在原有每日免費額度外，額外增加總可用次數。適合彈性使用者。</p>
+            <div style="overflow-x: auto;">
+                <table class="price-table">
+                    <thead><tr><th>天數</th><th>費用 (TWD)</th><th>總量型次數</th></tr></thead>
+                    <tbody>
+                        <tr><td>30 天</td><td>$300</td><td style="color:var(--primary-green); font-weight:bold;">40 次</td></tr>
+                        <tr><td>90 天</td><td>$800</td><td style="color:var(--primary-green); font-weight:bold;">240 次</td></tr>
+                        <tr><td>180 天</td><td>$1,265</td><td style="color:var(--primary-green); font-weight:bold;">720 次</td></tr>
+                        <tr><td>365 天</td><td>$2,190</td><td style="color:var(--primary-green); font-weight:bold;">2,434 次</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="rule-box">
+            <h4 style="margin-top: 0; color: #d97706;"><i class="fas fa-info-circle"></i> 額度使用規則</h4>
+            <ul style="font-size: 1rem; color: #7c2d12; padding-left: 20px;">
+                <li>系統自動<strong>優先使用每日免費額度</strong>，完畢後才使用購買的會員額度。</li>
+                <li><strong>每日型：</strong>額度每天重置，當日未使用完畢之額度隔日歸零。</li>
+                <li><strong>總量型：</strong>於會籍期間內有效，逾期未使用完畢數量歸零。</li>
+                <li>重置時間：每日凌晨 <strong>04:00 (GMT+8)</strong>。</li>
+            </ul>
+        </div>
+    </div>
+</section>
+
 <section class="faq-section">
     <div class="container">
         <h2 style="text-align: center; border: none; padding: 0; color: #1a365d; font-size: 2rem; margin-bottom: 40px;">常見問題</h2>
@@ -210,7 +267,7 @@
         <details>
             <summary>計算結果準確嗎？ <i class="fas fa-plus text-blue-600"></i></summary>
             <div class="faq-answer">
-                是的，算分系統已套用象棋卜卦的計分規則(包含：牽制、保護、特殊格局)，並進行嚴謹的驗證，確保每個卦象的結果分數是正確的。
+                是的，算分系統已套用象棋卜卦的算分規則(包含：牽制、保護、特殊格局)，並進行嚴謹的驗證，確保每個卦象的結果分數都是正確的。
             </div>
         </details>
 
@@ -224,14 +281,14 @@
         <details>
             <summary>為什麼會有這個機器人呢？ <i class="fas fa-plus text-blue-600"></i></summary>
             <div class="faq-answer">
-                2024年初，上完蔡老師的象棋卜卦課後，接續上許老師的象棋進階課程，深深感受到要人工手動計算象卦的分數是一件不容易的事情，但可以讓他程式化變簡單的事情。<br>由於需要投入的學習時間與成本曲線都很高，甚至連已經學過的學長姊們，有時候也會有算錯的時候，更不用說剛入門的同學們。<br>因此希望藉由本人的技能專長，打造一個全自動又方便的工具，幫助給需要的同學們。
+                2024年初，上完蔡老師的象棋卜卦課後，深深感受到若要計算每一次抽卦的分數都是準確的，並不是一件容易的事情，但我知道可以將其程式化後，以獲得最終結果且不會出錯。<br>由於自己計算需要投入的學習時間與成本都很高，且卦象也容易有算錯的時候，甚至已經深入學習過的學長姊們也會出錯，更不用說剛入門的新同學們。<br>因此希望藉由本人的專業技能，打造一個全自動又方便的工具，幫助給需要的同學們。
             </div>
         </details>
-
+		<details><summary>如何升級VIP會員方案？ <i class="fas fa-plus text-blue-600"></i></summary><div class="faq-answer">請在 Line 機器人中留言聯繫，我們會與您確認欲購買的會員方案後，提供後續的付款訊息給您。</div></details>
         <details>
             <summary>其他問題與建議？ <i class="fas fa-plus text-blue-600"></i></summary>
             <div class="faq-answer">
-                可直接在Line機器人的對話中留言，我們會盡快回覆您的訊息。
+                請在 Line機器人對話中留下您的問題或建議，我們會盡快回覆您的訊息。
             </div>
         </details>
     </div>
@@ -270,7 +327,7 @@
             </ul>`,
         privacy: `
             <h2 style="color:var(--warm-gold); border-left: 5px solid var(--warm-gold); padding-left:10px;">隱私權政策</h2>
-            <p>我們非常重視您的隱私，針對您的個人修行數據，我們承諾如下：</p>
+            <p>我們非常重視您的隱私，針對您的個人療癒數據，我們承諾如下：</p>
             <ul style="line-height:2;">
                 <li><strong>數據歸屬：</strong>您所紀錄的噴瓶數據、象卦分數僅供您個人於 Line 對話視窗中查詢。</li>
                 <li><strong>數據用途：</strong>我們僅將數據用於系統運算與呈現給您本人，不會將您的個人資訊分享或販售給任何第三方。</li>
