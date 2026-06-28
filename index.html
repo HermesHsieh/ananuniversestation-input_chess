@@ -627,6 +627,7 @@
 
 <body>
   <div id="refreshIndicator">下拉刷新</div>
+  <input type="file" id="photoInput" accept="image/*" style="display:none">
 
   <div id="mainContent" class="hidden">
     <div class="wrap">
@@ -634,6 +635,7 @@
         <div class="title">單卦</div>
         <div class="bar-actions">
           <button class="btn btn-secondary" id="chessMatrixBtn">線上抽卦</button>
+          <button class="ghost" id="photoScanBtn">📷 掃描</button>
           <button class="mode-toggle" id="elderToggleBtn">放大模式</button>
         </div>
       </div>
@@ -815,6 +817,7 @@
     const LIFF_ID = "2007931033-4D50LqwM";
     const APP_VERSION = "v1.0.5";
     const LINE_ID = "@968noswo"; // 你的官方帳號 ID（@ 開頭）
+    const CHESS_PHOTO_ANALYZE_URL = "https://qqegjrbelxfjgthniugl.supabase.co/functions/v1/chess-photo-analyze";
 
     /** ******************************
     *  🧰 全套 32 枚牌堆（抽過即移除）
@@ -1151,8 +1154,8 @@
       const titleParam = encodeURIComponent(titleText);
       const modeTag = (drawMode === "隨機" ? "隨機" : "手動"); // 要顯示的文字
       const modeParam = encodeURIComponent(modeTag);
-      const modeHint = (drawMode === "隨機" ? "*隨機抽卦結果僅供參考*" : (drawMode === "線上" ? "*線上抽卦結果僅供參考*" : ""));
-      const auto = (drawMode === "隨機") ? 1 : (drawMode === "手動") ? 0 : 2;
+      const modeHint = drawMode === "隨機" ? "*隨機抽卦結果僅供參考*" : drawMode === "線上" ? "*線上抽卦結果僅供參考*" : drawMode === "照片掃描" ? "*照片掃描結果僅供參考*" : "";
+      const auto = drawMode === "隨機" ? 1 : drawMode === "照片掃描" ? 3 : drawMode === "手動" ? 0 : 2;
       const isBigMode = getSwitchModeName() === "放大模式" ? 1 : 0;
 
       return {
@@ -1256,7 +1259,7 @@
       const fiveParam = encodeURIComponent(fiveStr);
       const titleText = (titleName || "象棋卜卦-單掛").trim();
       const titleParam = encodeURIComponent(titleText);
-      const modeHint = (auto === "1" ? "*隨機抽卦結果僅供參考*" : (auto === "2" ? "*線上抽卦結果僅供參考*" : ""));
+      const modeHint = auto === "1" ? "*隨機抽卦結果僅供參考*" : auto === "2" ? "*線上抽卦結果僅供參考*" : auto === "3" ? "*照片掃描結果僅供參考*" : "";
       const modeHintParam = encodeURIComponent(modeHint);
 
       // ★ 圓圈尺寸（可調）：建議 72~90px
@@ -1556,6 +1559,134 @@
     document.getElementById('elderToggleBtn').addEventListener('click', () => {
       const on = !document.body.classList.contains('mode-elder');
       applyElderMode(on);
+    });
+
+    // ====== 照片掃描功能 ======
+    async function resizeImageToBase64(file, maxPx, quality, grayscale) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onerror = reject;
+        reader.onload = (e) => {
+          const img = new Image();
+          img.onerror = reject;
+          img.onload = () => {
+            let w = img.naturalWidth, h = img.naturalHeight;
+            if (maxPx > 0 && Math.max(w, h) > maxPx) {
+              if (w >= h) { h = Math.round(h * maxPx / w); w = maxPx; }
+              else        { w = Math.round(w * maxPx / h); h = maxPx; }
+            }
+            const canvas = document.createElement('canvas');
+            canvas.width = w; canvas.height = h;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0, w, h);
+            if (grayscale) {
+              const imageData = ctx.getImageData(0, 0, w, h);
+              const px = imageData.data;
+              for (let i = 0; i < px.length; i += 4) {
+                const lum = 0.299 * px[i] + 0.587 * px[i + 1] + 0.114 * px[i + 2];
+                px[i] = px[i + 1] = px[i + 2] = lum;
+              }
+              ctx.putImageData(imageData, 0, 0);
+            }
+            resolve(canvas.toDataURL('image/jpeg', quality / 100));
+          };
+          img.src = e.target.result;
+        };
+        reader.readAsDataURL(file);
+      });
+    }
+
+    function showPhotoScanError(aiError) {
+      const hint = [
+        '',
+        '若無法辨識成功可能原因如下：',
+        '棋子文字未轉正或顛倒放置',
+        '棋子擺放位置非十字位置',
+        '棋子有反光、字體過小',
+        '棋子文字非一般慣用象棋字及字體'
+      ].join('\n');
+      alert((aiError || '照片解析失敗') + hint);
+    }
+
+    async function processChessPhoto(file) {
+      const btn = document.getElementById('photoScanBtn');
+      const origText = btn ? btn.textContent : '';
+      if (btn) { btn.disabled = true; btn.textContent = '解析中…'; }
+
+      try {
+        const base64 = await resizeImageToBase64(file, 768, 60, true);
+
+        if (!CHESS_PHOTO_ANALYZE_URL) {
+          alert('照片掃描功能尚未設定，請聯繫管理員。');
+          return;
+        }
+
+        const resp = await fetch(CHESS_PHOTO_ANALYZE_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ image_base64: base64 }),
+        });
+
+        if (!resp.ok) {
+          showPhotoScanError('網路請求失敗（' + resp.status + '），請稍後再試');
+          return;
+        }
+
+        const result = await resp.json();
+
+        if (!result.success) {
+          showPhotoScanError(result.error || '解析失敗，請稍後再試');
+          return;
+        }
+
+        const d = result.data || {};
+        if (d.error) {
+          showPhotoScanError(d.error);
+          return;
+        }
+
+        const posKeys = { 1: 'pos_1', 2: 'pos_2', 3: 'pos_3', 4: 'pos_4', 5: 'pos_5' };
+        const newPicks = {};
+        let parseOk = true;
+        for (const [pos, key] of Object.entries(posKeys)) {
+          const type = d[key];
+          const color = pieceColorOf(type);
+          if (!type || !color) { parseOk = false; break; }
+          newPicks[Number(pos)] = { type, color };
+        }
+
+        if (!parseOk) {
+          showPhotoScanError('部分棋子無法辨識');
+          return;
+        }
+
+        for (let i = 1; i <= 5; i++) picks[i] = newPicks[i];
+        selectedPos = null;
+        setDrawMode('照片掃描');
+
+        // 若 AI 解析到標題文字，且目前問題名稱為空，則自動填入
+        if (d.title && cardTitleInput && !cardTitleInput.value.trim()) {
+          cardTitleInput.value = String(d.title).slice(0, MAX_TITLE_LENGTH);
+          cardTitleInput.dispatchEvent(new Event('input'));
+        }
+
+        render();
+
+      } catch (err) {
+        showPhotoScanError('網路錯誤，請稍後再試');
+      } finally {
+        if (btn) { btn.disabled = false; btn.textContent = origText; }
+      }
+    }
+
+    document.getElementById('photoScanBtn')?.addEventListener('click', () => {
+      document.getElementById('photoInput')?.click();
+    });
+
+    document.getElementById('photoInput')?.addEventListener('change', async (e) => {
+      const file = e.target.files?.[0];
+      e.target.value = '';
+      if (file) await processChessPhoto(file);
     });
 
     let gUrlParams = null; // 儲存 URL 參數物件
