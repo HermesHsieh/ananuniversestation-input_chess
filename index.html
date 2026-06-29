@@ -652,6 +652,9 @@
     <div style="background:#fff;border-radius:16px;padding:36px 24px;max-width:320px;width:88%;text-align:center;">
       <p style="font-size:20px;font-weight:700;color:#1e3a5f;margin:0 0 16px;line-height:1.65;">此功能為AI辨識象卦照片，辨識結果請再次人工確認是否正確。</p>
       <p style="font-size:16px;color:#374151;text-align:left;margin:0 0 24px;line-height:1.8;">以下情形可能造成無法正確辨識照片：<br>・棋子文字未轉正或顛倒放置<br>・棋子擺放位置非十字位置<br>・棋子有反光、字體過小<br>・棋子文字非一般慣用象棋字及字體</p>
+      <label style="display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:20px;font-size:15px;color:#6b7280;cursor:pointer;">
+        <input type="checkbox" id="photoNoticeDontShow" checked style="width:18px;height:18px;cursor:pointer;"> 不再顯示
+      </label>
       <button id="photoNoticeConfirmBtn" style="background:#2563EB;color:#fff;border:none;border-radius:8px;padding:12px 36px;font-size:17px;font-weight:600;cursor:pointer;">了解，繼續</button>
     </div>
   </div>
@@ -1720,7 +1723,9 @@
     });
 
     document.getElementById('photoNoticeConfirmBtn')?.addEventListener('click', () => {
-      localStorage.setItem('chessPhotoNoticeSeen', '1');
+      if (document.getElementById('photoNoticeDontShow')?.checked) {
+        localStorage.setItem('chessPhotoNoticeSeen', '1');
+      }
       document.getElementById('photoNoticeOverlay').style.display = 'none';
       document.getElementById('photoInput')?.click();
     });
