@@ -388,6 +388,10 @@
       transform: translateY(1px);
     }
 
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
     /* ===== 刷新提示條 ===== */
     #refreshIndicator {
       position: fixed;
@@ -629,13 +633,35 @@
   <div id="refreshIndicator">下拉刷新</div>
   <input type="file" id="photoInput" accept="image/*" style="display:none">
 
+  <!-- 照片辨卦：讀取中遮罩 -->
+  <div id="photoLoadingOverlay" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.75);z-index:9999;align-items:center;justify-content:center;flex-direction:column;gap:16px;">
+    <div style="width:48px;height:48px;border:5px solid rgba(255,255,255,0.3);border-top-color:#fff;border-radius:50%;animation:spin 0.8s linear infinite;"></div>
+    <p style="color:#fff;font-size:20px;font-weight:600;margin:0;">AI 辨識中，請稍候…</p>
+  </div>
+
+  <!-- 照片辨卦：錯誤訊息遮罩 -->
+  <div id="photoErrorOverlay" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.85);z-index:9999;align-items:center;justify-content:center;">
+    <div style="background:#fff;border-radius:16px;padding:32px 24px;max-width:320px;width:88%;text-align:center;">
+      <p id="photoErrorMsg" style="font-size:20px;font-weight:700;color:#dc2626;margin:0 0 24px;white-space:pre-line;line-height:1.7;"></p>
+      <button onclick="document.getElementById('photoErrorOverlay').style.display='none'" style="background:#2563EB;color:#fff;border:none;border-radius:8px;padding:12px 36px;font-size:17px;font-weight:600;cursor:pointer;">關閉</button>
+    </div>
+  </div>
+
+  <!-- 照片辨卦：首次使用提示遮罩 -->
+  <div id="photoNoticeOverlay" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.85);z-index:9999;align-items:center;justify-content:center;">
+    <div style="background:#fff;border-radius:16px;padding:36px 24px;max-width:320px;width:88%;text-align:center;">
+      <p style="font-size:22px;font-weight:700;color:#1e3a5f;margin:0 0 28px;line-height:1.65;">此功能為AI辨識象卦照片，辨識結果請再次人工確認是否正確。</p>
+      <button id="photoNoticeConfirmBtn" style="background:#2563EB;color:#fff;border:none;border-radius:8px;padding:12px 36px;font-size:17px;font-weight:600;cursor:pointer;">了解，繼續</button>
+    </div>
+  </div>
+
   <div id="mainContent" class="hidden">
     <div class="wrap">
       <div class="topbar">
         <div class="title">單卦</div>
         <div class="bar-actions">
           <button class="btn btn-secondary" id="chessMatrixBtn">線上抽卦</button>
-          <button class="ghost" id="photoScanBtn">📷 掃描</button>
+          <button class="ghost" id="photoScanBtn">照片辨卦</button>
           <button class="mode-toggle" id="elderToggleBtn">放大模式</button>
         </div>
       </div>
@@ -1154,8 +1180,8 @@
       const titleParam = encodeURIComponent(titleText);
       const modeTag = (drawMode === "隨機" ? "隨機" : "手動"); // 要顯示的文字
       const modeParam = encodeURIComponent(modeTag);
-      const modeHint = drawMode === "隨機" ? "*隨機抽卦結果僅供參考*" : drawMode === "線上" ? "*線上抽卦結果僅供參考*" : drawMode === "照片掃描" ? "*照片掃描結果僅供參考*" : "";
-      const auto = drawMode === "隨機" ? 1 : drawMode === "照片掃描" ? 3 : drawMode === "手動" ? 0 : 2;
+      const modeHint = drawMode === "隨機" ? "*隨機抽卦結果僅供參考*" : drawMode === "線上" ? "*線上抽卦結果僅供參考*" : drawMode === "掃描" ? "*照片掃描結果*" : "";
+      const auto = drawMode === "隨機" ? 1 : drawMode === "掃描" ? 3 : drawMode === "手動" ? 0 : 2;
       const isBigMode = getSwitchModeName() === "放大模式" ? 1 : 0;
 
       return {
@@ -1259,7 +1285,7 @@
       const fiveParam = encodeURIComponent(fiveStr);
       const titleText = (titleName || "象棋卜卦-單掛").trim();
       const titleParam = encodeURIComponent(titleText);
-      const modeHint = auto === "1" ? "*隨機抽卦結果僅供參考*" : auto === "2" ? "*線上抽卦結果僅供參考*" : auto === "3" ? "*照片掃描結果僅供參考*" : "";
+      const modeHint = auto === "1" ? "*隨機抽卦結果僅供參考*" : auto === "2" ? "*線上抽卦結果僅供參考*" : auto === "3" ? "*照片掃描結果*" : "";
       const modeHintParam = encodeURIComponent(modeHint);
 
       // ★ 圓圈尺寸（可調）：建議 72~90px
@@ -1596,6 +1622,11 @@
       });
     }
 
+    function showPhotoLoading(show) {
+      const el = document.getElementById('photoLoadingOverlay');
+      if (el) el.style.display = show ? 'flex' : 'none';
+    }
+
     function showPhotoScanError(aiError) {
       const hint = [
         '',
@@ -1605,19 +1636,19 @@
         '棋子有反光、字體過小',
         '棋子文字非一般慣用象棋字及字體'
       ].join('\n');
-      alert((aiError || '照片解析失敗') + hint);
+      const msg = document.getElementById('photoErrorMsg');
+      const overlay = document.getElementById('photoErrorOverlay');
+      if (msg) msg.textContent = (aiError || '照片解析失敗') + hint;
+      if (overlay) overlay.style.display = 'flex';
     }
 
     async function processChessPhoto(file) {
-      const btn = document.getElementById('photoScanBtn');
-      const origText = btn ? btn.textContent : '';
-      if (btn) { btn.disabled = true; btn.textContent = '解析中…'; }
-
+      showPhotoLoading(true);
       try {
         const base64 = await resizeImageToBase64(file, 768, 60, true);
 
         if (!CHESS_PHOTO_ANALYZE_URL) {
-          alert('照片掃描功能尚未設定，請聯繫管理員。');
+          showPhotoScanError('照片掃描功能尚未設定，請聯繫管理員。');
           return;
         }
 
@@ -1662,10 +1693,10 @@
 
         for (let i = 1; i <= 5; i++) picks[i] = newPicks[i];
         selectedPos = null;
-        setDrawMode('照片掃描');
+        setDrawMode('掃描');
 
-        // 若 AI 解析到標題文字，且目前問題名稱為空，則自動填入
-        if (d.title && cardTitleInput && !cardTitleInput.value.trim()) {
+        // 掃描到的標題直接覆蓋原有輸入
+        if (d.title && cardTitleInput) {
           cardTitleInput.value = String(d.title).slice(0, MAX_TITLE_LENGTH);
           cardTitleInput.dispatchEvent(new Event('input'));
         }
@@ -1675,11 +1706,21 @@
       } catch (err) {
         showPhotoScanError('網路錯誤，請稍後再試');
       } finally {
-        if (btn) { btn.disabled = false; btn.textContent = origText; }
+        showPhotoLoading(false);
       }
     }
 
     document.getElementById('photoScanBtn')?.addEventListener('click', () => {
+      if (!localStorage.getItem('chessPhotoNoticeSeen')) {
+        document.getElementById('photoNoticeOverlay').style.display = 'flex';
+      } else {
+        document.getElementById('photoInput')?.click();
+      }
+    });
+
+    document.getElementById('photoNoticeConfirmBtn')?.addEventListener('click', () => {
+      localStorage.setItem('chessPhotoNoticeSeen', '1');
+      document.getElementById('photoNoticeOverlay').style.display = 'none';
       document.getElementById('photoInput')?.click();
     });
 
