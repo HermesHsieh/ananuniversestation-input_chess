@@ -1736,6 +1736,15 @@
       if (file) await processChessPhoto(file);
     });
 
+    // 隱藏功能：點擊版本號文字清除 localStorage
+    document.getElementById('ver')?.addEventListener('click', () => {
+      localStorage.clear();
+      const el = document.getElementById('ver');
+      const orig = el.textContent;
+      el.textContent = '✓ localStorage 已清除';
+      setTimeout(() => { el.textContent = orig; }, 1500);
+    });
+
     let gUrlParams = null; // 儲存 URL 參數物件
 
     // ✅ 最小守門員：只允許「手機 LINE App 內」打開
